@@ -1,4 +1,9 @@
 # TPI - Informática 02 - UTN.FRBA
+## Integrantes:
+* Juanes  Francisco  (221.033-2)
+* Román   Mateo      (220.926-3)
+* Yopolo  Iván       (233.133-0)   
+
 ## Idea fuerza:   
 Desarrollar un rover terrestre inspirado en los robots de exploración espacial, capaz de desplazarse a control remoto, detectar obstáculos y transmitir información del entorno hacia una computadora en tiempo real. Además, el rover debe captar imagen en vivo (cámara), más un mapeo del entorno por curvas de nivel con colores en una interfaz gráfica. Nuestra decisión fue por el deseo de realizar un *Mars Rover de la NASA*.   
 
