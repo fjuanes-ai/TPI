@@ -1,0 +1,132 @@
+# Con el "gcc -c" se genera un archivo objeto *.o.
+# Así, no se tienen que recompilar TODOS los 
+# *.c para volver a hacer el ejecutable, por cada cambio hecho.
+#
+# Recordar PARARSE en la carpeta del proyecto, antes de entrar
+# en carpetas de SOURCE, INCLUDE, BIN y demás. O sea, donde
+# esté este mismo archivo makefile.
+#
+#
+#
+# ### ESTRUCTURA MAKEFILE ###
+# https://www.gnu.org/software/make/manual/make.html#Introduction
+#
+#
+# # REGLAS #
+#
+# target : prerequisitos
+#   receta
+#
+#   ^-- LA RECETA VA CON TAB SÍ O SÍ.
+#
+# * target:         Un archivo generado por el programa (generalmente un archivo ejecutable u objeto), excepto "clean", por ejemplo.
+# * prerequisitos:  Un archivo usado como input y requisito para ejecutar las recetas. Sirve para dependencias. Puede haber 0 requisitos.
+# * receta:         Son las acciones específicas que ejecuta make. VAN CON UN (1) TAB OBLIGATORIAMENTE.
+
+
+################################################################
+# VARIABLES #
+################################################################
+# C #
+# CC         = gcc
+
+# C++ #
+CC         = g++
+
+DEP_FLAGS  = -MD -MP
+OBJ_DIR    = ./obj
+BIN_DIR    = ./bin
+INC_DIR    = ./inc
+SRC_DIR    = ./src
+TARGET     = prog
+TARGET_DIR = $(BIN_DIR)/$(TARGET).bin
+
+SRCS       = $(wildcard $(SRC_DIR)/*.c)
+# El wildcard accede al directorio de la variable SRC_DIR y busca por cualquier
+# archivo terminante en la extensión ".c" .
+
+OBJS       = $(SRCS:.c=.o)
+# Sustituye los nombres de los archivos ".c" por ".o" para la búsqueda
+# (no los cambia en el directorio realmente).
+			  
+CFLAGS     = -Wall --pedantic-errors -I$(INC_DIR)
+LDFLAGS    = -Wall --pedantic-errors 
+
+
+################################################################
+# Target PRINCIPAL #
+################################################################
+#
+all : $(TARGET)
+
+
+################################################################
+# Linkeo #
+################################################################
+# mkdir -p crea la carpeta si no existe; sinó, ignora el comando.
+#
+$(TARGET) : $(OBJS)
+	@echo ''
+	@echo '#################################################################'
+	@echo '###   Linkeando...   ###'
+	@echo ''
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(LDFLAGS) -o $(TARGET_DIR) $(OBJS)
+	@echo ''
+	@echo '###   Terminó de linkear.   ###'
+	@echo '#################################################################'
+	@echo ''
+
+
+################################################################
+# Compilado #
+################################################################
+# Pattern Rules & Variables automáticas (Linker) #
+# Automáticamente hace el archivo objeto de TODO .c en el proyecto. 
+#
+# $<	sustituye por el nombre del primer pre-requisito.
+# $^	sustituye por el nombre de TODOS los pre-requisitos, en orden.
+# $@ 	sustituye por el nombre del INPUT (target de la regla).
+# mkdir -p crea la carpeta si no existe; sinó, ignora el comando.
+#
+$(OBJ_DIR)/%o : $(SRC_DIR)/%c
+	@echo ''
+	@echo '#################################################################'
+	@echo '###   Compilando $^...   ###'
+	@echo ''
+	@mkdir -p $(OBJ_DIR)
+	$(CC) -c $(DEP_FLAGS) $(CFLAGS) -o $@ $^
+	@echo ''
+	@echo '###   Terminó de compilar.   ###'
+	@echo '#################################################################'
+	@echo ''
+
+
+################################################################
+# Dependencias #
+################################################################
+# Para incluir dependencias *.h y sus cambios automáticamente #
+# Ligado al -MD.
+#
+-include $(OBJ_DIR)/*.d
+
+
+################################################################
+# Clean #
+################################################################
+# .PHONY evita conflictos con archivos/directorios de nombre
+# "clean".
+# Cuando se ejecuta por terminal "make clean", 
+# borra las carpetas no útiles (objetos y binarios).
+#
+.PHONY : clean
+clean : 
+	@echo ''
+	@echo '#################################################################'
+	@echo '###   Removiendo $(OBJ_DIR)...   ###'
+	@rm -r $(OBJ_DIR) 
+	@echo ''
+	@echo '###   Removiendo $(BIN_DIR)...   ###'
+	@rm -r $(BIN_DIR)
+	@echo '#################################################################'
+	@echo ''
