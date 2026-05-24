@@ -1,7 +1,15 @@
-/**/.o
-/**/.log
-/**/.txt
-/**~
+**.o
+**.log
+**.txt
+**~
+
+### MCUXpresso IDE ###
+# **.mcuxpressoide_packages_support
+# **.settings
+# **.project
+# **.cproject
+
+
 
 # Created by https://www.toptal.com/developers/gitignore/api/c
 # Edit at https://www.toptal.com/developers/gitignore?templates=c
