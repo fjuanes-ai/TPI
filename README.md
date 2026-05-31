@@ -40,7 +40,96 @@ Nos dividimos el trabajo en varias partes:
 ---
 
 ## Ramas (branches):   
-Nostros vamos a trabajar con un flujo de trabajo o "workflow" **ascendente**. Es decir, la dependencia se da **hacia arriba**. *Una rama NO PUEDE DEPENDER de las que originan de ella misma*. Ej.: si "main" es la principal, no depende de nadie; si "testing" es la primera rama que deriva de "main", entonces *testing depende de main y NO AL REVÉS*; cualquier otra rama debe de depender de "testing" y así...   
+
+> [!WARNING]
+> Nostros vamos a trabajar con un flujo de trabajo o "workflow" **ascendente**. Es decir, la dependencia se da **hacia arriba**. *Una rama NO PUEDE DEPENDER de las que originan de ella misma*. Ej.: si "main" es la principal, no depende de nadie; si "testing" es la primera rama que deriva de "main", entonces *testing depende de main y NO AL REVÉS*; cualquier otra rama debe de depender de "testing" y así...   
+
+
+```mermaid
+gitGraph
+  commit
+  branch testing
+  commit
+  branch lpc
+  checkout lpc
+  commit
+
+
+
+  checkout lpc
+  branch lpc_acelerometro
+  branch lcp_puente_h
+  branch lpc_remoto
+  branch lpc_ultrasonido
+  branch lpc_wifi
+  checkout lpc
+
+  checkout lpc_acelerometro
+  commit
+  checkout lcp_puente_h
+  commit
+  checkout lpc_remoto
+  commit
+  checkout lpc_ultrasonido
+  commit id:"ultrasonido"
+  checkout lpc_wifi
+  commit id:"wifi"
+  checkout lpc
+  merge lpc_acelerometro
+  merge lcp_puente_h
+  merge lpc_remoto
+  merge lpc_ultrasonido
+  merge lpc_wifi
+  commit id:"merge_lpc"
+
+
+
+  checkout testing
+  branch qt
+  commit
+  branch qt_cam
+  branch qt_remoto
+  branch qt_wifi
+
+  checkout qt_cam
+  commit
+  checkout qt_remoto
+  commit
+  checkout qt_wifi
+  commit
+  checkout qt
+  merge qt_cam
+  merge qt_remoto
+  merge qt_wifi
+  commit id:"merge_qt"
+  
+
+
+  checkout testing
+  branch esp
+  commit
+  branch esp_cam
+  branch esp_wifi
+
+  checkout esp_cam
+  commit
+  checkout esp_wifi
+  commit
+  checkout esp
+  merge esp_cam
+  merge esp_wifi
+  commit id:"merge_esp"
+
+
+  checkout testing
+  merge lpc
+  merge esp
+  merge qt
+
+
+  checkout main
+  merge testing
+```
 
 
 * **main**: Donde se publican lo funcional para el proyecto entero. "MERGEAR" O "PUSHEAR" **SOLAMENTE CUANDO SEA ESTRICTAMENTE NECESARIO**. Vamos a tener que resolver conflictos seguramente.
@@ -60,6 +149,8 @@ Nostros vamos a trabajar con un flujo de trabajo o "workflow" **ascendente**. Es
          * **lpc_wifi**: Funcionalidad de WiFi para el LPC; protocolo por HW externo + recibir y enviar datos por él (útil para otras funcionalidades).
 
       * **qt**: Rama a trabajar en C con Qt (PC). Trabajo sobre procesamiento de imágen del ESPCAM, protocolo WiFi, teclado como control remoto, etc.
+
+         * **qt_cam**: Funcionalidad de procesamiento de imágen (cámara) en pantalla.
 
          * **qt_remoto**: Funcionalidad de teclado como control remoto; traduce teclas a instrucciones y guarda datos en buffer. **Decidir si se guardan datos en buffer global, donde la funcionalidad de WiFi agarra, o si llama a las funciones de WiFi cada vez que presiona una tecla, como interrupción**.
 
