@@ -161,3 +161,31 @@ gitGraph
          * **esp_cam**: Funcionalidad de procesamiento de imágen. Llama a funciones de WiFi para envío de datos.
 
          * **esp_wifi**: Funcionalidad de WiFi para conectarse con la PC + envío de imágen.
+
+
+> [!NOTE]
+> Ejemplo bueno:
+```bash
+git checkout lpc
+git merge lpc_remoto --no-commit
+
+# ...
+# Se sigue desarrollando la rama de "lpc" hasta que la nueva implementación quede funcional.
+# ...
+
+git commit -m "merge: lpc_remoto -> lpc [FUNCIONAL]"
+
+# ...
+# Al probar que esté todo OK con toda la rama "lpc", se pasa la implementación a la rama "testing".
+# ...
+
+git checkout testing
+git merge lpc --no-commit
+
+# ...
+# Se sigue desarrollando la rama de "testing" hasta que la nueva implementación quede funcional.
+# ...
+
+git commit -m "merge: lpc -> testing [FUNCIONAL]"
+```
+
