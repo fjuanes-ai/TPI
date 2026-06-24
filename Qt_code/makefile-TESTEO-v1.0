@@ -45,7 +45,7 @@ SRCS       = $(wildcard $(SRC_DIR)/*.c)
 # El wildcard accede al directorio de la variable SRC_DIR y busca por cualquier
 # archivo terminante en la extensión ".c" .
 
-OBJS       = $(SRCS:.c=.o)
+OBJS       = $(SRCS:%.c=%.o)
 # Sustituye los nombres de los archivos ".c" por ".o" para la búsqueda
 # (no los cambia en el directorio realmente).
 			  
@@ -70,7 +70,7 @@ $(TARGET) : $(OBJS)
 	@echo '#################################################################'
 	@echo '###   Linkeando...   ###'
 	@echo ''
-	@mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR)
 	$(CC) $(LDFLAGS) -o $(TARGET_DIR) $(OBJS)
 	@echo ''
 	@echo '###   Terminó de linkear.   ###'
@@ -94,7 +94,7 @@ $(OBJ_DIR)/%o : $(SRC_DIR)/%c
 	@echo '#################################################################'
 	@echo '###   Compilando $^...   ###'
 	@echo ''
-	@mkdir -p $(OBJ_DIR)
+	mkdir -p $(OBJ_DIR)
 	$(CC) -c $(DEP_FLAGS) $(CFLAGS) -o $@ $^
 	@echo ''
 	@echo '###   Terminó de compilar.   ###'
@@ -124,9 +124,7 @@ clean :
 	@echo ''
 	@echo '#################################################################'
 	@echo '###   Removiendo $(OBJ_DIR)...   ###'
-	@rm -r $(OBJ_DIR) 
-	@echo ''
-	@echo '###   Removiendo $(BIN_DIR)...   ###'
-	@rm -r $(BIN_DIR)
+	rm -r $(OBJ_DIR) 
+	@echo '###   Todo limpito. :)   ###'
 	@echo '#################################################################'
 	@echo ''
