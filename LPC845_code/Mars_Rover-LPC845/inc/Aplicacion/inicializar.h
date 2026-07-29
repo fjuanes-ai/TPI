@@ -22,7 +22,6 @@
 	#include "Aplicacion/PULSADOR.h"
 	#include "Modulos/02-GPIO/GPIO.h"
 	#include "Modulos/07-InterrupcionesExternas/intext.h"
-	#include "Aplicacion/secuencia.h"
 	#include "Drivers/systick.h"
 	#include "Modulos/05-SalidasDigitales/digital_outputs.h"
 

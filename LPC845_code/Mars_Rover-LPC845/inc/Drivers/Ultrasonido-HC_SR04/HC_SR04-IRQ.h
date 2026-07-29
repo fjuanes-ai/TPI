@@ -9,14 +9,14 @@
  *********************************************/
 
 
-#ifndef         DRIVERS_ACELEROMETRO_HC_SR04_HC_SR04_IRQ_H_
-    #define     DRIVERS_ACELEROMETRO_HC_SR04_HC_SR04_IRQ_H_
+#ifndef         DRIVERS_Ultrasonido_HC_SR04_HC_SR04_IRQ_H_
+    #define     DRIVERS_Ultrasonido_HC_SR04_HC_SR04_IRQ_H_
 
 
     /* ###########################################
      * ### INCLUDES GLOBALES ###
      * ########################################### */
-	#include "Drivers/Acelerometro-HC_SR04/HC_SR04.h"
+	#include "Drivers/Ultrasonido-HC_SR04/HC_SR04.h"
 
 
     /* ###########################################
@@ -43,4 +43,4 @@
     //
 
 
-#endif          /* DRIVERS_ACELEROMETRO_HC_SR04_HC_SR04_IRQ_H_ */
+#endif          /* DRIVERS_Ultrasonido_HC_SR04_HC_SR04_IRQ_H_ */

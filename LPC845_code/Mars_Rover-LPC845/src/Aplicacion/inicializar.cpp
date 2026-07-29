@@ -49,9 +49,6 @@
 /* ###########################################
  * ### VARIABLES GLOBALES PÚBLICAS ###
  * ########################################### */
-DigitalOutputs startBut( GPIO::PORT0, 4, 0, GPIO::BAJO, false );		// TODO: revisar pinout de pulsadores.
-DigitalOutputs stopBut( GPIO::PORT0, 12, 0, GPIO::BAJO, false );
-Intext emergencyBut( 2, GPIO::PORT0, 6, Emergency_Stop );
 
 
 /*********************************************
@@ -63,10 +60,6 @@ Intext emergencyBut( 2, GPIO::PORT0, 6, Emergency_Stop );
 void Inicializar() {
 	// # Timers #
 	SysTick_Config(1);
-	SetupTimers();
-
-	// # Interrupción externa #
-	emergencyBut.set_flanco(Intext::ASCENDENTE);
 }
 
 

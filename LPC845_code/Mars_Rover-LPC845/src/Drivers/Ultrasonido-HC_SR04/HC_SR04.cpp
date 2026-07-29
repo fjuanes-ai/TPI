@@ -2,7 +2,7 @@
  *
  * ### HC_SR04.cpp ###
  * 
- * @brief           Descripción del módulo...
+ * @brief           Drivers del sensor ultrasónico HC SR04.
  * @date            Jun 21, 2026
  * @author          iyopolo
  *
@@ -12,8 +12,7 @@
 /* ###########################################
  * ### INCLUDES ###
  * ########################################### */
-
-#include "Drivers/Acelerometro-HC_SR04/HC_SR04.h"
+#include "Drivers/Ultrasonido-HC_SR04/HC_SR04.h"
 
 
 /* ###########################################
@@ -25,7 +24,7 @@
 /* ###########################################
  * ### MACROS & TIPOS DE DATOS PRIVADOS ###
  * ########################################### */
-//
+#define		MAX_TICKS	10		// En us.
 
 
 /* ###########################################
@@ -34,45 +33,37 @@
 //
 
 
-/* ###########################################
- * ### PROTOTIPOS DE FUNCIONES PRIVADAS ###
- * ########################################### */
-//void Stop_Trig_Pulse();
-
-
 /**********************************************/
 
 
-/* ###########################################
- * ### FUNCIONES PRIVADAS ###
- * ########################################### */
-
-
-
-/**********************************************/
+/*********************************************
+ * *** FUNCIONES PÚBLICAS ***
+ *********************************************/
 
 
 /* #############################################
- * Acelerometro (CONSTRUCTOR)
+ * Ultrasonido (CONSTRUCTOR)
  * #############################################
  * Establece puertos y pines del HW.
  */
-Acelerometro::Acelerometro( uint8_t portTrig, uint8_t pinTrig, uint8_t portEcho, uint8_t pinEcho ) :
-	__trigHW(portTrig, pinTrig, GPIO::SALIDA, GPIO::BAJO),
-	__echoHW(portEcho, pinEcho, GPIO::ENTRADA, GPIO::BAJO),
-	trigDuration(Timer::DEC, HC_SR04_IRQ)	// TODO: implementar HC_SR04_IRQ...
-	{
+Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig, uint8_t portEcho, uint8_t pinEcho ) :
+						__trigHW(portTrig, pinTrig, GPIO::SALIDA, GPIO::BAJO),
+						__echoHW(portEcho, pinEcho, GPIO::ENTRADA, GPIO::BAJO)	{
+
+	__ticksCount = MAX_TICKS;
+	InstalarPerifericoTemporizado(this);
 }
 
 
 /* #############################################
  * Trig_Pulse
  * #############################################
- * Manda un pulso de 10 uS a "TRIG".
+ * Manda un pulso de 10 us a "TRIG".
  */
-void Acelerometro::Trig_Pulse() {
-	trigDuration.TimerStart( 10 );	// TODO: setear en uS.
+void Ultrasonido::Trig_Pulse() {
+
 	__trigHW.SetPin();
+	__isTriggering = Y_TRIG;
 }
 
 
@@ -81,7 +72,7 @@ void Acelerometro::Trig_Pulse() {
  * #############################################
  * Checkea si recibió un pulso como eco.
  */
-void Acelerometro::Check_Echo() {
+void Ultrasonido::Check_Echo() {
 
 }
 
@@ -91,8 +82,10 @@ void Acelerometro::Check_Echo() {
  * #############################################
  * Para el pulso del TRIG.
  */
-void Acelerometro::Stop_Trig_Pulse() {
+void Ultrasonido::Stop_Trig_Pulse() {
+
 	__trigHW.ClrPin();
+	__isTriggering = N_TRIG;
 }
 
 
@@ -106,7 +99,7 @@ void Acelerometro::Stop_Trig_Pulse() {
  * 	MAX: 18  mS.
  * 	N/O: 36  mS.	(No Obstacle)
  */
-void Acelerometro::Measure_Time() {
+void Ultrasonido::Measure_Time() {
 
 }
 
@@ -120,7 +113,7 @@ void Acelerometro::Measure_Time() {
  * # FÓRMULA #
  * uS / 58 = centimeters
  */
-uint32_t Acelerometro::Time_to_Distance( uint32_t microSec ) {
+uint32_t Ultrasonido::Time_to_Distance( uint32_t microSec ) {
 	uint32_t o_DistanceCM = 0;	// Output distance in cm.
 
 	if ( microSec != 0 ) {
@@ -131,8 +124,32 @@ uint32_t Acelerometro::Time_to_Distance( uint32_t microSec ) {
 }
 
 
-/* ###########################################
- * ### FUNCIONES PÚBLICAS ###
- * ########################################### */
-//
+/* #############################################
+ * HandlerDelPeriferico
+ * #############################################
+ * Checkea cada tick
+ */
+void Ultrasonido::HandlerDelPeriferico ( void ) {
+
+	switch ( __isTriggering ) {
+
+		case Y_TRIG:
+			if ( __ticksCount )
+				__ticksCount--;
+
+
+			if ( !__ticksCount ) {
+				__ticksCount = MAX_TICKS;
+				// TODO: EJECUTAR EVENTO
+				Measure_Time();
+			}
+		break;
+
+
+		default:
+			// ...
+	}
+
+}
+
 

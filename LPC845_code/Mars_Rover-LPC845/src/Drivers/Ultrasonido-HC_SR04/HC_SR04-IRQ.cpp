@@ -13,7 +13,7 @@
  * ### INCLUDES ###
  * ########################################### */
 
-#include "Drivers/Acelerometro-HC_SR04/HC_SR04-IRQ.h"
+#include "Drivers/Ultrasonido-HC_SR04/HC_SR04-IRQ.h"
 
 
 /* ###########################################
@@ -35,7 +35,8 @@
  * ### VARIABLES GLOBALES PRIVADAS ###
  * ########################################### */
 // Instanciamos un objeto tipo Acelerómetro con pines predefinidos...
-Acelerometro sensAcelerometro( PORT_TRIG, PIN_TRIG, PORT_ECHO, PIN_ECHO );
+// TODO: revisar...
+//Ultrasonido sensUltrasonido( PORT_TRIG, PIN_TRIG, PORT_ECHO, PIN_ECHO );
 
 
 /* ###########################################
@@ -55,7 +56,10 @@ Acelerometro sensAcelerometro( PORT_TRIG, PIN_TRIG, PORT_ECHO, PIN_ECHO );
 
 /* ###########################################
  * ### FUNCIONES PÚBLICAS ###
- * ########################################### */
+ * ###########################################
+ * Cada 10 us (si está habilitado el pin de TRIG)
+ * mide tiempo en ECHO para luego ser convertido a distancia.
+ */
 void HC_SR04_IRQ ( void ) {
 
 }

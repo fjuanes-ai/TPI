@@ -9,8 +9,8 @@
  *********************************************/
 
 
-#ifndef         DRIVERS_ACELEROMETRO_HC_SR04_HC_SR04_H_
-    #define     DRIVERS_ACELEROMETRO_HC_SR04_HC_SR04_H_
+#ifndef         DRIVERS_Ultrasonido_HC_SR04_HC_SR04_H_
+    #define     DRIVERS_Ultrasonido_HC_SR04_HC_SR04_H_
 
 
     /* ###########################################
@@ -19,7 +19,7 @@
 	#include "Modulos/02-GPIO/GPIO.h"
 	#include "Modulos/06-PerifericosTemporizados/perifericotemporizado.h"
 	#include "Modulos/03-Timer/Timer.h"
-	#include "Drivers/Acelerometro-HC_SR04/HC_SR04-IRQ.h"
+	#include "Drivers/Ultrasonido-HC_SR04/HC_SR04-IRQ.h"
 
 
     /* ###########################################
@@ -44,27 +44,34 @@
      * ### DEFINICIONES DE CLASES ###
      * ########################################### */
 
-	class Acelerometro : protected PerifericoTemporizado {
+	class Ultrasonido : protected PerifericoTemporizado {
 		private:
 			GPIO 		__trigHW;	// PINES en HARDWARE de Trigger + Echo.
-			GPIO 		__echoHW;	// PINES en HARDWARE de Trigger + Echo.;
+			GPIO 		__echoHW;	// PINES en HARDWARE de Trigger + Echo.
+			uint8_t		__isTriggering;
+			uint8_t		__ticksCount;
+
+			typedef enum trigering_e {
+				N_TRIG	= 0,
+				Y_TRIG	= 1
+			} triggering_t;
+
+//		public:
+//			Timer 		measureEvent;
+//			Timer 		trigDuration;
+//			Timer 		echoDuration;
 
 
 		public:
-			Timer 		measureEvent;
-			Timer 		trigDuration;
-			Timer 		echoDuration;
-
-
-		public:
-						Acelerometro( uint8_t portTrig, uint8_t pinTrig, uint8_t portEcho, uint8_t pinEcho );
+						Ultrasonido( uint8_t portTrig, uint8_t pinTrig, uint8_t portEcho, uint8_t pinEcho );
 			void 		Trig_Pulse();
 			void 		Check_Echo();
 			void 		Stop_Trig_Pulse();
 			void 		Measure_Time();
+			void 		HandlerDelPeriferico ( void );
 			uint32_t 	Time_to_Distance( uint32_t microSec );
-//		~Acelerometro();
+//						~Ultrasonido();
 	};
 
 
-#endif          /* DRIVERS_ACELEROMETRO_HC_SR04_HC_SR04_H_ */
+#endif          /* DRIVERS_Ultrasonido_HC_SR04_HC_SR04_H_ */

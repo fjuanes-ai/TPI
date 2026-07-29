@@ -13,7 +13,6 @@
  *********************************************/
 //
 #include "Aplicacion/inicializar.h"
-#include "Aplicacion/secuencia.h"
 
 //Intext pulsadorInterExt;
 
@@ -22,8 +21,6 @@ int main( void ) {
 	Inicializar();
 
     while ( 1 ) {
-    	Timers_Check();
-    	Check_Seq();
     }
 
 
