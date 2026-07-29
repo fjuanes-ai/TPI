@@ -63,7 +63,7 @@ Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig, uint8_t portEcho, u
 void Ultrasonido::Trig_Pulse() {
 
 	__trigHW.SetPin();
-	__isTriggering = Y_TRIG;
+	__pulseSent = Y_PULSE;
 }
 
 
@@ -85,7 +85,7 @@ void Ultrasonido::Check_Echo() {
 void Ultrasonido::Stop_Trig_Pulse() {
 
 	__trigHW.ClrPin();
-	__isTriggering = N_TRIG;
+	__pulseSent = N_PULSE;
 }
 
 
@@ -131,23 +131,27 @@ uint32_t Ultrasonido::Time_to_Distance( uint32_t microSec ) {
  */
 void Ultrasonido::HandlerDelPeriferico ( void ) {
 
-	switch ( __isTriggering ) {
+	switch ( __pulseSent ) {
 
-		case Y_TRIG:
+		case Y_PULSE:
 			if ( __ticksCount )
 				__ticksCount--;
 
 
 			if ( !__ticksCount ) {
+
 				__ticksCount = MAX_TICKS;
+				__pulseSent = N_PULSE;
+
 				// TODO: EJECUTAR EVENTO
-				Measure_Time();
+//				Measure_Time();
 			}
 		break;
 
 
-		default:
-			// ...
+		case N_PULSE:
+			Measure_Time();
+		break;
 	}
 
 }

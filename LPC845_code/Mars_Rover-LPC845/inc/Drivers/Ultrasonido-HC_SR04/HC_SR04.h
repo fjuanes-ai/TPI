@@ -48,13 +48,13 @@
 		private:
 			GPIO 		__trigHW;	// PINES en HARDWARE de Trigger + Echo.
 			GPIO 		__echoHW;	// PINES en HARDWARE de Trigger + Echo.
-			uint8_t		__isTriggering;
+			uint8_t		__pulseSent;
 			uint8_t		__ticksCount;
 
-			typedef enum trigering_e {
-				N_TRIG	= 0,
-				Y_TRIG	= 1
-			} triggering_t;
+			typedef enum pulse_e {
+				N_PULSE	= 0,
+				Y_PULSE	= 1
+			} pulse_t;
 
 //		public:
 //			Timer 		measureEvent;
