@@ -27,6 +27,9 @@
 /***********************************************************************************************************************************
  *** MACROS GLOBALES
  **********************************************************************************************************************************/
+#define __LPC845_MAX_PORTS 			2
+#define __LPC845_PORT0_MAX_PINS 	32
+#define __LPC845_PORT1_MAX_PINS 	22
 
 /***********************************************************************************************************************************
  *** TIPO DE DATOS GLOBALES
@@ -1176,19 +1179,14 @@ typedef struct {
   __IO uint32_t PINENABLE1;                        /**< Pin enable register 1. Enables fixed-pin functions CAPT_X4, CAPT_X5, CAPT_X6, CAPT_X7, CAPT_X8, CAPT_X4, CAPT_YL and CAPT_YH., offset: 0x1C4 */
 } SWM_Type;
 
+// Offset entre bits del PORT0 y PORT1
+#define __PINASSIGN13_PORT_OFFSET				0x20
 
-// # Conversión pin/puerto a número para SWM  #
-typedef enum {
-	PIO0_0 = 0x00, PIO0_1, PIO0_2, PIO0_3, PIO0_4, PIO0_5, PIO0_6, PIO0_7, PIO0_8,
-	PIO0_9, PIO0_10, PIO0_11, PIO0_12, PIO0_13, PIO0_14, PIO0_15, PIO0_16,
-	PIO0_17, PIO0_18, PIO0_19, PIO0_20, PIO0_21, PIO0_22, PIO0_23, PIO0_24,
-	PIO0_25, PIO0_26, PIO0_27, PIO0_28, PIO0_29, PIO0_30, PIO0_31,
-
-	PIO1_0 = 0x20, PIO1_1, PIO1_2, PIO1_3, PIO1_4, PIO1_5, PIO1_6, PIO1_7, PIO1_8,
-	PIO1_9, PIO1_10, PIO1_11, PIO1_12, PIO1_13, PIO1_14, PIO1_15, PIO1_16,
-	PIO1_17, PIO1_18, PIO1_19, PIO1_20, PIO1_21
-} __SWM_PIO_NUMBER;
-
+// Offset del bit correspondiente de los TO_MATx
+#define __PINASSIGN13_TO_MAT_0_OFFSET			8
+#define __PINASSIGN13_TO_MAT_1_OFFSET			16
+#define __PINASSIGN13_TO_MAT_2_OFFSET			24
+#define __PINASSIGN14_TO_MAT_3_OFFSET			0
 
 /* ----------------------------------------------------------------------------
    -- SWM Register Masks

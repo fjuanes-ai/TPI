@@ -25,7 +25,6 @@
     /* ###########################################
      * ### MACROS & TIPOS DE DATOS GLOBALES ###
      * ########################################### */
-    //
 
 
     /* ###########################################
@@ -37,7 +36,8 @@
     /* ###########################################
      * ### PROTOTIPOS DE FUNCIONES PÚBLICAS ###
      * ########################################### */
-    void	CTimer_Config( uint8_t inputPeriod, __SWM_PIO_NUMBER inputPinAssign );
+//    void	CTimer_Config( uint8_t inputPeriod, __SWM_PIO_NUMBER inputPinAssign );
+    void	CTimer_Config( uint8_t inputPeriod, uint8_t inputPort_PINASSIGN, uint8_t inputPin_PINASSIGN );
 
 
     /* ###########################################

@@ -58,7 +58,7 @@
  */
 void Inicializar() {
 	// # Timers #
-	CTimer_Config( 1, PIO1_10 );	// Ver pin elegido como Match Output...
+	CTimer_Config( 1, 1, 10 );	// Ver pin elegido como Match Output...
 	SysTick_Config( 1 );
 }
 
