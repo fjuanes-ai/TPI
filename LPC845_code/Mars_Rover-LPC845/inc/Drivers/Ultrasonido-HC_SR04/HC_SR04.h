@@ -44,8 +44,8 @@
 
 	class Ultrasonido : protected PerifericoTemporizado {
 		private:
-			Intext 		__trigHW;	// PINES en HARDWARE de Trigger + Echo.
-			GPIO 		__echoHW;	// PINES en HARDWARE de Trigger + Echo.
+			GPIO 		__trigHW;	// PINES en HARDWARE de Trigger + Echo.
+			Intext 		__echoHW;
 			uint8_t		__pulseSent;
 			uint8_t		__ticksCount;
 

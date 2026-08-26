@@ -76,13 +76,18 @@
  *
  * \input:
  * 	 \--->	inputPeriod:	Período de entrada en us (x 10^(-6) s).
- * 	 \--->	inputPinAssign:	Pin elegido según como lo lee SWM.
+ * 	 \--->	inputPinAssign:	Pin elegido según como lo lee SWM por tabla (se usa una enumeración).
  *
  */
-void CTimer_Config( uint8_t inputPeriod, __SWM_PIO_NUMBER inputPinAssign ) {
-	SYSCON->SYSAHBCLKCTRL0 |= (__SWM_SYSCON_MASK | __CTIMER0_SYSCON_MASK);	// Habilitamos el CTIMER + SWM desde SYSCON.
+void CTimer_Config( uint8_t inputPeriod, __SWM_PIO_NUMBER inputTRIG_PinAssign ) {
+	// # Habilitación de los periféricos C-Timer + Switch Matrix #
+	SYSCON->SYSAHBCLKCTRL0 |= (__SWM_SYSCON_MASK | __CTIMER0_SYSCON_MASK);
+	// # Reseto del periférico "Fractional Baud Rate Generator" 0 y 1 #
+	SYSCON->PRESETCTRL1 &= (uint8_t) ~((0x01 << 3) | (0x01 << 4));	// Apaga.
+	SYSCON->PRESETCTRL1 |= (uint8_t)  ((0x01 << 3) | (0x01 << 4));	// Prende.
 
-	SWM0->PINASSIGN.PINASSIGN13 |= inputPinAssign;		// Habilitamos la opción de MATCH OUTPUT para el pin elegido.
+	// # Asignación del pin #
+	SWM0->PINASSIGN.PINASSIGN13 |= inputTRIG_PinAssign;		// Habilitamos la opción de MATCH OUTPUT para el pin de TRIG.
 
 	// Activar EXTERNAL MATCH para que decida qué hacer en cada MATCH.
 	// Configurar el pin y puerto a utilizar para el EXTERNAL MATCH.

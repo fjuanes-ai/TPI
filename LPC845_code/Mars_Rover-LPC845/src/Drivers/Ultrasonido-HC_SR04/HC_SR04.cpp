@@ -47,8 +47,8 @@
  * Establece puertos y pines del HW.
  */
 Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig, uint8_t portEcho, uint8_t pinEcho ) :
-						__trigHW( 7, portTrig, pinTrig, HC_SR04_IRQ ),
-						__echoHW(portEcho, pinEcho, GPIO::ENTRADA, GPIO::BAJO)	{
+						__trigHW( portTrig, pinTrig, GPIO::ENTRADA, GPIO::BAJO),
+						__echoHW( 7, portEcho, pinEcho, HC_SR04_IRQ ){
 
 	__ticksCount = MAX_TICKS;
 	InstalarPerifericoTemporizado(this);
