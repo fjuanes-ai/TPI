@@ -47,7 +47,7 @@
  * Establece puertos y pines del HW.
  */
 Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig, uint8_t portEcho, uint8_t pinEcho ) :
-						__trigHW(portTrig, pinTrig, GPIO::SALIDA, GPIO::BAJO),
+						__trigHW( 7, portTrig, pinTrig, HC_SR04_IRQ ),
 						__echoHW(portEcho, pinEcho, GPIO::ENTRADA, GPIO::BAJO)	{
 
 	__ticksCount = MAX_TICKS;
@@ -62,7 +62,7 @@ Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig, uint8_t portEcho, u
  */
 void Ultrasonido::Trig_Pulse() {
 
-	__trigHW.SetPin();
+//	__trigHW.SetPin();
 	__pulseSent = Y_PULSE;
 }
 
@@ -84,7 +84,7 @@ void Ultrasonido::Check_Echo() {
  */
 void Ultrasonido::Stop_Trig_Pulse() {
 
-	__trigHW.ClrPin();
+//	__trigHW.ClrPin();
 	__pulseSent = N_PULSE;
 }
 

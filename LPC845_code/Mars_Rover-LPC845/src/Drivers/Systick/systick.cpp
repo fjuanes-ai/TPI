@@ -10,7 +10,7 @@
 /***********************************************************************************************************************************
  *** INCLUDES
  **********************************************************************************************************************************/
-#include "Drivers/systick.h"
+#include "Drivers/Systick/systick.h"
 
 
 /***********************************************************************************************************************************
@@ -71,11 +71,7 @@ uint32_t SysTick_Config( uint32_t ms ) {
 		return 1 ;
 
 	SYST_RVR  =  ticks - 1UL;
-//	SYST_RVR  =  0UL;
 	SYST_CVR  =  0UL;			// Metemos el valor actual en 0 para que entre instantáneamente al IRQ.
-//	SYS_CSR_ENABLE  =  1UL;
-//	SYS_CSR_CLKSOURCE  =  1UL;
-//	SYS_CSR_TICKINT  =  1UL;
 	SYS_CSR = 0x7UL;			// Metemos una máscara para habilitar "ENABLE", "CLKSOURCE" y "TICKINT" al mismo tiempo.
 								// Manualmente NO funciona (por alguna razón...).
 	//o…. SYS_CSR  = 7;

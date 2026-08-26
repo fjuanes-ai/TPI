@@ -955,6 +955,10 @@ typedef enum IRQn {
 /*!
  * @}
  */ /* end of group Interrupt_vector_numbers */
+
+/* ----------------------------------------------------------------------------
+   -- GPIO --
+   ---------------------------------------------------------------------------- */
 typedef struct {
   __IO uint8_t B[2][32];
        uint8_t RESERVED_0[4032];
@@ -983,17 +987,10 @@ typedef struct {
 
 #define	 GPIO_REG  		( (GPIO_Type *) 0xA0000000UL )
 
-/**
-  \brief  Structure type to access the System Timer (SysTick).
- */
-//typedef struct
-//{
-//  __IO uint32_t CTRL;     /*!< Offset: 0x000 (R/W)  SysTick Control and Status Register */
-//  __IO uint32_t RELOAD;   /*!< Offset: 0x004 (R/W)  SysTick Reload Value Register */
-//  __IO uint32_t CURR;     /*!< Offset: 0x008 (R/W)  SysTick Current Value Register */
-//  __I  uint32_t CALIB;    /*!< Offset: 0x00C (R/ )  SysTick Calibration Register */
-//} SysTick_t;
 
+/* ----------------------------------------------------------------------------
+   -- Systick --
+   ---------------------------------------------------------------------------- */
 
 typedef struct {
 	union {
@@ -1018,7 +1015,7 @@ typedef struct {
 #define SysTick    ( (SysTick_t *) 0xE000E010UL)   /*!< SysTick configuration struct */
 //#define SysTick    ( (SysTick_t *) 0xE000E010UL)   /*!< SysTick configuration struct */
 
-#define FREQ_CLOCK	(30000000UL)
+#define FREQ_CLOCK	(30000000UL)	// 30 MHz = 30 x 10^6 Hz
 
 
 #define   SYS_CSR		SysTick-> W_syst_csr
@@ -1029,6 +1026,35 @@ typedef struct {
 #define SYST_RVR		SysTick->_syst_rvr
 #define SYST_CVR 		SysTick->_syst_cvr
 #define SYST_CALIB	SysTick->_syst_calib
+
+
+/* ----------------------------------------------------------------------------
+   -- C-Timer --
+   ---------------------------------------------------------------------------- */
+#define	__CTimer_n_MR	4
+#define	__CTimer_n_CR	4
+#define	__CTimer_n_MSR	4
+
+typedef struct {
+	__IO uint32_t	IR;
+	__IO uint32_t 	TCR;
+	__IO uint32_t 	TC;
+	__IO uint32_t 	PR;
+	__IO uint32_t 	PC;
+	__IO uint32_t 	MCR;
+	__IO uint32_t 	MR[__CTimer_n_MR];
+	__IO uint32_t 	CCR;
+	__IO uint32_t 	CR[__CTimer_n_CR];
+	__IO uint32_t 	EMR;
+	__IO uint32_t 	CTCR;
+	__IO uint32_t 	PWMC;
+	__IO uint32_t 	MSR[__CTimer_n_MSR];
+} CTimer_t;
+
+/* CTIMER - Base Address in Memory */
+#define		CTIMER_BASE		(0x4003 8000)
+/* CTIMER - Pointer of register in Memory */
+#define		CTIMER			((volatile CTimer_t *) CTIMER_BASE)
 
 
 /** IOCON - Register Layout Typedef */
@@ -1149,6 +1175,20 @@ typedef struct {
   __IO uint32_t PINENABLE0;                        /**< Pin enable register 0. Enables fixed-pin functions ACMP_I0, ACMP_I1, SWCLK, SWDIO, XTALIN, XTALOUT, RESET, CLKIN, VDDCMP and so on., offset: 0x1C0 */
   __IO uint32_t PINENABLE1;                        /**< Pin enable register 1. Enables fixed-pin functions CAPT_X4, CAPT_X5, CAPT_X6, CAPT_X7, CAPT_X8, CAPT_X4, CAPT_YL and CAPT_YH., offset: 0x1C4 */
 } SWM_Type;
+
+
+// # Conversión pin/puerto a número para SWM  #
+typedef enum {
+	PIO0_0 = 0x00, PIO0_1, PIO0_2, PIO0_3, PIO0_4, PIO0_5, PIO0_6, PIO0_7, PIO0_8,
+	PIO0_9, PIO0_10, PIO0_11, PIO0_12, PIO0_13, PIO0_14, PIO0_15, PIO0_16,
+	PIO0_17, PIO0_18, PIO0_19, PIO0_20, PIO0_21, PIO0_22, PIO0_23, PIO0_24,
+	PIO0_25, PIO0_26, PIO0_27, PIO0_28, PIO0_29, PIO0_30, PIO0_31,
+
+	PIO1_0 = 0x20, PIO1_1, PIO1_2, PIO1_3, PIO1_4, PIO1_5, PIO1_6, PIO1_7, PIO1_8,
+	PIO1_9, PIO1_10, PIO1_11, PIO1_12, PIO1_13, PIO1_14, PIO1_15, PIO1_16,
+	PIO1_17, PIO1_18, PIO1_19, PIO1_20, PIO1_21
+} __SWM_PIO_NUMBER;
+
 
 /* ----------------------------------------------------------------------------
    -- SWM Register Masks

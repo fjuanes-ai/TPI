@@ -41,15 +41,14 @@
 
 
 /* ###########################################
- * ### FUNCIONES PÚBLICAS ###
+ * ### VARIABLES GLOBALES PÚBLICAS ###
  * ########################################### */
 //
 
 
 /* ###########################################
- * ### VARIABLES GLOBALES PÚBLICAS ###
+ * ### FUNCIONES PÚBLICAS ###
  * ########################################### */
-
 
 /*********************************************
  * Inicializar
@@ -59,7 +58,8 @@
  */
 void Inicializar() {
 	// # Timers #
-	SysTick_Config(1);
+	CTimer_Config( 1, PIO1_10 );	// Ver pin elegido como Match Output...
+	SysTick_Config( 1 );
 }
 
 

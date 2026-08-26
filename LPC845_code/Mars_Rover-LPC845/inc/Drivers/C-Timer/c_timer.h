@@ -1,28 +1,25 @@
 /*********************************************
  *
- * ### inicializar.h ###
+ * ### c_timer.h ###
  * 
  * @brief           Descripción del módulo...
- * @date            Jun 10, 2026
+ * @date            Aug 25, 2026
  * @author          iyopolo
  *
  *********************************************/
 
 
-#ifndef         APLICACION_INICIALIZAR_H_
-    #define     APLICACION_INICIALIZAR_H_
+#ifndef         DRIVERS_C_TIMER_C_TIMER_H_
+    #define     DRIVERS_C_TIMER_C_TIMER_H_
 
+//	#include "Drivers/C-Timer/c_timer.h"
 
     /* ###########################################
      * ### INCLUDES GLOBALES ###
      * ########################################### */
-	#include "Drivers/Systick/systick.h"
 	#include "Drivers/LPC845.h"
 	#include "Drivers/tipos.h"
-	#include "Drivers/C-Timer/c_timer.h"
 	#include "Modulos/includeModulos.h"
-	#include "Aplicacion/LED.h"
-	#include "Aplicacion/PULSADOR.h"
 
 
     /* ###########################################
@@ -34,12 +31,19 @@
     /* ###########################################
      * ### VARIABLES GLOBALES PÚBLICAS ###
      * ########################################### */
+    //
 
 
     /* ###########################################
      * ### PROTOTIPOS DE FUNCIONES PÚBLICAS ###
      * ########################################### */
-    void Inicializar();
+    void	CTimer_Config( uint8_t inputPeriod, __SWM_PIO_NUMBER inputPinAssign );
 
 
-#endif          /* APLICACION_INICIALIZAR_H_ */
+    /* ###########################################
+     * ### DEFINICIONES DE CLASES ###
+     * ########################################### */
+    //
+
+
+#endif          /* DRIVERS_C_TIMER_C_TIMER_H_ */

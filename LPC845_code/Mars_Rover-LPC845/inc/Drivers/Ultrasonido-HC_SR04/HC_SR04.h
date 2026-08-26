@@ -16,9 +16,7 @@
     /* ###########################################
      * ### INCLUDES GLOBALES ###
      * ########################################### */
-	#include "Modulos/02-GPIO/GPIO.h"
-	#include "Modulos/06-PerifericosTemporizados/perifericotemporizado.h"
-	#include "Modulos/03-Timer/Timer.h"
+	#include "Modulos/includeModulos.h"
 	#include "Drivers/Ultrasonido-HC_SR04/HC_SR04-IRQ.h"
 
 
@@ -46,7 +44,7 @@
 
 	class Ultrasonido : protected PerifericoTemporizado {
 		private:
-			GPIO 		__trigHW;	// PINES en HARDWARE de Trigger + Echo.
+			Intext 		__trigHW;	// PINES en HARDWARE de Trigger + Echo.
 			GPIO 		__echoHW;	// PINES en HARDWARE de Trigger + Echo.
 			uint8_t		__pulseSent;
 			uint8_t		__ticksCount;

@@ -63,7 +63,7 @@ class Intext
 		enum flanco_t{ASCENDENTE=0, DESCENDENTE=1, AMBOS_FLANCOS=2};
 		enum nivel_t{BAJO=0, ALTO=1};
 
-		Intext(uint8_t, uint8_t , uint8_t, void (*) (void));
+		Intext(uint8_t pint, uint8_t port, uint8_t pin, void (*callback) (void));
 		int set_flanco(flanco_t);
 		int set_nivel(nivel_t);
 		void limpiar_irq(void);
