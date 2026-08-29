@@ -58,7 +58,8 @@
  */
 void Inicializar() {
 	// # Timers #
-	CTimer_Config( 1, 1, 10 );	// Ver pin elegido como Match Output...
+	// TODO: hacer una manera más modular para meter la información de TRIG y ECHO...
+//	CTimer_Config( inputPort_PINASSIGN, inputPin_PINASSIGN, outputPort_PINASSIGN, outputPin_PINASSIGN );
 	SysTick_Config( 1 );
 }
 

@@ -13,6 +13,7 @@
  * ### INCLUDES ###
  * ########################################### */
 #include "Drivers/Ultrasonido-HC_SR04/HC_SR04.h"
+#include "Drivers/Ultrasonido-HC_SR04/HC_SR04-IRQ.h"
 
 
 /* ###########################################
@@ -47,7 +48,7 @@
  * Establece puertos y pines del HW.
  */
 Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig, uint8_t portEcho, uint8_t pinEcho ) :
-						__trigHW( portTrig, pinTrig, GPIO::ENTRADA, GPIO::BAJO),
+						__trigHW( portTrig, pinTrig, GPIO::ENTRADA, GPIO::BAJO ),
 						__echoHW( 7, portEcho, pinEcho, HC_SR04_IRQ ){
 
 	__ticksCount = MAX_TICKS;
@@ -111,16 +112,16 @@ void Ultrasonido::Measure_Time() {
  * centímetros (cm).
  *
  * # FÓRMULA #
- * uS / 58 = centimeters
+ * uS / 58 = centimetros
  */
-uint32_t Ultrasonido::Time_to_Distance( uint32_t microSec ) {
-	uint32_t o_DistanceCM = 0;	// Output distance in cm.
+uint32_t Ultrasonido::Time_to_Distance( uint32_t inputTime_uS ) {
+	uint32_t outputDistance_CM = 0;
 
-	if ( microSec != 0 ) {
-		o_DistanceCM = microSec / 58;
+	if ( inputTime_uS != 0 ) {
+		outputDistance_CM = inputTime_uS / 58;
 	}
 
-	return o_DistanceCM;
+	return outputDistance_CM;
 }
 
 
