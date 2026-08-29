@@ -1055,9 +1055,9 @@ typedef struct {
 } CTimer_t;
 
 /* CTIMER - Base Address in Memory */
-#define		CTIMER_BASE		(0x4003 8000)
+#define		CTIMER_BASE		(0x40038000u)
 /* CTIMER - Pointer of register in Memory */
-#define		CTIMER			((volatile CTimer_t *) CTIMER_BASE)
+#define		CTIMER			((CTimer_t *) CTIMER_BASE)
 
 
 /** IOCON - Register Layout Typedef */

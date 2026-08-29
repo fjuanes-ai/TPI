@@ -100,6 +100,7 @@ void CTimer_Config( uint8_t inputPeriod, uint8_t inputPort_PINASSIGN, uint8_t in
 									<< __PINASSIGN13_TO_MAT_0_OFFSET);
 //	SWM0->PINASSIGN.PINASSIGN13 |= inputTRIG_PinAssign;		// Habilitamos la opción de MATCH OUTPUT para el pin de TRIG.
 
+	CTIMER->CTCR &= ~(0x01);		// Timer Mode.
 	// Activar EXTERNAL MATCH para que decida qué hacer en cada MATCH.
 	// Configurar el pin y puerto a utilizar para el EXTERNAL MATCH.
 }
