@@ -27,6 +27,10 @@
  * ########################################### */
 #define	__SWM_SYSCON_MASK		( (uint16_t) (0x01 << 7)  )
 #define	__CTIMER0_SYSCON_MASK	( (uint16_t) (0x01 << 25) )
+#define	__CAP_CHANNEL			0
+#define	__MAT_CHANNEL			0
+#define	__CTIMER0_CCR_CHANNELS_OFFSET	3
+#define	__CTIMER0_MCR_CHANNELS_OFFSET	3
 
 // # Conversión pin/puerto a número para SWM  #
 typedef enum __SWM_Port_Offset_e {
@@ -143,9 +147,10 @@ void CTimer_Config( uint8_t inputPort_MAT,
 	CTIMER->TCR  &=	~(0x01 << 1);	// Los volvemos a habilitar.
 
 
-	CTimer_Config_MatchOutput(  inputPort_MAT, inputPin_MAT );
-
-	CTimer_Config_CaptureInput( inputPort_CAP, inputPin_CAP );
+	CTIMER->MCR   =   0x00;			// Limpieza del MCR y del CCR.
+	CTIMER->CCR   =   0x00;
+	CTimer_Config_MatchOutput(  __MAT_CHANNEL, STOP_MCR, 0, 10 );
+	CTimer_Config_CaptureInput( __CAP_CHANNEL, FALLING_CCR, 1 );
 }
 
 
@@ -153,6 +158,8 @@ void CTimer_Config( uint8_t inputPort_MAT,
  * SwitchMatrix_Config_MAT_CAP
  *********************************************
  * \brief: 	Cambia de funcionalidad los pines seleccionados según SW.
+ * 			Se configura en los canales 0; es decir:
+ * 			MAT0, CAP0.
  *
  * \input:
  * 	 \--->	inputPortMAT:	Puerto de entrada para configurar como Match Output.
@@ -202,11 +209,11 @@ void SwitchMatrix_Config_MAT_CAP( uint8_t inputPort_MAT,
 
 	// # Habilitación de los pines MATCH #
 	SWM0->PINASSIGN.PINASSIGN13 |= ((inputPort_MAT * __PINASSIGN_PORT_OFFSET + inputPin_MAT)
-									<< __PINASSIGN13_TO_MAT_0_OFFSET);
+									<< __PINASSIGN13_TO_MAT_0_OFFSET);	// MAT0
 
 	// # Habilitación de los pines CAP #
 	SWM0->PINASSIGN.PINASSIGN14 |= ((inputPort_CAP * __PINASSIGN_PORT_OFFSET + inputPin_CAP)
-									<< __PINASSIGN14_TO_CAP_0_OFFSET);
+									<< __PINASSIGN14_TO_CAP_0_OFFSET);	// CAP0
 
 
 	SYSCON->SYSAHBCLKCTRL0 &= ~(__SWM_SYSCON_MASK );	// Deshabilitación del SW.
@@ -220,14 +227,28 @@ void SwitchMatrix_Config_MAT_CAP( uint8_t inputPort_MAT,
  * 			Esto sirve para que un pin cambie de estado cuando TC = MATx.
  *
  * \input:
- * 	 \--->	inputPort_MAT:		Port elegido.
- * 	 \--->	inputPin_MAT:		Pin elegido.
+ * 	 \--->	inputMATchannel:	Canal del MAT (0 ~ 3).
+ * 	 \--->	inputMCRmode:		Modo a configurar entre INTERRUPT, RESET, STOP.
+ * 	 \--->	bitValueMCR:		Valor en binario a establecer {0; 1}.
  *
  */
-void CTimer_Config_MatchOutput( uint8_t inputPort_MAT,
-						   	    uint8_t inputPin_MAT ) {
+void CTimer_Config_MatchOutput( uint8_t inputMATchannel,
+								MCRvalues_t inputMCRmode,
+								uint8_t	bitValueMCR,
+								uint32_t microSecondsMATCH ) {
+	// # Protección contra límites físicos (HW) #
+	if ( (inputMATchannel > 3) || (bitValueMCR > 1) ) {
+		return;
+	}
 
-//	 A
+	// # Limpieza del registro #
+//	CTIMER->MCR  =   0x00;
+	CTIMER->MCR &= ~(0x01 << (__CTIMER0_MCR_CHANNELS_OFFSET * inputMATchannel + inputMCRmode));
+//	CTIMER->MCR |=  (0x01 << 1);
+	CTIMER->MCR |=  ((0x01 * bitValueMCR) << (__CTIMER0_MCR_CHANNELS_OFFSET * inputMATchannel + inputMCRmode));
+
+	// # Asignación del tiempo deseado para el MATCH en microsegundos (x 10^(-6)) #
+	CTIMER->MR[inputMATchannel] = microSecondsMATCH;
 }
 
 
@@ -239,11 +260,22 @@ void CTimer_Config_MatchOutput( uint8_t inputPort_MAT,
  * 			realize la acción configurada.
  *
  * \input:
- * 	 \--->	inputPort_CAP:		Port elegido.
- * 	 \--->	inputPin_CAP:		Pin elegido.
+ * 	 \--->	inputCAPchannel:	Canal del CAP (0 ~ 3).
+ * 	 \--->	inputCCRmode:		Modo a configurar entre RISING, FALLING, INTERRUPT.
+ * 	 \--->	bitValueCCR:		Valor en binario a establecer {0; 1}.
  *
  */
-void CTimer_Config_CaptureInput( uint8_t inputPort_CAP,
-			   	   	   	   		 uint8_t inputPin_CAP ) {
+void CTimer_Config_CaptureInput( uint8_t inputCAPchannel,
+								 CCRvalues_t inputCCRmode,
+								 uint8_t bitValueCCR ) {
+	// # Protección contra límites físicos (HW) #
+	if ( (inputCAPchannel > 3) || (bitValueCCR > 1) ) {
+		return;
+	}
 
+	// # Limpieza del registro #
+//	CTIMER->CCR  =   0x00;
+	CTIMER->CCR &= ~(0x01 << (__CTIMER0_CCR_CHANNELS_OFFSET * inputCAPchannel + inputCCRmode));
+//	CTIMER->CCR |=  (0x01 << 1);
+	CTIMER->CCR |=  ((0x01 * bitValueCCR) << (__CTIMER0_CCR_CHANNELS_OFFSET * inputCAPchannel + inputCCRmode));
 }
