@@ -36,11 +36,21 @@
     /* ###########################################
      * ### PROTOTIPOS DE FUNCIONES PÚBLICAS ###
      * ########################################### */
-//    void	CTimer_Config( uint8_t inputPeriod, __SWM_PIO_NUMBER inputPinAssign );
-    void	CTimer_Config(  uint8_t inputPort_PINASSIGN,
-							uint8_t inputPin_PINASSIGN,
-							uint8_t outputPort_PINASSIGN,
-							uint8_t outputPin_PINASSIGN );
+    void	CTimer_Config( uint8_t inputPort_MAT,
+						   uint8_t inputPin_MAT,
+						   uint8_t inputPort_CAP,
+						   uint8_t inputPin_CAP );
+
+    void 	CTimer_Config_MatchOutput( uint8_t inputPort_MAT,
+			   	   	   	   	   	  	   uint8_t inputPin_MAT );
+
+    void 	CTimer_Config_CaptureInput( uint8_t inputPort_CAP,
+			   	   	   	   	   	   	    uint8_t inputPin_CAP );
+
+    void 	SwitchMatrix_Config_MAT_CAP( uint8_t inputPort_MAT,
+									     uint8_t inputPin_MAT,
+										 uint8_t inputPort_CAP,
+										 uint8_t inputPin_CAP );
 
 
     /* ###########################################

@@ -1047,7 +1047,7 @@ typedef struct {
 	__IO uint32_t 	MCR;					// Match Control Register.
 	__IO uint32_t 	MR[__CTimer_n_MR];		// Match Registers.
 	__IO uint32_t 	CCR;					// Capture Control Register.
-	__IO uint32_t 	CR[__CTimer_n_CR];		// Capture Register.
+	__I  uint32_t 	CR[__CTimer_n_CR];		// Capture Register.
 	__IO uint32_t 	EMR;					// External Match Register.
 	__IO uint32_t 	CTCR;					// Count Control Register.
 	__IO uint32_t 	PWMC;					// PWM  Control Register.
@@ -1180,13 +1180,17 @@ typedef struct {
 } SWM_Type;
 
 // Offset entre bits del PORT0 y PORT1
-#define __PINASSIGN13_PORT_OFFSET				0x20
+#define __PINASSIGN_PORT_OFFSET					0x20
 
 // Offset del bit correspondiente de los TO_MATx
 #define __PINASSIGN13_TO_MAT_0_OFFSET			8
 #define __PINASSIGN13_TO_MAT_1_OFFSET			16
 #define __PINASSIGN13_TO_MAT_2_OFFSET			24
 #define __PINASSIGN14_TO_MAT_3_OFFSET			0
+
+#define __PINASSIGN14_TO_CAP_0_OFFSET			8
+#define __PINASSIGN14_TO_CAP_1_OFFSET			16
+#define __PINASSIGN14_TO_CAP_2_OFFSET			24
 
 /* ----------------------------------------------------------------------------
    -- SWM Register Masks
