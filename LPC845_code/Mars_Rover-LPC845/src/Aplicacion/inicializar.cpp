@@ -59,7 +59,7 @@
 void Inicializar() {
 	// # Timers #
 	// TODO: hacer una manera más modular para meter la información de TRIG y ECHO...
-//	CTimer_Config( puertoTRIG, pinTRIG, puertoECHO, pinECHO );
+//	CTimer_Config( puertoTRIG, pinTRIG, puertoECHO, pinECHO, PRESCALER_DEFAULT );
 	SysTick_Config( 1 );
 }
 

@@ -48,113 +48,85 @@
  * Establece puertos y pines del HW.
  */
 Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig, uint8_t portEcho, uint8_t pinEcho ) :
-						__trigHW( portTrig, pinTrig, GPIO::ENTRADA, GPIO::BAJO ),
-						__echoHW( 7, portEcho, pinEcho, HC_SR04_IRQ ){
+				CTimer( portTrig, pinTrig, portEcho, pinEcho, PRESCALER_DEFAULT_FREQ ) {
 
-	__ticksCount = MAX_TICKS;
-	InstalarPerifericoTemporizado(this);
+	__ticksCount_microSeconds = MAX_TICKS;
 }
 
 
-/* #############################################
- * Trig_Pulse
- * #############################################
- * Manda un pulso de 10 us a "TRIG".
- */
-void Ultrasonido::Trig_Pulse() {
-
-//	__trigHW.SetPin();
-	__pulseSent = Y_PULSE;
-}
-
-
-/* #############################################
- * Check_Echo
- * #############################################
- * Checkea si recibió un pulso como eco.
- */
-void Ultrasonido::Check_Echo() {
-
-}
-
-
-/* #############################################
- * Stop_Trig_Pulse
- * #############################################
- * Para el pulso del TRIG.
- */
-void Ultrasonido::Stop_Trig_Pulse() {
-
-//	__trigHW.ClrPin();
-	__pulseSent = N_PULSE;
-}
+///* #############################################
+// * Trig_Pulse
+// * #############################################
+// * Manda un pulso de 10 us a "TRIG".
+// */
+//void Ultrasonido::Trig_Pulse() {
+//
+////	__trigHW.SetPin();
+//	__pulseSent = Y_PULSE;
+//}
+//
+//
+///* #############################################
+// * Check_Echo
+// * #############################################
+// * Checkea si recibió un pulso como eco.
+// */
+//void Ultrasonido::Check_Echo() {
+//
+//}
+//
+//
+///* #############################################
+// * Stop_Trig_Pulse
+// * #############################################
+// * Para el pulso del TRIG.
+// */
+//void Ultrasonido::Stop_Trig_Pulse() {
+//
+////	__trigHW.ClrPin();
+//	__pulseSent = N_PULSE;
+//}
 
 
 /* #############################################
  * Measure_Time
  * #############################################
- * Mide el tiempo de pulso recibido en "ECHO".
+ * \brief:			Mide el tiempo de pulso recibido en "ECHO".
  *
  * # Valores típicos #
  * 	MIN: 100 uS.
  * 	MAX: 18  mS.
  * 	N/O: 36  mS.	(No Obstacle)
  */
-void Ultrasonido::Measure_Time() {
+uint32_t Ultrasonido::Measure_Time() {
+	// # TODO: Implementar método en CTimer para obtención de valores de CAP #
+	uint32_t outputMeasuredTime = this->CTimer::GetCAPxValue();
 
+	return outputMeasuredTime;
 }
 
 
 /* #############################################
- * Time_to_Distance
+ * Time_microSec_to_Distance_milimeters
  * #############################################
- * Convierte la duración del pulso de "ECHO" a
- * centímetros (cm).
+ * \brief:			Convierte la duración del pulso de "ECHO" a
+ * 					centímetros (mm).
  *
  * # FÓRMULA #
- * uS / 58 = centimetros
+ * uS * 10 / 58 = mm
  */
-uint32_t Ultrasonido::Time_to_Distance( uint32_t inputTime_uS ) {
-	uint32_t outputDistance_CM = 0;
+//uint32_t Ultrasonido::Time_microSec_to_Distance_milimeters( uint32_t inputTime_microSec ) {
+void Ultrasonido::Time_microSec_to_Distance_milimeters() {
+//	uint32_t outputDistance_milimeters = 0;
 
-	if ( inputTime_uS != 0 ) {
-		outputDistance_CM = inputTime_uS / 58;
+	uint32_t inputTime_microSec = this->Measure_Time();
+
+	if ( inputTime_microSec != 0 ) {
+//		outputDistance_milimeters = inputTime_microSec * 10 / 58.0;
+		__distance_milimeters = inputTime_microSec * 10 / 58.0;
 	}
 
-	return outputDistance_CM;
-}
-
-
-/* #############################################
- * HandlerDelPeriferico
- * #############################################
- * Checkea cada tick
- */
-void Ultrasonido::HandlerDelPeriferico ( void ) {
-
-	switch ( __pulseSent ) {
-
-		case Y_PULSE:
-			if ( __ticksCount )
-				__ticksCount--;
-
-
-			if ( !__ticksCount ) {
-
-				__ticksCount = MAX_TICKS;
-				__pulseSent = N_PULSE;
-
-				// TODO: EJECUTAR EVENTO
-//				Measure_Time();
-			}
-		break;
-
-
-		case N_PULSE:
-			Measure_Time();
-		break;
-	}
-
+//	return outputDistance_milimeters;
 }
 
 
