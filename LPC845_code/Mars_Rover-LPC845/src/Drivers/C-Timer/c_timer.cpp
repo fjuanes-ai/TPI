@@ -43,7 +43,7 @@ typedef enum __SWM_Port_Offset_e {
  * ########################################### */
 
 // # Inicialización de objetos estáticos (canales MAT/CAP) #
-int8_t CTimer::__MATchannelsAvailable = MAT_CHANNEL_LIMIT;
+int8_t CTimer::__MATchannelsAvailable = MAT_CHANNEL_LIMIT;	 // Valor neg (< 0) = sin espacio para canales MAT.
 int8_t CTimer::__CAPchannelsAvailable = CAP_CHANNEL_LIMIT;
 
 
@@ -178,7 +178,9 @@ CTimer::CTimer( uint8_t 	inputPort_MAT,
 				__MATperiod(0),
 				__CAPport(inputPort_CAP),
 				__CAPpin(inputPin_CAP),
-				__prescalerFrequency(prescalerFrequency) {
+				__prescalerFrequency(prescalerFrequency),
+				__MR{0, 0, 0, 0},
+				__CR{0, 0, 0, 0} {
 	// # Habilitación del periférico C-Timer #
 	SYSCON->SYSAHBCLKCTRL0 |= (__CTIMER0_SYSCON_MASK);
 
@@ -195,8 +197,8 @@ CTimer::CTimer( uint8_t 	inputPort_MAT,
 		return;
 	}
 
-	__MATchannel = MAT_CHANNEL_LIMIT - __MATchannelsAvailable;
-	__CAPchannel = CAP_CHANNEL_LIMIT - __CAPchannelsAvailable;
+	__MATchannel = MAT_CHANNEL_LIMIT - __MATchannelsAvailable - 1;
+	__CAPchannel = CAP_CHANNEL_LIMIT - __CAPchannelsAvailable - 1;
 
 	this->SwitchMatrix_Config_MAT_CAP();
 
@@ -309,11 +311,10 @@ void CTimer::SetMATxValue( uint32_t	inputMATvalue ) {
 
 
 
-
-
 // ====================================================================================
 // >> EN DESUSO: CTimer programado a lo C (sin clases).
 // ====================================================================================
+
 
 
 //

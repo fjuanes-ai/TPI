@@ -41,8 +41,8 @@
 
 	#define	PRESCALER_DEFAULT_FREQ	1000000		// MHz = 10^6 Hz
 	#define	MAT_PERIOD_DEFAULT		10			// us  = 10^(-6) s
-	#define	MAT_CHANNEL_LIMIT		3
-	#define	CAP_CHANNEL_LIMIT		3
+	#define	MAT_CHANNEL_LIMIT		4
+	#define	CAP_CHANNEL_LIMIT		4
 
 
     /* ###########################################
@@ -81,28 +81,28 @@
     class CTimer {
     	// # Variables #
     	private:
-    		uint8_t			__MATport;
-    		uint8_t			__MATpin;
-    		uint8_t 		__MATchannel;
-    		static int8_t	__MATchannelsAvailable;
-    		uint32_t		__MATperiod;
+    		uint8_t				__MATport;
+    		uint8_t				__MATpin;
+    		uint8_t 			__MATchannel;
+    		static int8_t		__MATchannelsAvailable;		// Valor neg (< 0) = sin espacio para canales MAT.
+    		uint32_t			__MATperiod;
 
-    		uint8_t			__CAPport;
-    		uint8_t			__CAPpin;
-    		uint8_t 		__CAPchannel;
-    		static int8_t	__CAPchannelsAvailable;
+    		uint8_t				__CAPport;
+    		uint8_t				__CAPpin;
+    		uint8_t 			__CAPchannel;
+    		static int8_t		__CAPchannelsAvailable;
 
-    		uint32_t		__prescalerFrequency;
-
+    		uint32_t			__prescalerFrequency;
 
     	protected:
     		// Valores en los registros MATx y CAPx.
-    		uint32_t		__MR[MAT_CHANNEL_LIMIT];
-    		uint32_t		__CR[CAP_CHANNEL_LIMIT];
+    		__IO uint32_t		__MR[MAT_CHANNEL_LIMIT];
+    		__I  uint32_t		__CR[CAP_CHANNEL_LIMIT];
+
 
 		// # Métodos #
     	private:
-    		void 	SwitchMatrix_Config_MAT_CAP();
+    		void 		SwitchMatrix_Config_MAT_CAP();
 
     	public:
 						CTimer( uint8_t 	inputPort_MAT,
