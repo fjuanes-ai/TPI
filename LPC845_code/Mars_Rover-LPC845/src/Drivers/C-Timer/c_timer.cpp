@@ -178,7 +178,7 @@ CTimer::CTimer( uint8_t 	inputPort_MAT,
 				__MATperiod(0),
 				__CAPport(inputPort_CAP),
 				__CAPpin(inputPin_CAP),
-				__prescalerFrequency(prescalerFrequency) {
+				__ticksFrequency(prescalerFrequency) {
 	// # Habilitación del periférico C-Timer #
 	SYSCON->SYSAHBCLKCTRL0 |= (__CTIMER0_SYSCON_MASK);
 
@@ -201,8 +201,10 @@ CTimer::CTimer( uint8_t 	inputPort_MAT,
 	this->SwitchMatrix_Config_MAT_CAP();
 
 	// ## Prescale register (PR) ##
-	CTIMER->PR 	  =   FREQ_CLOCK / __prescalerFrequency - 1;	// Cada 30 ciclos del APB (FRO = 30 M Hz), se incrementa en 1 el TC.
-											// Con este método, 1 tick = 1 us = 1 x 10^(-6)s.
+	CTIMER->PR 	  =   FREQ_CLOCK / __ticksFrequency - 1;
+							// Cada 30 ciclos del APB (FRO = 30 M Hz), se incrementa en 1 el TC.
+							// Con este método, 1 tick = 1 us = 1 x 10^(-6)s.
+
 	// ## Count Control register (CTCR) ##
 	CTIMER->CTCR  =   0x00000000;	// Limpiamos el registro con 0s.
 	// # Counter/Timer Mode (CTMODE) #
@@ -241,7 +243,7 @@ CTimer::CTimer( uint8_t 	inputPort_MAT,
  * 	 							la función elegida.
  * 	 \--->	microSecondsMATCH:	Período configurado del registro MATx.
  */
-void CTimer::Config_MatchOutput( MCRvalues_t 	inputMCRmode,
+void CTimer::Config_MatchOutput( MCRtriggers_t 	inputMCRmode,
 								 uint8_t		bitValueMCR,
 								 uint32_t 		microSecondsMATCH ) {
 	// # Protección contra límites físicos (HW) #
@@ -271,7 +273,7 @@ void CTimer::Config_MatchOutput( MCRvalues_t 	inputMCRmode,
  * 	 \--->	bitValueCCR:		Valor binario para habilitar o deshabilitar
  * 	 							la función elegida.
  */
-void CTimer::Config_CaptureInput( CCRvalues_t 	inputCCRmode,
+void CTimer::Config_CaptureInput( CCRtriggers_t 	inputCCRmode,
 								  uint8_t 		bitValueCCR ) {
 	// # Protección contra límites físicos (HW) #
 	if ( (__CAPchannel > 3) || (bitValueCCR > 1) ) {
@@ -293,7 +295,7 @@ void CTimer::Config_CaptureInput( CCRvalues_t 	inputCCRmode,
  *********************************************
  * \brief: 	Devuelve el valor de CAPx pedido.
  */
-uint32_t CTimer::GetCAPxValue() {
+__I uint32_t CTimer::GetCAPxValue() {
 	return CTIMER->CR[__CAPchannel];
 }
 

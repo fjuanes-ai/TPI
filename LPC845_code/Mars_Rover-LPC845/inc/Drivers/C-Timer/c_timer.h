@@ -26,10 +26,10 @@
      * ### MACROS & TIPOS DE DATOS GLOBALES ###
      * ########################################### */
 
-	#define	PRESCALER_DEFAULT_FREQ	1000000		// MHz = 10^6 Hz
+	#define	CTIMER_TICKS_DEFAULT_FREQ	1000000		// MHz = 10^6 Hz
 	#define	MAT_PERIOD_DEFAULT		10			// us  = 10^(-6) s
 	#define	MAT_CHANNEL_LIMIT		4
-	#define	CAP_CHANNEL_LIMIT		4
+	#define	CAP_CHANNEL_LIMIT		3
 
 
     /* ###########################################
@@ -79,22 +79,32 @@
     		uint8_t 			__CAPchannel;
     		static int8_t		__CAPchannelsAvailable;
 
-    		uint32_t			__prescalerFrequency;
+    		uint32_t			__ticksFrequency;
 
     	public:
     		// # Valores posibles para el CCR, por canal #
-    		typedef enum CCRvalues_e {
+    		typedef enum CCRtriggers_e {
     			RISING_CCR = 0,
     			FALLING_CCR,
     			INTERRUPT_CCR
-    		} CCRvalues_t;
+    		} CCRtriggers_t;
+
+    		typedef enum CCRactions_e {
+    			B
+    		} CCRactions_t;
 
     		// # Valores posibles para el MCR, por canal #
-    		typedef enum MCRvalues_e {
+    		typedef enum MCRtriggers_e {
     			INTERRUPT_MCR = 0,
     			RESET_MCR,
     			STOP_MCR
-    		} MCRvalues_t;
+    		} MCRtriggers_t;
+
+    		typedef enum EMRactions_e {
+    			CLEAR = 0,
+				SET,
+				TOGGLE
+    		} EMRactions_t;
 
 
 		// # Métodos #
@@ -106,13 +116,13 @@
 								uint8_t 	inputPin_MAT,
 								uint8_t 	inputPort_CAP,
 								uint8_t 	inputPin_CAP,
-								uint32_t 	prescalerFrequency = PRESCALER_DEFAULT_FREQ );
-			void 		Config_MatchOutput(  MCRvalues_t 	inputMCRmode,
+								uint32_t 	prescalerFrequency = CTIMER_TICKS_DEFAULT_FREQ );
+			void 		Config_MatchOutput(  MCRtriggers_t 	inputMCRmode,
 											 uint8_t		bitValueMCR,
 											 uint32_t 		microSecondsMATCH = MAT_PERIOD_DEFAULT );
-			void		Config_CaptureInput( CCRvalues_t 	inputCCRmode,
+			void		Config_CaptureInput( CCRtriggers_t 	inputCCRmode,
 					  	  	  	  	  	 	 uint8_t 		bitValueCCR );
-			uint32_t	GetCAPxValue();
+			__I uint32_t	GetCAPxValue();
 			void 		SetMATxValue( uint32_t	inputMATvalue );
     };
 

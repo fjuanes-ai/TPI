@@ -1034,9 +1034,9 @@ typedef struct {
 /* ----------------------------------------------------------------------------
    -- C-Timer --
    ---------------------------------------------------------------------------- */
-#define	__CTimer_n_MR	4
-#define	__CTimer_n_CR	4
-#define	__CTimer_n_MSR	4
+#define	__CTimer_MAX_MR		4
+#define	__CTimer_MAX_CR		3
+#define	__CTimer_MAX_MSR	4
 
 typedef struct {
 	__IO uint32_t	IR;						// Interrupt Register.
@@ -1045,13 +1045,13 @@ typedef struct {
 	__IO uint32_t 	PR;						// Prescale Register.
 	__IO uint32_t 	PC;						// Prescale Counter.
 	__IO uint32_t 	MCR;					// Match Control Register.
-	__IO uint32_t 	MR[__CTimer_n_MR];		// Match Registers.
+	__IO uint32_t 	MR[__CTimer_MAX_MR];	// Match Registers.
 	__IO uint32_t 	CCR;					// Capture Control Register.
-	__I  uint32_t 	CR[__CTimer_n_CR];		// Capture Register.
+	__I  uint32_t 	CR[__CTimer_MAX_CR];	// Capture Register.
 	__IO uint32_t 	EMR;					// External Match Register.
 	__IO uint32_t 	CTCR;					// Count Control Register.
 	__IO uint32_t 	PWMC;					// PWM  Control Register.
-	__IO uint32_t 	MSR[__CTimer_n_MSR];	// Match Shadow Registers.
+	__IO uint32_t 	MSR[__CTimer_MAX_MSR];	// Match Shadow Registers.
 } CTimer_t;
 
 /* CTIMER - Base Address in Memory */

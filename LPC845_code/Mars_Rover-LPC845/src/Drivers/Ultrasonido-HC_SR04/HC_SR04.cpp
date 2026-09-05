@@ -25,7 +25,8 @@
 /* ###########################################
  * ### MACROS & TIPOS DE DATOS PRIVADOS ###
  * ########################################### */
-#define		__MAX_TICKS					10					// us = 10^(-6) s.
+#define		__MAX_TICKS_MEASUREMENT		10					// us = 10^(-6) s.
+#define		__MAX_TICKS_UPDATE			10					// ms = 10^(-3) s.
 #define		__DISTANCE_MIN				20U					// mm = 10^(-3) m.
 #define		__DISTANCE_MAX				4000U				// mm = 10^(-3) m.
 
@@ -50,9 +51,10 @@
  * Establece puertos y pines del HW.
  */
 Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig, uint8_t portEcho, uint8_t pinEcho ) :
-				CTimer( portTrig, pinTrig, portEcho, pinEcho, PRESCALER_DEFAULT_FREQ ) {
+				CTimer( portTrig, pinTrig, portEcho, pinEcho, CTIMER_TICKS_DEFAULT_FREQ ) {
 
-	__ticksCount_microSeconds = __MAX_TICKS;
+	__ticksCount_microSeconds = __MAX_TICKS_MEASUREMENT;
+	InstalarPerifericoTemporizado( this );
 }
 
 
@@ -115,9 +117,24 @@ void Ultrasonido::Time_microSec_to_Distance_millimeters() {
  * A
  */
 void Ultrasonido::A() {
-//	return this->CTimer::GetCAPxValue();
+//	...
 }
 
+
+/* #############################################
+ * HandlerDelPeriferico
+ * #############################################
+ * \brief:			Handler para actualizar información de distancia.
+ */
+void Ultrasonido::HandlerDelPeriferico() {
+
+	--__ticksUpdateCount;
+
+	if ( !__ticksUpdateCount ) {
+		__ticksUpdateCount = __MAX_TICKS_UPDATE;
+		// TODO: implementar...
+	}
+}
 
 
 // ====================================================================================

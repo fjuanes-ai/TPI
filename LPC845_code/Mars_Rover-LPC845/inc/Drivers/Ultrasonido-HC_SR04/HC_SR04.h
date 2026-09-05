@@ -46,7 +46,7 @@
      * ### DEFINICIONES DE CLASES ###
      * ########################################### */
 
-	class Ultrasonido : protected CTimer {
+	class Ultrasonido : protected CTimer, PerifericoTemporizado {
 		// # Tipos de datos #
 		public:
 			typedef enum HC_SR04_TimeValues_microSeconds_e {
@@ -68,6 +68,7 @@
 //			Intext 		__echoHW;
 			uint8_t		__pulseSent;
 			uint8_t		__ticksCount_microSeconds;
+			uint16_t	__ticksUpdateCount;
 
 			typedef enum pulse_e {
 				N_PULSE	= 0,
@@ -89,6 +90,7 @@
 //			uint32_t 	Time_microSec_to_Distance_millimeters( uint32_t inputTime_microSec );
 			void 		Time_microSec_to_Distance_millimeters();
 			void		A();
+			void		HandlerDelPeriferico();
 //						~Ultrasonido();
 	};
 
