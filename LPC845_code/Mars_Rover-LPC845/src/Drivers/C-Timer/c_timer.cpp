@@ -2,7 +2,7 @@
  *
  * ### c_timer.cpp ###
  * 
- * @brief           Descripción del módulo...
+ * @brief           Drivers del periférico CTimer del LPC845.
  * @date            Aug 25, 2026
  * @author          iyopolo
  *
@@ -178,9 +178,7 @@ CTimer::CTimer( uint8_t 	inputPort_MAT,
 				__MATperiod(0),
 				__CAPport(inputPort_CAP),
 				__CAPpin(inputPin_CAP),
-				__prescalerFrequency(prescalerFrequency),
-				__MR{0, 0, 0, 0},
-				__CR{0, 0, 0, 0} {
+				__prescalerFrequency(prescalerFrequency) {
 	// # Habilitación del periférico C-Timer #
 	SYSCON->SYSAHBCLKCTRL0 |= (__CTIMER0_SYSCON_MASK);
 
@@ -296,7 +294,7 @@ void CTimer::Config_CaptureInput( CCRvalues_t 	inputCCRmode,
  * \brief: 	Devuelve el valor de CAPx pedido.
  */
 uint32_t CTimer::GetCAPxValue() {
-	return __CR[__CAPchannel];
+	return CTIMER->CR[__CAPchannel];
 }
 
 
@@ -306,7 +304,7 @@ uint32_t CTimer::GetCAPxValue() {
  * \brief: 	Escribe el valor de MATx elegido.
  */
 void CTimer::SetMATxValue( uint32_t	inputMATvalue ) {
-	__MR[__MATchannel] = inputMATvalue;
+	CTIMER->MR[__MATchannel] = inputMATvalue;
 }
 
 

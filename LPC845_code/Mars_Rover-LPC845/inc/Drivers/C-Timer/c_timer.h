@@ -2,7 +2,7 @@
  *
  * ### c_timer.h ###
  * 
- * @brief           Descripción del módulo...
+ * @brief           Drivers del periférico CTimer del LPC845.
  * @date            Aug 25, 2026
  * @author          iyopolo
  *
@@ -25,19 +25,6 @@
     /* ###########################################
      * ### MACROS & TIPOS DE DATOS GLOBALES ###
      * ########################################### */
-	// # Valores posibles para el CCR, por canal #
-	typedef enum CCRvalues_e {
-		RISING_CCR = 0,
-		FALLING_CCR,
-		INTERRUPT_CCR
-	} CCRvalues_t;
-
-	// # Valores posibles para el MCR, por canal #
-	typedef enum MCRvalues_e {
-		INTERRUPT_MCR = 0,
-		RESET_MCR,
-		STOP_MCR
-	} MCRvalues_t;
 
 	#define	PRESCALER_DEFAULT_FREQ	1000000		// MHz = 10^6 Hz
 	#define	MAT_PERIOD_DEFAULT		10			// us  = 10^(-6) s
@@ -94,10 +81,20 @@
 
     		uint32_t			__prescalerFrequency;
 
-    	protected:
-    		// Valores en los registros MATx y CAPx.
-    		__IO uint32_t		__MR[MAT_CHANNEL_LIMIT];
-    		__I  uint32_t		__CR[CAP_CHANNEL_LIMIT];
+    	public:
+    		// # Valores posibles para el CCR, por canal #
+    		typedef enum CCRvalues_e {
+    			RISING_CCR = 0,
+    			FALLING_CCR,
+    			INTERRUPT_CCR
+    		} CCRvalues_t;
+
+    		// # Valores posibles para el MCR, por canal #
+    		typedef enum MCRvalues_e {
+    			INTERRUPT_MCR = 0,
+    			RESET_MCR,
+    			STOP_MCR
+    		} MCRvalues_t;
 
 
 		// # Métodos #

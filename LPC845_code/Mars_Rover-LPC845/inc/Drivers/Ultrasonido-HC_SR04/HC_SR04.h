@@ -2,7 +2,7 @@
  *
  * ### HC_SR04.h ###
  * 
- * @brief           Descripción del módulo...
+ * @brief           Archivo de cabecera del sensor ultrasónico HC-SR04.
  * @date            Jun 21, 2026
  * @author          iyopolo
  *
@@ -88,6 +88,7 @@
 			uint32_t 	Measure_Time();
 //			uint32_t 	Time_microSec_to_Distance_millimeters( uint32_t inputTime_microSec );
 			void 		Time_microSec_to_Distance_millimeters();
+			void		A();
 //						~Ultrasonido();
 	};
 

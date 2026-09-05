@@ -2,7 +2,7 @@
  *
  * ### HC_SR04.cpp ###
  * 
- * @brief           Drivers del sensor ultrasónico HC SR04.
+ * @brief           Drivers del sensor ultrasónico HC-SR04.
  * @date            Jun 21, 2026
  * @author          iyopolo
  *
@@ -104,6 +104,18 @@ void Ultrasonido::Time_microSec_to_Distance_millimeters() {
 		default:
 			__distance_millimeters = measuredTime_microSec * 10 / 58.0;
 	}
+}
+
+
+/* #############################################
+ * A
+ * #############################################
+ * \brief:			A.
+ *
+ * A
+ */
+void Ultrasonido::A() {
+//	return this->CTimer::GetCAPxValue();
 }
 
 
