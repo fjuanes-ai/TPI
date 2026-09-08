@@ -89,10 +89,6 @@
     			INTERRUPT_CCR
     		} CCRtriggers_t;
 
-    		typedef enum CCRactions_e {
-    			B
-    		} CCRactions_t;
-
     		// # Valores posibles para el MCR, por canal #
     		typedef enum MCRtriggers_e {
     			INTERRUPT_MCR = 0,
@@ -100,11 +96,24 @@
     			STOP_MCR
     		} MCRtriggers_t;
 
-    		typedef enum EMRactions_e {
-    			CLEAR = 0,
-				SET,
-				TOGGLE
-    		} EMRactions_t;
+    		typedef enum CTCR_TimerCounter_Mode_e {
+    			TIMER_MODE = 0x0,
+				COUNTER_RISING_MODE,
+				COUNTER_FALLING_MODE,
+				COUNTER_DUAL_MODE
+    		} CTCR_TimerCounter_Mode_t;
+
+    		typedef enum CTCR_Edge_e {
+    			CAP_RISING_EDGE = 0,
+    			CAP_FALLING_EDGE
+    		} CTCR_Edge_t;
+
+    		typedef enum EMR_Mode_e {
+    			EMR_NOTHING = 0,
+				EMR_CLEAR,
+				EMR_SET,
+				EMR_TOGGLE
+    		} EMR_Mode_t;
 
 
 		// # Métodos #
@@ -117,12 +126,20 @@
 								uint8_t 	inputPort_CAP,
 								uint8_t 	inputPin_CAP,
 								uint32_t 	prescalerFrequency = CTIMER_TICKS_DEFAULT_FREQ );
+			int8_t 		Set_MAT_CAP_Channels();
+			void		Config_CountControlRegister( CTCR_TimerCounter_Mode_t 	inputMode,
+													 bool 						clearTCwithCaptureEdge,
+													 CTCR_Edge_t 				inputEdge );
+			void 		Config_PrescalerFrequency( uint32_t prescalerFrequency );
 			void 		Config_MatchOutput(  MCRtriggers_t 	inputMCRmode,
-											 uint8_t		bitValueMCR,
+											 bool			bitValueMCR,
 											 uint32_t 		microSecondsMATCH = MAT_PERIOD_DEFAULT );
 			void		Config_CaptureInput( CCRtriggers_t 	inputCCRmode,
-					  	  	  	  	  	 	 uint8_t 		bitValueCCR );
-			__I uint32_t	GetCAPxValue();
+					  	  	  	  	  	 	 bool 			bitValueCCR );
+			void		Config_ExternalMatchOutput( EMR_Mode_t inputMatchDemeanor );
+			void 		Reset_Timer_Prescale();
+			void 		EnableDisable_Timer_Prescale( bool inputEnableValue );
+		__I uint32_t	GetCAPxValue() const;
 			void 		SetMATxValue( uint32_t	inputMATvalue );
     };
 

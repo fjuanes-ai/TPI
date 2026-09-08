@@ -54,7 +54,13 @@ Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig, uint8_t portEcho, u
 				CTimer( portTrig, pinTrig, portEcho, pinEcho, CTIMER_TICKS_DEFAULT_FREQ ) {
 
 	__ticksCount_microSeconds = __MAX_TICKS_MEASUREMENT;
-	InstalarPerifericoTemporizado( this );
+
+	this->Config_CountControlRegister( CTCR_TimerCounter_Mode_t::TIMER_MODE,
+									   true,
+									   CTCR_Edge_t::CAP_RISING_EDGE );
+	this->Config_ExternalMatchOutput( EMR_Mode_t::EMR_SET );
+
+	this->InstalarPerifericoTemporizado( this );
 }
 
 
