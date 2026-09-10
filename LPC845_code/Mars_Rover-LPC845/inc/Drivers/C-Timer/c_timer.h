@@ -26,10 +26,10 @@
      * ### MACROS & TIPOS DE DATOS GLOBALES ###
      * ########################################### */
 
-	#define	CTIMER_TICKS_DEFAULT_FREQ	1000000		// MHz = 10^6 Hz
+	#define	CTIMER_DEFAULT_FREQ		1000000		// MHz = 10^6 Hz
 	#define	MAT_PERIOD_DEFAULT		10			// us  = 10^(-6) s
-	#define	MAT_CHANNEL_LIMIT		4
-	#define	CAP_CHANNEL_LIMIT		3
+//	#define	__CTimer_MAX_MR		4
+//	#define	__CTimer_MAX_CR		3
 
 
     /* ###########################################
@@ -41,45 +41,50 @@
     /* ###########################################
      * ### PROTOTIPOS DE FUNCIONES PÚBLICAS ###
      * ########################################### */
-//    void	CTimer_Config( uint8_t 	inputPort_MAT,
-//						   uint8_t 	inputPin_MAT,
-//						   uint8_t 	inputPort_CAP,
-//						   uint8_t 	inputPin_CAP,
-//						   uint32_t prescalerFrequency = PRESCALER_DEFAULT );
-//
-//    void 	CTimer_Config_MatchOutput( uint8_t 		inputMATchannel,
-//    								   MCRvalues_t 	inputMCRmode,
-//									   uint8_t 		bitValueCCR,
-//									   uint32_t 	microSecondsMATCH );
-//
-//    void 	CTimer_Config_CaptureInput( uint8_t 	inputCAPchannel,
-//    									CCRvalues_t inputCCRmode,
-//										uint8_t 	bitValueMCR );
-//
-//    void 	SwitchMatrix_Config_MAT_CAP( uint8_t inputPort_MAT,
-//									     uint8_t inputPin_MAT,
-//										 uint8_t inputPort_CAP,
-//										 uint8_t inputPin_CAP );
+
+	#if defined (__cplusplus)
+		extern "C" {
+			void CTIMER0_IRQHandler();
+		}
+	#endif
 
 
     /* ###########################################
      * ### DEFINICIONES DE CLASES ###
      * ########################################### */
+
     class CTimer {
     	// # Variables #
     	private:
-    		uint8_t				__MATport;
-    		uint8_t				__MATpin;
-    		uint8_t 			__MATchannel;
-    		static int8_t		__MATchannelsAvailable;		// Valor neg (< 0) = sin espacio para canales MAT.
-    		uint32_t			__MATperiod;
+    		static bool			__isSetup;
 
-    		uint8_t				__CAPport;
-    		uint8_t				__CAPpin;
-    		uint8_t 			__CAPchannel;
-    		static int8_t		__CAPchannelsAvailable;
+    		typedef struct MAT_data_s {
+        		uint8_t				port;
+        		uint8_t				pin;
+        		uint32_t			period;
+        		__IO uint32_t		* const EMRx;
+        		__IO uint32_t		* const MCRx;
+        		__IO uint32_t 		* const MRx;
+        		static void			(*__callback)();
+    		} MAT_data_t;
+    		static MAT_data_t	__MAT[__CTimer_MAX_MR];
+    		static int8_t		__availableMATchannels;		// Valor neg (< 0) = sin espacio para canales MAT.
+
+    		typedef struct CAP_data_s {
+        		uint8_t				port;
+        		uint8_t				pin;
+        		__IO uint32_t 		* const CCRmode;
+        		__IO uint32_t 		* const CTCRedge;
+        		__I  uint32_t 		* const CRx;
+        		static void			(*__callback)();
+    		} CAP_data_t;
+    		static CAP_data_t	__CAP[__CTimer_MAX_CR];
+    		static int8_t		__availableCAPchannels;
 
     		uint32_t			__ticksFrequency;
+
+    		// < TODO: resolver callbacks... >
+    		static void			(*__callbacks[__CTimer_MAX_MR + __CTimer_MAX_CR])();
 
     	public:
     		// # Valores posibles para el CCR, por canal #
@@ -117,30 +122,31 @@
 
 
 		// # Métodos #
-    	private:
-    		void 		SwitchMatrix_Config_MAT_CAP();
+//    	private:
 
     	public:
-						CTimer( uint8_t 	inputPort_MAT,
-								uint8_t 	inputPin_MAT,
-								uint8_t 	inputPort_CAP,
-								uint8_t 	inputPin_CAP,
-								uint32_t 	prescalerFrequency = CTIMER_TICKS_DEFAULT_FREQ );
-			int8_t 		Set_MAT_CAP_Channels();
-			void		Config_CountControlRegister( CTCR_TimerCounter_Mode_t 	inputMode,
+						CTimer( uint32_t prescalerFrequency = CTIMER_DEFAULT_FREQ );
+			void 		SwitchMatrix_Config_MAT( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel );
+			void 		SwitchMatrix_Config_CAP( uint8_t inputCAPport, uint8_t inputCAPpin, uint8_t channel );
+			int8_t 		Set_MAT_Channel();
+			int8_t 		Set_CAP_Channel();
+			void		Config_CountControlRegister( uint8_t					inputCAPchannel,
+					  	  	  	  	  	  	  	  	 CTCR_TimerCounter_Mode_t 	inputMode,
 													 bool 						clearTCwithCaptureEdge,
 													 CTCR_Edge_t 				inputEdge );
 			void 		Config_PrescalerFrequency( uint32_t prescalerFrequency );
-			void 		Config_MatchOutput(  MCRtriggers_t 	inputMCRmode,
+			void 		Config_MatchOutput(  uint8_t		inputMATchannel,
+	  	  	  	  	  	 	 	 	 	 	 MCRtriggers_t 	inputMCRmode,
 											 bool			bitValueMCR,
 											 uint32_t 		microSecondsMATCH = MAT_PERIOD_DEFAULT );
-			void		Config_CaptureInput( CCRtriggers_t 	inputCCRmode,
+			void		Config_CaptureInput( uint8_t		inputCAPchannel,
+	  	 	 	 	 	  	  	  	  	  	 CCRtriggers_t 	inputCCRmode,
 					  	  	  	  	  	 	 bool 			bitValueCCR );
-			void		Config_ExternalMatchOutput( EMR_Mode_t inputMatchDemeanor );
+			void		Config_ExternalMatchOutput( uint8_t inputMATchannel, EMR_Mode_t inputMatchDemeanor );
 			void 		Reset_Timer_Prescale();
-			void 		EnableDisable_Timer_Prescale( bool inputEnableValue );
-		__I uint32_t	GetCAPxValue() const;
-			void 		SetMATxValue( uint32_t	inputMATvalue );
+			void 		Enable_Timer_Prescale( bool inputEnableValue );
+		__I uint32_t	GetCAPxValue( uint8_t channel ) const;
+			void 		SetMATxValue( uint8_t channel, uint32_t	inputMATvalue );
     };
 
 
