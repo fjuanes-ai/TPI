@@ -28,6 +28,8 @@
 	#define		__MY_FLOAT_NEG_INFINITY		0xFF800000
 	#define		__MY_DOUBLE_POS_INFINITY	0x7FF0000000000000
 	#define		__MY_DOUBLE_NEG_INFINITY	0xFFF0000000000000
+	#define		__SEQ_TRIG_STEPS			4
+	#define		__SEQ_ECHO_STEPS			4
 
 
     /* ###########################################
@@ -69,9 +71,14 @@
 			uint8_t		__pulseSent;
 			uint8_t		__ticksCount_microSeconds;
 			uint16_t	__ticksUpdateCount;
+			void		(*__SecuenciaTRIGcallback[__SEQ_TRIG_STEPS])(void);
+			uint8_t		__TRIGsequenceStep_callback;
+			void		(*__SecuenciaECHOcallback[__SEQ_ECHO_STEPS])(void);
+			uint8_t		__ECHOsequenceStep_callback;
+
 			CTimer		*__CTimerFeatures;
-			uint8_t		__MATchannel;
-			uint8_t		__CAPchannel;
+			uint8_t		__MATchannelTRIG;
+			uint8_t		__CAPchannelECHO;
 
 			typedef enum pulse_e {
 				N_PULSE	= 0,
@@ -94,7 +101,8 @@
 			uint32_t 	Measure_Time();
 //			uint32_t 	Time_microSec_to_Distance_millimeters( uint32_t inputTime_microSec );
 			void 		Time_microSec_to_Distance_millimeters();
-			void		A();
+			void 		Set_TRIG_Callback_Sequence( void (**inputCallback)(void) );
+			void 		Set_ECHO_Callback_Sequence( void (**inputCallback)(void) );
 			void		HandlerDelPeriferico();
 //						~Ultrasonido();
 	};

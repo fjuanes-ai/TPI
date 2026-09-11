@@ -110,10 +110,15 @@
 				EMR_TOGGLE
     		} EMR_Mode_t;
 
+    		typedef enum registerSelection_MAT_CAP_e {
+    			MAT_REGISTER,
+				CAP_REGISTER
+    		} registerSelection_MAT_CAP_t;
+
     	private:
     		static bool			__isSetup;
-    		static int8_t		__availableMATchannels;		// Valor neg (< 0) = sin espacio para canales MAT.
-    		static int8_t		__availableCAPchannels;
+    		static uint8_t		__availableMATchannels;		// Valor neg (< 0) = sin espacio para canales MAT.
+    		static uint8_t		__availableCAPchannels;
 
     		uint32_t			__ticksFrequency;
 
@@ -122,11 +127,14 @@
 //    	private:
 
     	public:
+						CTimer();
 						CTimer( uint32_t prescalerFrequency = CTIMER_DEFAULT_FREQ );
+			void 		Set_Callback( registerSelection_MAT_CAP_t registerSelection,
+									  uint8_t channel, void (* inputCallback)(void) );
 			int8_t 		SwitchMatrix_Config_MAT( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel );
 			int8_t 		SwitchMatrix_Config_CAP( uint8_t inputCAPport, uint8_t inputCAPpin, uint8_t channel );
-			int8_t 		Set_MAT_Channel();
-			int8_t 		Set_CAP_Channel();
+			int8_t 		Get_available_MAT_channel();
+			int8_t 		Get_available_CAP_channel();
 			void		Config_CountControlRegister( uint8_t					inputCAPchannel,
 					  	  	  	  	  	  	  	  	 CTCR_TimerCounter_Mode_t 	inputMode,
 													 bool 						clearTCwithCaptureEdge,

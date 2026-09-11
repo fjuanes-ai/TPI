@@ -37,7 +37,48 @@
 //
 
 
-/**********************************************/
+/* ###########################################
+ * ### PROTOTIPOS DE FUNCIONES PRIVADAS ###
+ * ########################################### */
+//#if defined (__cplusplus)
+//	extern "C" {
+//		static void SecuenciaTRIG();
+//		static void SecuenciaECHO();
+//	}
+//#endif
+
+
+// ====================================================================================
+// ====================================================================================
+
+
+/* ###########################################
+ * ### FUNCIONES PRIVADAS ###
+ * ########################################### */
+
+/* #############################################
+ * SecuenciaTRIG (ASYNC)
+ * #############################################
+ * Función asíncrona de secuencia para TRIG.
+ */
+//void SecuenciaTRIG() {
+//
+//}
+
+
+/* #############################################
+ * SecuenciaECHO (ASYNC)
+ * #############################################
+ * Función asíncrona de secuencia para ECHO.
+ */
+//void SecuenciaECHO() {
+//
+//}
+
+
+// ====================================================================================
+// ====================================================================================
+
 
 
 /*********************************************
@@ -53,33 +94,46 @@
 Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig,
 						  uint8_t portEcho, uint8_t pinEcho,
 						  CTimer *inputCTimerObject ) :
+					__TRIGsequenceStep_callback(0),
+					__ECHOsequenceStep_callback(0),
 					__CTimerFeatures( inputCTimerObject ) {
+
+	int8_t	__tempErrorBuffer;
 
 	__ticksCount_microSeconds = __MAX_TICKS_MEASUREMENT;
 
-	for ( uint8_t i = 0; i < __CTimer_MAX_MR; i++ ) {
-		if ( !(__CTimerFeatures->SwitchMatrix_Config_MAT( portTrig, pinTrig, i )) ) {
-			__MATchannel = i;
-			break;
-		}
-		else {
-			continue;
-		}
-	}
-	__CTimerFeatures->Config_ExternalMatchOutput( __MATchannel, CTimer::EMR_Mode_t::EMR_SET );
+	// ## Obtención de los canales necesarios de MAT y CAP, para TRIG y ECHO respectivamente. ##
 
-	for ( uint8_t j = 0; j < __CTimer_MAX_MR; j++ ) {
-		if ( !(__CTimerFeatures->SwitchMatrix_Config_CAP( portEcho, pinEcho, j )) ) {
-			__CAPchannel = j;
-			break;
-		}
-		else {
-			continue;
-		}
+	// # MAT = TRIG #
+	__MATchannelTRIG = __CTimerFeatures->Get_available_MAT_channel();
+	if ( __MATchannelTRIG < 0 ) {
+		return;		// < ERROR >
 	}
-	__CTimerFeatures->Config_CountControlRegister( __CAPchannel, CTimer::CTCR_TimerCounter_Mode_t::TIMER_MODE,
+
+	__tempErrorBuffer = __CTimerFeatures->SwitchMatrix_Config_MAT( portTrig, pinTrig, __MATchannelTRIG );
+	if ( __tempErrorBuffer < 0 ) {
+		return;		// < ERROR >
+	}
+
+	__CTimerFeatures->Config_ExternalMatchOutput( __MATchannelTRIG, CTimer::EMR_Mode_t::EMR_SET );
+
+
+	// # CAP = ECHO #
+	__CAPchannelECHO = __CTimerFeatures->Get_available_CAP_channel();
+	if ( __CAPchannelECHO < 0 ) {
+		return;		// < ERROR >
+	}
+
+	__tempErrorBuffer = __CTimerFeatures->SwitchMatrix_Config_CAP( portEcho, pinEcho, __CAPchannelECHO );
+	if ( __tempErrorBuffer < 0 ) {
+		return;		// < ERROR >
+	}
+
+	__CTimerFeatures->Config_CountControlRegister( __CAPchannelECHO, CTimer::CTCR_TimerCounter_Mode_t::TIMER_MODE,
 												   true, CTimer::CTCR_Edge_t::CAP_RISING_EDGE );
 
+	this->Set_TRIG_Callback_Sequence( nullptr );
+	this->Set_ECHO_Callback_Sequence( nullptr );
 
 	this->InstalarPerifericoTemporizado( this );
 }
@@ -96,7 +150,7 @@ Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig,
  * 	N/O: 36  mS.	(No Obstacle)
  */
 uint32_t Ultrasonido::Measure_Time() {
-	return __CTimerFeatures->CTimer::GetCAPxValue( __CAPchannel );
+	return __CTimerFeatures->CTimer::GetCAPxValue( __CAPchannelECHO );
 }
 
 
@@ -137,14 +191,48 @@ void Ultrasonido::Time_microSec_to_Distance_millimeters() {
 
 
 /* #############################################
- * A
+ * Set_TRIG_Callback_Sequence
  * #############################################
- * \brief:			A.
+ * \brief:		Asigna el callback de TRIG a una secuencia.
  *
- * A
+ * \input:
+ * 	 \--->	inputCallback:	Secuencia de funciones callback
+ * 	 						a ejecutar por cada interrupción.
  */
-void Ultrasonido::A() {
-//	...
+void Ultrasonido::Set_TRIG_Callback_Sequence( void (**inputCallback)(void) ) {
+	for ( uint8_t index = 0; index < __CTimer_MAX_MR; index++ ) {
+		if ( inputCallback != nullptr ) {
+			__SecuenciaTRIGcallback[index] = inputCallback[index];
+		} else {
+			__SecuenciaTRIGcallback[index] = nullptr;
+		}
+	}
+
+	__CTimerFeatures->Set_Callback( CTimer::registerSelection_MAT_CAP_t::MAT_REGISTER,
+									__MATchannelTRIG, __SecuenciaTRIGcallback[__TRIGsequenceStep_callback] );
+}
+
+
+/* #############################################
+ * Set_ECHO_Callback_Sequence
+ * #############################################
+ * \brief:			Asigna el callback de ECHO.
+ *
+ * \input:
+ * 	 \--->	inputCallback:	Secuencia de funciones callback
+ * 	 						a ejecutar por cada interrupción.
+ */
+void Ultrasonido::Set_ECHO_Callback_Sequence( void (**inputCallback)(void) ) {
+	for ( uint8_t index = 0; index < __CTimer_MAX_CR; index++ ) {
+		if ( inputCallback != nullptr ) {
+			__SecuenciaECHOcallback[index] = inputCallback[index];
+		} else {
+			__SecuenciaECHOcallback[index] = nullptr;
+		}
+	}
+
+	__CTimerFeatures->Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER,
+									__CAPchannelECHO, __SecuenciaECHOcallback[__ECHOsequenceStep_callback] );
 }
 
 
