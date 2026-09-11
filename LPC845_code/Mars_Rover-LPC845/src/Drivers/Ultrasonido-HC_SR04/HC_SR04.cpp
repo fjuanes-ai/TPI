@@ -57,10 +57,29 @@ Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig,
 
 	__ticksCount_microSeconds = __MAX_TICKS_MEASUREMENT;
 
-	__CTimerFeatures->Config_CountControlRegister( CTimer::CTCR_TimerCounter_Mode_t::TIMER_MODE,
+	for ( uint8_t i = 0; i < __CTimer_MAX_MR; i++ ) {
+		if ( !(__CTimerFeatures->SwitchMatrix_Config_MAT( portTrig, pinTrig, i )) ) {
+			__MATchannel = i;
+			break;
+		}
+		else {
+			continue;
+		}
+	}
+	__CTimerFeatures->Config_ExternalMatchOutput( __MATchannel, CTimer::EMR_Mode_t::EMR_SET );
+
+	for ( uint8_t j = 0; j < __CTimer_MAX_MR; j++ ) {
+		if ( !(__CTimerFeatures->SwitchMatrix_Config_CAP( portEcho, pinEcho, j )) ) {
+			__CAPchannel = j;
+			break;
+		}
+		else {
+			continue;
+		}
+	}
+	__CTimerFeatures->Config_CountControlRegister( __CAPchannel, CTimer::CTCR_TimerCounter_Mode_t::TIMER_MODE,
 												   true, CTimer::CTCR_Edge_t::CAP_RISING_EDGE );
-	__CTimerFeatures->Config_ExternalMatchOutput( CTimer::EMR_Mode_t::EMR_SET );
-	__CTimerFeatures->SwitchMatrix_Config_MAT_CAP();
+
 
 	this->InstalarPerifericoTemporizado( this );
 }
@@ -77,7 +96,7 @@ Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig,
  * 	N/O: 36  mS.	(No Obstacle)
  */
 uint32_t Ultrasonido::Measure_Time() {
-	return __CTimerFeatures->CTimer::GetCAPxValue();
+	return __CTimerFeatures->CTimer::GetCAPxValue( __CAPchannel );
 }
 
 

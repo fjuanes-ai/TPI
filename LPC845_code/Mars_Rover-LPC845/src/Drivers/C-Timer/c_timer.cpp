@@ -37,6 +37,8 @@
 #define __CTIMER0_CTCR_CHANNELS_OFFSET	2
 #define	__CTIMER0_TCR_CRST_OFFSET		1
 #define	__CTIMER0_TCR_CEN_OFFSET		0
+#define __CTIMER0_IRQ_MR_OFFSET			0
+#define __CTIMER0_IRQ_CR_OFFSET			4
 
 // # Conversión pin/puerto a número para SWM  #
 typedef enum __SWM_Port_Offset_e {
@@ -54,9 +56,15 @@ typedef enum __IRQ_MAT_CAP_TABLE_e {
  * ### VARIABLES GLOBALES PRIVADAS ###
  * ########################################### */
 
-// # Inicialización de objetos estáticos (canales MAT/CAP) #
+bool CTimer::__isSetup = false;
+
+// ## Datos estáticos para MAT/CAP ##
+
+// # Canales MAT/CAP #
 int8_t CTimer::__availableMATchannels = __CTimer_MAX_MR;	 // Valor neg (< 0) = sin espacio para canales MAT.
 int8_t CTimer::__availableCAPchannels = __CTimer_MAX_CR;
+
+// # Estructuras con datos MAT/CAP #
 CTimer::MAT_data_t  CTimer::__MAT[__CTimer_MAX_MR] = {
 	{	// # Channel 0 #
 		.port = 0,
@@ -64,7 +72,8 @@ CTimer::MAT_data_t  CTimer::__MAT[__CTimer_MAX_MR] = {
 		.period = 0,
 		.EMRx = &(CTIMER->EMR),
 		.MCRx = &(CTIMER->MCR),
-		.MRx = CTIMER->MR
+		.MRx = CTIMER->MR,
+		.__callback = nullptr
 	},
 	{
 		.port = 0,
@@ -72,7 +81,8 @@ CTimer::MAT_data_t  CTimer::__MAT[__CTimer_MAX_MR] = {
 		.period = 0,
 		.EMRx = &(CTIMER->EMR) + 1,
 		.MCRx = &(CTIMER->MCR) + 1,
-		.MRx = CTIMER->MR + 1
+		.MRx = CTIMER->MR + 1,
+		.__callback = nullptr
 	},
 	{
 		.port = 0,
@@ -80,7 +90,8 @@ CTimer::MAT_data_t  CTimer::__MAT[__CTimer_MAX_MR] = {
 		.period = 0,
 		.EMRx = &(CTIMER->EMR) + 2,
 		.MCRx = &(CTIMER->MCR) + 2,
-		.MRx = CTIMER->MR + 2
+		.MRx = CTIMER->MR + 2,
+		.__callback = nullptr
 	},
 	{
 		.port = 0,
@@ -88,7 +99,8 @@ CTimer::MAT_data_t  CTimer::__MAT[__CTimer_MAX_MR] = {
 		.period = 0,
 		.EMRx = &(CTIMER->EMR) + 3,
 		.MCRx = &(CTIMER->MCR) + 3,
-		.MRx = CTIMER->MR + 3
+		.MRx = CTIMER->MR + 3,
+		.__callback = nullptr
 	}
 };
 
@@ -98,36 +110,32 @@ CTimer::CAP_data_t  CTimer::__CAP[__CTimer_MAX_CR] = {
 		.pin = 0,
 		.CCRmode = &(CTIMER->CCR),
 		.CTCRedge = &(CTIMER->CTCR),
-		.CRx = CTIMER->CR
+		.CRx = CTIMER->CR,
+		.__callback = nullptr
 	},
 	{
 		.port = 0,
 		.pin = 0,
 		.CCRmode = &(CTIMER->CCR) + 1,
 		.CTCRedge = &(CTIMER->CTCR) + 1,
-		.CRx = CTIMER->CR + 1
+		.CRx = CTIMER->CR + 1,
+		.__callback = nullptr
 	},
 	{
 		.port = 0,
 		.pin = 0,
 		.CCRmode = &(CTIMER->CCR) + 2,
 		.CTCRedge = &(CTIMER->CTCR) + 2,
-		.CRx = CTIMER->CR + 2
+		.CRx = CTIMER->CR + 2,
+		.__callback = nullptr
 	},
 };
 
-CTimer::MAT_data_t static void (*__callback)() = nullptr;
-CTimer::CAP_data_t static void (*__callback)() = nullptr;
 
 /* ###########################################
  * ### PROTOTIPOS DE FUNCIONES PRIVADAS ###
  * ########################################### */
-
-//#if defined (__cplusplus)
-//	extern "C" {
-//		void CTIMER0_IRQHandler();
-//	}
-//#endif
+//
 
 
 // ====================================================================================
@@ -151,25 +159,25 @@ CTimer::CAP_data_t static void (*__callback)() = nullptr;
 void CTIMER0_IRQHandler() {
 	uint8_t		__tempRead;
 
-	for ( uint8_t j = 0; j < 2; j++ ) {
-		for ( uint8_t index = 0; index < __CTimer_MAX_MR; index++ ) {
-			__tempRead = (uint8_t) ( CTIMER->IR & (0x01 << index) );
+	// # MAT #
+	for ( uint8_t index = 0; index < __CTimer_MAX_MR; index++ ) {	// Separación canales.
+		__tempRead = (uint8_t) ( CTIMER->IR & (0x01 << index) );
 
-			if ( __tempRead != 0x00 ) {
-				CTIMER->IR |= (0x01 << index);		// Reiniciamos el IR.
+		if ( __tempRead != 0x00 ) {
+			CTIMER->IR |= (0x01 << index);		// Reiniciamos el IR con un 1.
 
-//				if ( __callback ) {
-//					__callback();
-//				}
+			CTimer::__MAT[__tempRead].__callback();
+		}
+	}
 
-				switch ( __tempRead ) {
-					case 0:
-						j = j;
-						break;
+	// # CAP #
+	for ( uint8_t index = 0; index < __CTimer_MAX_CR; index++ ) {	// Separación canales.
+		__tempRead = (uint8_t) ( CTIMER->IR & (0x01 << (index + __CTIMER0_IRQ_CR_OFFSET)) );
 
-//					default:
-				}
-			}
+		if ( __tempRead != 0x00 ) {
+			CTIMER->IR |= (0x01 << (index + __CTIMER0_IRQ_CR_OFFSET));		// Reiniciamos el IR con un 1.
+
+			CTimer::__CAP[__tempRead].__callback();
 		}
 	}
 }
@@ -245,30 +253,30 @@ CTimer::CTimer( uint32_t prescalerFrequency ) :
  * \brief: 	Cambia de funcionalidad los pines seleccionados según SW
  * 			para habilitar la función de MAT.
  */
-void CTimer::SwitchMatrix_Config_MAT( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel ) {
+int8_t CTimer::SwitchMatrix_Config_MAT( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel ) {
 
 	SYSCON->SYSAHBCLKCTRL0 |=  (__SWM_SYSCON_MASK );	// Habilitación del SW.
 
 	// # Protección contra límites físicos (HW) #
 	if ( channel >= __CTimer_MAX_MR )
-		return;
+		return -1;
 
 	if ( this->Set_MAT_Channel() == -1 )
-		return;
+		return -1;
 
 	switch ( inputMATport ) {
 		case Port0:
 			if ( inputMATpin >= __LPC845_PORT0_MAX_PINS )
-				return;
+				return -1;
 		break;
 
 		case Port1:
 			if ( inputMATpin >= __LPC845_PORT1_MAX_PINS )
-				return;
+				return -1;
 		break;
 
 		default:
-			return;
+			return -1;
 	}
 
 	this->__MAT[channel].port = inputMATport;
@@ -283,6 +291,7 @@ void CTimer::SwitchMatrix_Config_MAT( uint8_t inputMATport, uint8_t inputMATpin,
 
 
 	SYSCON->SYSAHBCLKCTRL0 &= ~(__SWM_SYSCON_MASK );	// Deshabilitación del SW.
+	return 0;
 }
 
 
@@ -292,30 +301,30 @@ void CTimer::SwitchMatrix_Config_MAT( uint8_t inputMATport, uint8_t inputMATpin,
  * \brief: 	Cambia de funcionalidad los pines seleccionados según SW
  * 			para habilitar la función de CAP.
  */
-void CTimer::SwitchMatrix_Config_CAP( uint8_t inputCAPport, uint8_t inputCAPpin, uint8_t channel ) {
+int8_t CTimer::SwitchMatrix_Config_CAP( uint8_t inputCAPport, uint8_t inputCAPpin, uint8_t channel ) {
 
 	SYSCON->SYSAHBCLKCTRL0 |=  (__SWM_SYSCON_MASK );	// Habilitación del SW.
 
 	// # Protección contra límites físicos (HW) #
 	if ( channel >= __CTimer_MAX_CR )
-		return;
+		return -1;
 
 	if ( this->Set_CAP_Channel() == -1 )
-		return;
+		return -1;
 
 	switch ( inputCAPport ) {
 		case Port0:
 			if ( inputCAPpin >= __LPC845_PORT0_MAX_PINS )
-				return;
+				return -1;
 		break;
 
 		case Port1:
 			if ( inputCAPpin >= __LPC845_PORT1_MAX_PINS )
-				return;
+				return -1;
 		break;
 
 		default:
-			return;
+			return -1;
 	}
 
 	this->__CAP[channel].port = inputCAPport;
@@ -327,6 +336,7 @@ void CTimer::SwitchMatrix_Config_CAP( uint8_t inputCAPport, uint8_t inputCAPpin,
 
 
 	SYSCON->SYSAHBCLKCTRL0 &= ~(__SWM_SYSCON_MASK );	// Deshabilitación del SW.
+	return 0;
 }
 
 
@@ -503,12 +513,12 @@ void CTimer::Config_MatchOutput( uint8_t		inputMATchannel,
  * 	 \--->	bitValueCCR:		Valor binario para habilitar o deshabilitar
  * 	 							la función elegida.
  */
-void CTimer::Config_CaptureInput( uint8_t			inputCAPchannel,
-	  	  	  	 	 	 	 	  CCRtriggers_t 	inputCCRmode,
-								  bool 				bitValueCCR ) {
+int8_t CTimer::Config_CaptureInput( uint8_t			inputCAPchannel,
+	  	  	  	 	 	 	 	  	CCRtriggers_t 	inputCCRmode,
+									bool 			bitValueCCR ) {
 	// # Protección contra límites físicos (HW) #
 	if ( inputCAPchannel >= __CTimer_MAX_CR ) {
-		return;
+		return -1;
 	}
 
 	// # Limpieza del registro #
@@ -516,6 +526,8 @@ void CTimer::Config_CaptureInput( uint8_t			inputCAPchannel,
 
 	// # Configuración de comportamiento de CAPx #
 	CTIMER->CCR |=  bitValueCCR << (__CTIMER0_CCR_CHANNELS_OFFSET * inputCAPchannel + inputCCRmode);
+
+	return inputCAPchannel;
 }
 
 

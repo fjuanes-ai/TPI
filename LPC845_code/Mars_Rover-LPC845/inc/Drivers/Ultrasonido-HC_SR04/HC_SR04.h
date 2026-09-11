@@ -70,6 +70,8 @@
 			uint8_t		__ticksCount_microSeconds;
 			uint16_t	__ticksUpdateCount;
 			CTimer		*__CTimerFeatures;
+			uint8_t		__MATchannel;
+			uint8_t		__CAPchannel;
 
 			typedef enum pulse_e {
 				N_PULSE	= 0,
