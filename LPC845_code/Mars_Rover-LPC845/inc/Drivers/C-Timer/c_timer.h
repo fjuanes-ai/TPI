@@ -133,6 +133,8 @@
 									  uint8_t channel, void (* inputCallback)(void) );
 			int8_t 		SwitchMatrix_Config_MAT( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel );
 			int8_t 		SwitchMatrix_Config_CAP( uint8_t inputCAPport, uint8_t inputCAPpin, uint8_t channel );
+			void 		Config_PWM( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel );
+			void 		Set_PWM_MAT_channel( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel, bool enable );
 			int8_t 		Get_available_MAT_channel();
 			int8_t 		Get_available_CAP_channel();
 			void		Config_CountControlRegister( uint8_t					inputCAPchannel,
@@ -143,6 +145,7 @@
 			void 		Config_MatchOutput(  uint8_t		inputMATchannel,
 	  	  	  	  	  	 	 	 	 	 	 MCRtriggers_t 	inputMCRmode,
 											 bool			bitValueMCR,
+											 bool			reloadWithMatchShadow,
 											 uint32_t 		microSecondsMATCH = MAT_PERIOD_DEFAULT );
 			int8_t		Config_CaptureInput( uint8_t		inputCAPchannel,
 	  	 	 	 	 	  	  	  	  	  	 CCRtriggers_t 	inputCCRmode,

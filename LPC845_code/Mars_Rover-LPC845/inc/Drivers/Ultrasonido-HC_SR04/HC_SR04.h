@@ -101,8 +101,8 @@
 			uint32_t 	Measure_Time();
 //			uint32_t 	Time_microSec_to_Distance_millimeters( uint32_t inputTime_microSec );
 			void 		Time_microSec_to_Distance_millimeters();
-			void 		Set_TRIG_Callback_Sequence( void (**inputCallback)(void) );
-			void 		Set_ECHO_Callback_Sequence( void (**inputCallback)(void) );
+			void 		Set_TRIG_Callback_Sequence( void (*inputCallback)(void) );
+			void 		Set_ECHO_Callback_Sequence( void (*inputCallback)(void) );
 			void		HandlerDelPeriferico();
 //						~Ultrasonido();
 	};

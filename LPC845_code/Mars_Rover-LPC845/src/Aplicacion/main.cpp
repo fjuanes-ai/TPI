@@ -21,6 +21,7 @@ int main( void ) {
 	Inicializar();
 
     while ( 1 ) {
+
     }
 
 

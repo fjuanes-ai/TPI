@@ -32,7 +32,12 @@
  * ### VARIABLES GLOBALES PRIVADAS ###
  * ########################################### */
 CTimer ctimerObject( 1000000 );
-Ultrasonido sensor_hc_sr04( 0, 10, 1, 5, nullptr );
+Ultrasonido sensor_hc_sr04( 1, 0, 1, 5, &ctimerObject );
+//GPIO lpcLED( GPIO::puertos_e::PORT1, 1, GPIO::direccion_e::SALIDA, GPIO::actividad_e::BAJO );
+
+//void (**SecuenciaTRIG[])() = {
+//		TRIGstep_01
+//};
 
 
 /* ###########################################
@@ -62,6 +67,19 @@ void Inicializar() {
 	// TODO: hacer una manera más modular para meter la información de TRIG y ECHO...
 //	CTimer_Config( puertoTRIG, pinTRIG, puertoECHO, pinECHO, PRESCALER_DEFAULT );
 	SysTick_Config( 1 );
+//	lpcLED.SetPin();
+
+//	sensor_hc_sr04.
+}
+
+
+/*********************************************
+ * SecuenciaTRIG
+ *********************************************
+ * A
+ */
+void SecuenciaTRIG() {
+//	sensor_hc_sr04.
 }
 
 

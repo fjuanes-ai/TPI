@@ -115,8 +115,7 @@ Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig,
 		return;		// < ERROR >
 	}
 
-	__CTimerFeatures->Config_ExternalMatchOutput( __MATchannelTRIG, CTimer::EMR_Mode_t::EMR_SET );
-
+//	__CTimerFeatures->Config_ExternalMatchOutput( __MATchannelTRIG, CTimer::EMR_Mode_t::EMR_SET );
 
 	// # CAP = ECHO #
 	__CAPchannelECHO = __CTimerFeatures->Get_available_CAP_channel();
@@ -134,6 +133,14 @@ Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig,
 
 	this->Set_TRIG_Callback_Sequence( nullptr );
 	this->Set_ECHO_Callback_Sequence( nullptr );
+
+
+	// ## DEBUG ##
+	__CTimerFeatures->Config_ExternalMatchOutput( __MATchannelTRIG, CTimer::EMR_Mode_t::EMR_TOGGLE );
+	__CTimerFeatures->Config_MatchOutput( __MATchannelTRIG, CTimer::MCRtriggers_t::RESET_MCR, true, false, 500000 );
+//	__CTimerFeatures->SetMATxValue( __MATchannelTRIG, 500000 );
+	// ## DEBUG ##
+
 
 	this->InstalarPerifericoTemporizado( this );
 }
@@ -199,10 +206,10 @@ void Ultrasonido::Time_microSec_to_Distance_millimeters() {
  * 	 \--->	inputCallback:	Secuencia de funciones callback
  * 	 						a ejecutar por cada interrupción.
  */
-void Ultrasonido::Set_TRIG_Callback_Sequence( void (**inputCallback)(void) ) {
+void Ultrasonido::Set_TRIG_Callback_Sequence( void (*inputCallback)(void) ) {
 	for ( uint8_t index = 0; index < __CTimer_MAX_MR; index++ ) {
 		if ( inputCallback != nullptr ) {
-			__SecuenciaTRIGcallback[index] = inputCallback[index];
+			__SecuenciaTRIGcallback[index] = inputCallback;
 		} else {
 			__SecuenciaTRIGcallback[index] = nullptr;
 		}
@@ -216,16 +223,16 @@ void Ultrasonido::Set_TRIG_Callback_Sequence( void (**inputCallback)(void) ) {
 /* #############################################
  * Set_ECHO_Callback_Sequence
  * #############################################
- * \brief:			Asigna el callback de ECHO.
+ * \brief:		Asigna el callback de ECHO.
  *
  * \input:
  * 	 \--->	inputCallback:	Secuencia de funciones callback
  * 	 						a ejecutar por cada interrupción.
  */
-void Ultrasonido::Set_ECHO_Callback_Sequence( void (**inputCallback)(void) ) {
+void Ultrasonido::Set_ECHO_Callback_Sequence( void (*inputCallback)(void) ) {
 	for ( uint8_t index = 0; index < __CTimer_MAX_CR; index++ ) {
 		if ( inputCallback != nullptr ) {
-			__SecuenciaECHOcallback[index] = inputCallback[index];
+			__SecuenciaECHOcallback[index] = inputCallback;
 		} else {
 			__SecuenciaECHOcallback[index] = nullptr;
 		}

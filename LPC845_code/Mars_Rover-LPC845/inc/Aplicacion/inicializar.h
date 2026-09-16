@@ -42,6 +42,6 @@
      * ### PROTOTIPOS DE FUNCIONES PÚBLICAS ###
      * ########################################### */
     void Inicializar();
-
+    void SecuenciaTRIG();
 
 #endif          /* APLICACION_INICIALIZAR_H_ */
