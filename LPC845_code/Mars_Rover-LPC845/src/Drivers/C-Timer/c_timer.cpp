@@ -70,8 +70,8 @@ uint8_t CTimer::__availableCAPchannels = __CTimer_MAX_CR;
 // # Estructuras con datos MAT/CAP #
 CTimer::MAT_data_t  CTimer::__MAT[__CTimer_MAX_MR] = {
 	{	// # Channel 0 #
-		.port = 0,
-		.pin = 0,
+		.port = -1,
+		.pin = -1,
 		.period = 0,
 		.EMRx = &(CTIMER->EMR),
 		.MCRx = &(CTIMER->MCR),
@@ -79,8 +79,8 @@ CTimer::MAT_data_t  CTimer::__MAT[__CTimer_MAX_MR] = {
 		.__callback = nullptr
 	},
 	{
-		.port = 0,
-		.pin = 0,
+		.port = -1,
+		.pin = -1,
 		.period = 0,
 		.EMRx = &(CTIMER->EMR) + 1,
 		.MCRx = &(CTIMER->MCR) + 1,
@@ -88,8 +88,8 @@ CTimer::MAT_data_t  CTimer::__MAT[__CTimer_MAX_MR] = {
 		.__callback = nullptr
 	},
 	{
-		.port = 0,
-		.pin = 0,
+		.port = -1,
+		.pin = -1,
 		.period = 0,
 		.EMRx = &(CTIMER->EMR) + 2,
 		.MCRx = &(CTIMER->MCR) + 2,
@@ -97,8 +97,8 @@ CTimer::MAT_data_t  CTimer::__MAT[__CTimer_MAX_MR] = {
 		.__callback = nullptr
 	},
 	{
-		.port = 0,
-		.pin = 0,
+		.port = -1,
+		.pin = -1,
 		.period = 0,
 		.EMRx = &(CTIMER->EMR) + 3,
 		.MCRx = &(CTIMER->MCR) + 3,
@@ -109,27 +109,35 @@ CTimer::MAT_data_t  CTimer::__MAT[__CTimer_MAX_MR] = {
 
 CTimer::CAP_data_t  CTimer::__CAP[__CTimer_MAX_CR] = {
 	{	// # Channel 0 #
-		.port = 0,
-		.pin = 0,
+		.port = -1,
+		.pin = -1,
 		.CCRmode = &(CTIMER->CCR),
 		.CTCRedge = &(CTIMER->CTCR),
 		.CRx = CTIMER->CR,
 		.__callback = nullptr
 	},
 	{
-		.port = 0,
-		.pin = 0,
+		.port = -1,
+		.pin = -1,
 		.CCRmode = &(CTIMER->CCR) + 1,
 		.CTCRedge = &(CTIMER->CTCR) + 1,
 		.CRx = CTIMER->CR + 1,
 		.__callback = nullptr
 	},
 	{
-		.port = 0,
-		.pin = 0,
+		.port = -1,
+		.pin = -1,
 		.CCRmode = &(CTIMER->CCR) + 2,
 		.CTCRedge = &(CTIMER->CTCR) + 2,
 		.CRx = CTIMER->CR + 2,
+		.__callback = nullptr
+	},
+	{
+		.port = -1,
+		.pin = -1,
+		.CCRmode = &(CTIMER->CCR) + 3,
+		.CTCRedge = &(CTIMER->CTCR) + 3,
+		.CRx = CTIMER->CR + 3,
 		.__callback = nullptr
 	},
 };
@@ -360,7 +368,7 @@ int8_t CTimer::SwitchMatrix_Config_CAP( uint8_t inputCAPport, uint8_t inputCAPpi
 	SYSCON->SYSAHBCLKCTRL0 |=  (__SYSCON_SYSAHBCLKCTRL0_SWM_MASK );	// Habilitación del SW.
 
 	// # Protección contra límites físicos (HW) #
-	if ( channel >= __CTimer_MAX_CR )
+	if ( channel >= __CTimer_MAX_CR - 1 )	// 1 CANAL MENOS DISPONIBLE POR HW.
 		return -1;
 
 	switch ( inputCAPport ) {
@@ -552,9 +560,9 @@ void CTimer::Config_PrescalerFrequency( uint32_t prescalerFrequency ) {
 void CTimer::Config_ExternalMatchOutput( uint8_t inputMATchannel, uint32_t inputMatchDemeanor ) {
 	CTIMER->EMR |= (uint32_t) ( inputMatchDemeanor << ((uint32_t) (__CTIMER0_EMR_EMC0_OFFSET + (__CTIMER0_EMR_CHANNELS_OFFSET * inputMATchannel))) );
 
-	CTIMER->EMR = 0x0;
+//	CTIMER->EMR = 0x0;
 	// TODO: perder la cabeza en por qué corno no pone el valor que debería de poner.
-	CTIMER->EMR = (uint32_t) 3 << 4;
+//	CTIMER->EMR = (uint32_t) 3 << 4;
 }
 
 
@@ -612,7 +620,7 @@ int8_t CTimer::Config_CaptureInput( uint8_t			inputCAPchannel,
 	  	  	  	 	 	 	 	  	CCRtriggers_t 	inputCCRmode,
 									bool 			bitValueCCR ) {
 	// # Protección contra límites físicos (HW) #
-	if ( inputCAPchannel >= __CTimer_MAX_CR ) {
+	if ( inputCAPchannel >= __CTimer_MAX_CR - 1 ) {		// 1 CANAL MENOS DISPONIBLE POR HW.
 		return -1;
 	}
 

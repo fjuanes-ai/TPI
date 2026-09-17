@@ -234,7 +234,7 @@ void Ultrasonido::Set_TRIG_Callback_Sequence( void (*inputCallback)(void) ) {
  * 	 						a ejecutar por cada interrupción.
  */
 void Ultrasonido::Set_ECHO_Callback_Sequence( void (*inputCallback)(void) ) {
-	for ( uint8_t index = 0; index < __CTimer_MAX_CR; index++ ) {
+	for ( uint8_t index = 0; index < __CTimer_MAX_CR - 1; index++ ) {	// 1 CANAL MENOS DISPONIBLE POR HW.
 		if ( inputCallback != nullptr ) {
 			__SecuenciaECHOcallback[index] = inputCallback;
 		} else {

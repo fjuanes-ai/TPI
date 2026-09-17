@@ -55,8 +55,8 @@
     	// ## Variables ##
     	private:
 			typedef struct MAT_data_s {
-				uint8_t				port;
-				uint8_t				pin;
+				int16_t				port;
+				int16_t				pin;
 				uint32_t			period;
 				__IO uint32_t		* const EMRx;
 				__IO uint32_t		* const MCRx;
@@ -65,8 +65,8 @@
 			} MAT_data_t;
 
 			typedef struct CAP_data_s {
-				uint8_t				port;
-				uint8_t				pin;
+				int16_t				port;
+				int16_t				pin;
 				__IO uint32_t 		* const CCRmode;
 				__IO uint32_t 		* const CTCRedge;
 				__I  uint32_t 		* const CRx;

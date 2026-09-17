@@ -1035,7 +1035,8 @@ typedef struct {
    -- C-Timer --
    ---------------------------------------------------------------------------- */
 #define	__CTimer_MAX_MR		4
-#define	__CTimer_MAX_CR		3
+//#define	__CTimer_MAX_CR		3
+#define	__CTimer_MAX_CR		4
 #define	__CTimer_MAX_MSR	4
 
 typedef struct {
@@ -1048,6 +1049,7 @@ typedef struct {
 	__IO uint32_t 	MR[__CTimer_MAX_MR];	// Match Registers.
 	__IO uint32_t 	CCR;					// Capture Control Register.
 	__I  uint32_t 	CR[__CTimer_MAX_CR];	// Capture Register.
+											// OJO QUE HAY 1 MÁS, POR MÁS DE QUE POR HW HAYAN 3.
 	__IO uint32_t 	EMR;					// External Match Register.
 	__IO uint32_t 	CTCR;					// Count Control Register.
 	__IO uint32_t 	PWMC;					// PWM  Control Register.
