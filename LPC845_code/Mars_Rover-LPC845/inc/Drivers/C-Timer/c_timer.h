@@ -105,9 +105,9 @@
 
     		typedef enum EMR_Mode_e {
     			EMR_NOTHING = 0,
-				EMR_CLEAR,
-				EMR_SET,
-				EMR_TOGGLE
+				EMR_CLEAR = 0x1,
+				EMR_SET = 0x2,
+				EMR_TOGGLE = 0x3
     		} EMR_Mode_t;
 
     		typedef enum registerSelection_MAT_CAP_e {
@@ -133,7 +133,7 @@
 									  uint8_t channel, void (* inputCallback)(void) );
 			int8_t 		SwitchMatrix_Config_MAT( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel );
 			int8_t 		SwitchMatrix_Config_CAP( uint8_t inputCAPport, uint8_t inputCAPpin, uint8_t channel );
-			void 		Config_PWM( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel );
+			void 		Config_PWM( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel, uint32_t valuePWM );
 			void 		Set_PWM_MAT_channel( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel, bool enable );
 			int8_t 		Get_available_MAT_channel();
 			int8_t 		Get_available_CAP_channel();
@@ -150,7 +150,8 @@
 			int8_t		Config_CaptureInput( uint8_t		inputCAPchannel,
 	  	 	 	 	 	  	  	  	  	  	 CCRtriggers_t 	inputCCRmode,
 					  	  	  	  	  	 	 bool 			bitValueCCR );
-			void		Config_ExternalMatchOutput( uint8_t inputMATchannel, EMR_Mode_t inputMatchDemeanor );
+//			void		Config_ExternalMatchOutput( uint8_t inputMATchannel, EMR_Mode_t inputMatchDemeanor );
+			void 		Config_ExternalMatchOutput( uint8_t inputMATchannel, uint32_t inputMatchDemeanor );
 			void 		Reset_Timer_Prescale();
 			void 		Enable_Timer_Prescale( bool inputEnableValue );
 		__I uint32_t	GetCAPxValue( uint8_t channel ) const;

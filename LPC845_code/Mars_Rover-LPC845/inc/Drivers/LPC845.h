@@ -1057,7 +1057,7 @@ typedef struct {
 /* CTIMER - Base Address in Memory */
 #define		CTIMER_BASE		(0x40038000u)
 /* CTIMER - Pointer of register in Memory */
-#define		CTIMER			((CTimer_t *) CTIMER_BASE)
+#define		CTIMER			((__IO CTimer_t *) CTIMER_BASE)
 
 
 /** IOCON - Register Layout Typedef */

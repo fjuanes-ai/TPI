@@ -224,18 +224,18 @@ CTimer::CTimer() {
 		// # Counter/Timer Mode (CTMODE) #
 		CTIMER->CTCR  =   0x00000000;	// Limpiamos el registro con 0s.
 
-		// ## Timer Control register (TCR) ##
-		CTIMER->TCR   =   0x00000000;	// Limpiamos el registro con 0s.
-		// # Counter enable (CEN) #
-		this->Enable_Timer_Prescale( true );
-		this->Reset_Timer_Prescale();
-
 		// ## Configuración de MCR/CCR (Match/Capture Control Register) ##
 		CTIMER->MCR   =   0x00;			// Limpieza del MCR y del CCR.
 		CTIMER->CCR   =   0x00;
 
 		// ## Habilitación del Vector de Interrupciones (NVIC) ##
 		NVIC->ISER[0] |=  (0x01 << 23);		// Se habilita la interrupción en el vector.
+
+		// ## Timer Control register (TCR) ##
+		CTIMER->TCR   =   0x00000000;	// Limpiamos el registro con 0s.
+		// # Counter enable (CEN) #
+		this->Enable_Timer_Prescale( true );
+		this->Reset_Timer_Prescale();
 	}
 }
 
@@ -548,9 +548,13 @@ void CTimer::Config_PrescalerFrequency( uint32_t prescalerFrequency ) {
  * \input:
  * 	 \--->	inputMatchDemeanor:		Comportamiento del EMx elegido.
  */
-void CTimer::Config_ExternalMatchOutput( uint8_t inputMATchannel, EMR_Mode_t inputMatchDemeanor ) {
-	CTIMER->EMR |= inputMatchDemeanor <<
-					(__CTIMER0_EMR_EMC0_OFFSET + __CTIMER0_EMR_CHANNELS_OFFSET * inputMATchannel);
+//void CTimer::Config_ExternalMatchOutput( uint8_t inputMATchannel, EMR_Mode_t inputMatchDemeanor ) {
+void CTimer::Config_ExternalMatchOutput( uint8_t inputMATchannel, uint32_t inputMatchDemeanor ) {
+	CTIMER->EMR |= (uint32_t) ( inputMatchDemeanor << ((uint32_t) (__CTIMER0_EMR_EMC0_OFFSET + (__CTIMER0_EMR_CHANNELS_OFFSET * inputMATchannel))) );
+
+	CTIMER->EMR = 0x0;
+	// TODO: perder la cabeza en por qué corno no pone el valor que debería de poner.
+	CTIMER->EMR = (uint32_t) 3 << 4;
 }
 
 
