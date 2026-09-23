@@ -14,9 +14,10 @@ class conexion : public QObject
         void conectar(const QString &host = "192.168.4.1", quint16 puerto = 3333);
         void desconectar();
         bool estaConectado() const;
+        void enviarComando(char comando); /*para CONTROLES*/
 
     signals:
-        void lineaRecibida(const QByteArray &linea);   // una línea completa (json) lista para parsear
+        void lineaRecibida(const QByteArray &linea);   /*una línea completa (json) lista para parsear*/
         void conectado();
         void desconectado();
         void errorSocket(const QString &mensaje);

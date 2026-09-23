@@ -57,3 +57,11 @@ void conexion::onErrorOccurred(QAbstractSocket::SocketError socketError)
     Q_UNUSED(socketError);
     emit errorSocket(m_socket->errorString());
 }
+
+void conexion::enviarComando(char comando)
+{
+    if (m_socket->state() == QAbstractSocket::ConnectedState)
+    {
+        m_socket->write(&comando, 1);
+    }
+}

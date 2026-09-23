@@ -1,4 +1,4 @@
-QT += core gui widgets network
+QT += core gui widgets network charts
 
 CONFIG += c++17
 
@@ -26,3 +26,6 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    recursos.qrc
