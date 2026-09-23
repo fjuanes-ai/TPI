@@ -16,15 +16,13 @@
     /* ###########################################
      * ### INCLUDES GLOBALES ###
      * ########################################### */
+	#include "Drivers/tipos.h"
+	#include "Modulos/includeModulos.h"
 	#include "Drivers/Systick/systick.h"
 	#include "Drivers/LPC845.h"
-	#include "Drivers/tipos.h"
 	#include "Drivers/C-Timer/c_timer.h"
-	#include "Drivers/Ultrasonido-HC_SR04/HC_SR04.h"
-	#include "Drivers/Ultrasonido-HC_SR04/HC_SR04-IRQ.h"
-	#include "Modulos/includeModulos.h"
-	#include "Aplicacion/LED.h"
-	#include "Aplicacion/PULSADOR.h"
+	#include "Sensores/Ultrasonido-HC_SR04/HC_SR04.h"
+	#include "Sensores/Ultrasonido-HC_SR04/HC_SR04-IRQ.h"
 
 
     /* ###########################################

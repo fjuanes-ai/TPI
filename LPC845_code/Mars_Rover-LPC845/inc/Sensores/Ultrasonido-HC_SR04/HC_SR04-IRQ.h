@@ -16,7 +16,7 @@
     /* ###########################################
      * ### INCLUDES GLOBALES ###
      * ########################################### */
-	#include "Drivers/Ultrasonido-HC_SR04/HC_SR04.h"
+	#include "Sensores/Ultrasonido-HC_SR04/HC_SR04.h"
 
 
     /* ###########################################

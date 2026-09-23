@@ -2045,4 +2045,20 @@ typedef struct {
 /** Peripheral PINT base pointer */
 #define PINT                                     ((PINT_Type *)PINT_BASE)
 
+
+/** DAC - Register Layout Typedef */
+typedef struct {
+  __IO uint32_t CR;                                /**< D/A Converter Register. This register contains the digital value to be converted to analog and a power control bit., offset: 0x0 */
+  __IO uint32_t CTRL;                              /**< DAC Control register. This register controls DMA and timer operation., offset: 0x4 */
+  __IO uint32_t CNTVAL;                            /**< DAC Counter Value register. This register contains the reload value for the DAC DMA/Interrupt timer., offset: 0x8 */
+} DAC_Type;
+
+#define DAC0_BASE                                (0x40014000u)
+/** Peripheral DAC0 base pointer */
+#define DAC0                                     ((DAC_Type *)DAC0_BASE)
+/** Peripheral DAC1 base address */
+#define DAC1_BASE                                (0x40018000u)
+/** Peripheral DAC1 base pointer */
+#define DAC1                                     ((DAC_Type *)DAC1_BASE)
+
 #endif /* LPC845_H_ */

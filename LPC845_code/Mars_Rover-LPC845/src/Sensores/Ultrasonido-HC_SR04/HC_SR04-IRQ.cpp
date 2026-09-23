@@ -13,7 +13,7 @@
  * ### INCLUDES ###
  * ########################################### */
 
-#include "Drivers/Ultrasonido-HC_SR04/HC_SR04-IRQ.h"
+#include "Sensores/Ultrasonido-HC_SR04/HC_SR04-IRQ.h"
 
 
 /* ###########################################
