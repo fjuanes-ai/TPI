@@ -31,8 +31,9 @@
 /* ###########################################
  * ### VARIABLES GLOBALES PRIVADAS ###
  * ########################################### */
-CTimer ctimerObject( 1000000 );
-//Ultrasonido sensor_hc_sr04( 1, 0, 1, 5, &ctimerObject );
+CTimer ctimerObject( 1e6 );
+//CTimer ctimerObject( 30 );
+Ultrasonido sensor_hc_sr04( 1, 0, 1, 5, &ctimerObject );
 //GPIO lpcLED( GPIO::puertos_e::PORT1, 1, GPIO::direccion_e::SALIDA, GPIO::actividad_e::BAJO );
 
 //void (**SecuenciaTRIG[])() = {

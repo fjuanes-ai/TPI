@@ -541,6 +541,7 @@ void CTimer::Config_PrescalerFrequency( uint32_t prescalerFrequency ) {
 	__ticksFrequency = prescalerFrequency;
 
 	CTIMER->PR 	  	 =   FREQ_CLOCK / __ticksFrequency - 1;
+//	CTIMER->PR 	  	 =   FREQ_CLOCK / __ticksFrequency;
 	// Cada 30 ciclos del APB (FRO = 30 M Hz), se incrementa en 1 el TC.
 	// Con este método, 1 tick = 1 us = 1 x 10^(-6)s.
 }
@@ -559,10 +560,6 @@ void CTimer::Config_PrescalerFrequency( uint32_t prescalerFrequency ) {
 //void CTimer::Config_ExternalMatchOutput( uint8_t inputMATchannel, EMR_Mode_t inputMatchDemeanor ) {
 void CTimer::Config_ExternalMatchOutput( uint8_t inputMATchannel, uint32_t inputMatchDemeanor ) {
 	CTIMER->EMR |= (uint32_t) ( inputMatchDemeanor << ((uint32_t) (__CTIMER0_EMR_EMC0_OFFSET + (__CTIMER0_EMR_CHANNELS_OFFSET * inputMATchannel))) );
-
-//	CTIMER->EMR = 0x0;
-	// TODO: perder la cabeza en por qué corno no pone el valor que debería de poner.
-//	CTIMER->EMR = (uint32_t) 3 << 4;
 }
 
 
@@ -650,6 +647,7 @@ __I uint32_t CTimer::GetCAPxValue( uint8_t channel ) const {
  * \brief: 	Escribe el valor de MATx elegido.
  */
 void CTimer::SetMATxValue( uint8_t channel, uint32_t	inputMATvalue ) {
+//	CTIMER->MR[channel] = inputMATvalue - 1;
 	CTIMER->MR[channel] = inputMATvalue;
 }
 

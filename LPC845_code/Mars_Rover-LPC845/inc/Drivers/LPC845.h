@@ -31,6 +31,10 @@
 #define __LPC845_PORT0_MAX_PINS 	32
 #define __LPC845_PORT1_MAX_PINS 	22
 
+
+//#define FREQ_CLOCK	(30000000UL)	// 30 MHz = 30 x 10^6 Hz
+#define FREQ_CLOCK	(12e6)
+
 /***********************************************************************************************************************************
  *** TIPO DE DATOS GLOBALES
  **********************************************************************************************************************************/
@@ -1017,8 +1021,6 @@ typedef struct {
 
 #define SysTick    ( (SysTick_t *) 0xE000E010UL)   /*!< SysTick configuration struct */
 //#define SysTick    ( (SysTick_t *) 0xE000E010UL)   /*!< SysTick configuration struct */
-
-#define FREQ_CLOCK	(30000000UL)	// 30 MHz = 30 x 10^6 Hz
 
 
 #define   SYS_CSR		SysTick-> W_syst_csr

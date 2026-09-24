@@ -136,9 +136,10 @@ Ultrasonido::Ultrasonido( uint8_t portTrig, uint8_t pinTrig,
 
 
 	// ## DEBUG ##
-//	__CTimerFeatures->Config_ExternalMatchOutput( __MATchannelTRIG, CTimer::EMR_Mode_t::EMR_TOGGLE );
-	__CTimerFeatures->Config_ExternalMatchOutput( __MATchannelTRIG, 0x3 );
-	__CTimerFeatures->Config_MatchOutput( __MATchannelTRIG, CTimer::MCRtriggers_t::RESET_MCR, true, false, 500000 );
+	__CTimerFeatures->Config_ExternalMatchOutput( __MATchannelTRIG, CTimer::EMR_Mode_t::EMR_TOGGLE );
+//	__CTimerFeatures->Config_ExternalMatchOutput( __MATchannelTRIG, 0x3 );
+	__CTimerFeatures->Config_MatchOutput( __MATchannelTRIG, CTimer::MCRtriggers_t::RESET_MCR, true, false, 500e3 );
+//	__CTimerFeatures->Config_MatchOutput( __MATchannelTRIG, CTimer::MCRtriggers_t::RESET_MCR, true, false, 1 );
 //	__CTimerFeatures->SetMATxValue( __MATchannelTRIG, 500000 );
 	// ## DEBUG ##
 
