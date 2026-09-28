@@ -12,6 +12,8 @@
 #ifndef         APLICACION_INICIALIZAR_H_
     #define     APLICACION_INICIALIZAR_H_
 
+//	#include "Aplicacion/inicializar.h"
+
 
     /* ###########################################
      * ### INCLUDES GLOBALES ###
@@ -34,12 +36,14 @@
     /* ###########################################
      * ### VARIABLES GLOBALES PÚBLICAS ###
      * ########################################### */
+	extern CTimer ctimerObject;
+	extern Ultrasonido sensor_hc_sr04;
 
 
     /* ###########################################
      * ### PROTOTIPOS DE FUNCIONES PÚBLICAS ###
      * ########################################### */
     void Inicializar();
-    void SecuenciaTRIG();
+//    void SecuenciaTRIG();
 
 #endif          /* APLICACION_INICIALIZAR_H_ */

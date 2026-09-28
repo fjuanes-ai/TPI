@@ -19,7 +19,11 @@
 /* ###########################################
  * ### MACROS & TIPOS DE DATOS PRIVADOS ###
  * ########################################### */
-//
+#define	__CTIMER_PRESCALER_FREQ		((uint32_t) 1e6)
+#define __HC_SR04_TRIG_PORT			1
+#define __HC_SR04_TRIG_PIN			0
+#define __HC_SR04_ECHO_PORT			1
+#define __HC_SR04_ECHO_PIN			1
 
 
 /* ###########################################
@@ -31,14 +35,11 @@
 /* ###########################################
  * ### VARIABLES GLOBALES PRIVADAS ###
  * ########################################### */
-CTimer ctimerObject( 1e6 );
-//CTimer ctimerObject( 30 );
-Ultrasonido sensor_hc_sr04( 1, 0, 1, 5, &ctimerObject );
+CTimer ctimerObject( __CTIMER_PRESCALER_FREQ );
+Ultrasonido sensor_hc_sr04( __HC_SR04_TRIG_PORT, __HC_SR04_TRIG_PIN,
+							__HC_SR04_ECHO_PORT, __HC_SR04_ECHO_PIN,
+							&ctimerObject );
 //GPIO lpcLED( GPIO::puertos_e::PORT1, 1, GPIO::direccion_e::SALIDA, GPIO::actividad_e::BAJO );
-
-//void (**SecuenciaTRIG[])() = {
-//		TRIGstep_01
-//};
 
 
 /* ###########################################
@@ -64,23 +65,12 @@ Ultrasonido sensor_hc_sr04( 1, 0, 1, 5, &ctimerObject );
  * Configura el modo de funcionamiento de la interrupción externa.
  */
 void Inicializar() {
-	// # Timers #
-	// TODO: hacer una manera más modular para meter la información de TRIG y ECHO...
-//	CTimer_Config( puertoTRIG, pinTRIG, puertoECHO, pinECHO, PRESCALER_DEFAULT );
+//	 ### Systick ###
 	SysTick_Config( 1 );
 //	lpcLED.SetPin();
 
-//	sensor_hc_sr04.
-}
-
-
-/*********************************************
- * SecuenciaTRIG
- *********************************************
- * A
- */
-void SecuenciaTRIG() {
-//	sensor_hc_sr04.
+//	### Sensor Ultrasónico HC-SR04 ###
+	sensor_hc_sr04.Set_Callback_Sequence( ultrasonido_secuencia );
 }
 
 

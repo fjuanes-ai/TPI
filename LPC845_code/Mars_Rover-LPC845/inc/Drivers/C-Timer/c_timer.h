@@ -108,7 +108,7 @@
 				EMR_CLEAR = 0x1,
 				EMR_SET = 0x2,
 				EMR_TOGGLE = 0x3
-    		} EMR_Mode_t;
+    		} EMR_Demeanor_t;
 
     		typedef enum registerSelection_MAT_CAP_e {
     			MAT_REGISTER,
@@ -131,31 +131,32 @@
 						CTimer( uint32_t prescalerFrequency = CTIMER_DEFAULT_FREQ );
 			void 		Set_Callback( registerSelection_MAT_CAP_t registerSelection,
 									  uint8_t channel, void (* inputCallback)(void) );
-			int8_t 		SwitchMatrix_Config_MAT( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel );
-			int8_t 		SwitchMatrix_Config_CAP( uint8_t inputCAPport, uint8_t inputCAPpin, uint8_t channel );
-			void 		Config_PWM( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel, uint32_t valuePWM );
-			void 		Set_PWM_MAT_channel( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel, bool enable );
+			int8_t 		SwitchMatrix_Config_MAT( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel );
+			int8_t 		SwitchMatrix_Config_CAP( uint8_t input_CAPport, uint8_t input_CAPpin, uint8_t channel );
+			void 		Config_PWM( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel, uint32_t valuePWM );
+			void 		Set_PWM_MAT_channel( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel, bool enable );
 			int8_t 		Get_available_MAT_channel();
 			int8_t 		Get_available_CAP_channel();
-			void		Config_CountControlRegister( uint8_t					inputCAPchannel,
-					  	  	  	  	  	  	  	  	 CTCR_TimerCounter_Mode_t 	inputMode,
+			void		Config_CountControlRegister( uint8_t					input_CAPchannel,
+					  	  	  	  	  	  	  	  	 CTCR_TimerCounter_Mode_t 	input_CTCRmode,
 													 bool 						clearTCwithCaptureEdge,
-													 CTCR_Edge_t 				inputEdge );
+													 CTCR_Edge_t 				input_Edge );
 			void 		Config_PrescalerFrequency( uint32_t prescalerFrequency );
-			void 		Config_MatchOutput(  uint8_t		inputMATchannel,
-	  	  	  	  	  	 	 	 	 	 	 MCRtriggers_t 	inputMCRmode,
-											 bool			bitValueMCR,
-											 bool			reloadWithMatchShadow,
-											 uint32_t 		microSecondsMATCH = MAT_PERIOD_DEFAULT );
-			int8_t		Config_CaptureInput( uint8_t		inputCAPchannel,
+			void 		Config_MatchControlRegister( uint8_t			input_MATchannel,
+	  	  	  	  	  	 	 	 	 	 	MCRtriggers_t 	input_MCRmode,
+											 bool			bitValueMCR );
+			void 		Config_MatchShadow( uint8_t			input_MATchannel,
+											bool			reloadWithMatchShadow );
+			void		Config_CaptureControlRegister( uint8_t		input_CAPchannel,
 	  	 	 	 	 	  	  	  	  	  	 CCRtriggers_t 	inputCCRmode,
 					  	  	  	  	  	 	 bool 			bitValueCCR );
-//			void		Config_ExternalMatchOutput( uint8_t inputMATchannel, EMR_Mode_t inputMatchDemeanor );
-			void 		Config_ExternalMatchOutput( uint8_t inputMATchannel, uint32_t inputMatchDemeanor );
+			void		Config_ExternalMatchRegister( uint8_t input_MATchannel, EMR_Demeanor_t input_ExternalMatchDemeanor );
+//			void 		Config_ExternalMatchRegister( uint8_t input_MATchannel, uint32_t input_ExternalMatchDemeanor );
 			void 		Reset_Timer_Prescale();
-			void 		Enable_Timer_Prescale( bool inputEnableValue );
+			void 		Enable_Timer_Prescale( bool input_EnableValue );
 		__I uint32_t	GetCAPxValue( uint8_t channel ) const;
-			void 		SetMATxValue( uint8_t channel, uint32_t	inputMATvalue );
+			void 		SetMATxValue( uint8_t channel, uint32_t	input_MATvalue );
+			void  		SetMSRxValue( uint8_t channel, uint32_t	input_MSRvalue );
     };
 
 

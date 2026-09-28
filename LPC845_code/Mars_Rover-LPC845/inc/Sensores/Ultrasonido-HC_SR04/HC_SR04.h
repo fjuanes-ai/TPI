@@ -12,6 +12,7 @@
 #ifndef         DRIVERS_Ultrasonido_HC_SR04_HC_SR04_H_
     #define     DRIVERS_Ultrasonido_HC_SR04_HC_SR04_H_
 
+//	#include "Sensores/Ultrasonido-HC_SR04/HC_SR04.h"
 
     /* ###########################################
      * ### INCLUDES GLOBALES ###
@@ -63,22 +64,27 @@
 							DISTANCE_NO_OBSTACLE =  __MY_DOUBLE_POS_INFINITY
 			} HC_SR04_DistanceValues_millimeters_t;
 
-
 		// # Variables #
+		public:
+			uint8_t		__MATchannelTRIG;
+			uint8_t		__CAPchannelECHO;
+
 		private:
 //			GPIO 		__trigHW;	// PINES en HARDWARE de Trigger + Echo.
 //			Intext 		__echoHW;
 			uint8_t		__pulseSent;
 			uint8_t		__ticksCount_microSeconds;
 			uint16_t	__ticksUpdateCount;
-			void		(*__SecuenciaTRIGcallback[__SEQ_TRIG_STEPS])(void);
-			uint8_t		__TRIGsequenceStep_callback;
-			void		(*__SecuenciaECHOcallback[__SEQ_ECHO_STEPS])(void);
-			uint8_t		__ECHOsequenceStep_callback;
+//			void		(*__SecuenciaTRIGcallback[__SEQ_TRIG_STEPS])(void);
+//			uint8_t		__TRIGsequenceStep_callback;
+//			void		(*__SecuenciaECHOcallback[__SEQ_ECHO_STEPS])(void);
+//			uint8_t		__ECHOsequenceStep_callback;
 
 			CTimer		*__CTimerFeatures;
-			uint8_t		__MATchannelTRIG;
-			uint8_t		__CAPchannelECHO;
+//			uint8_t		__MATchannelTRIG;
+//			uint8_t		__CAPchannelECHO;
+
+			void 		(**__sequenceCallbacks)(void);
 
 			typedef enum pulse_e {
 				N_PULSE	= 0,
@@ -101,8 +107,10 @@
 			uint32_t 	Measure_Time();
 //			uint32_t 	Time_microSec_to_Distance_millimeters( uint32_t inputTime_microSec );
 			void 		Time_microSec_to_Distance_millimeters();
-			void 		Set_TRIG_Callback_Sequence( void (*inputCallback)(void) );
-			void 		Set_ECHO_Callback_Sequence( void (*inputCallback)(void) );
+//			void 		Set_TRIG_Callback_Sequence( void (*inputCallback)(void) );
+//			void 		Set_ECHO_Callback_Sequence( void (*inputCallback)(void) );
+			void 		Set_Callback_Sequence( void (**inputCallback)(void) );
+			void 		InicioDeSecuencia();
 			void		HandlerDelPeriferico();
 //						~Ultrasonido();
 	};

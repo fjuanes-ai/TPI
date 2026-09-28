@@ -314,7 +314,7 @@ void CTimer::Set_Callback( registerSelection_MAT_CAP_t registerSelection,
  * \brief: 	Cambia de funcionalidad los pines seleccionados según SW
  * 			para habilitar la función de MAT.
  */
-int8_t CTimer::SwitchMatrix_Config_MAT( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel ) {
+int8_t CTimer::SwitchMatrix_Config_MAT( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel ) {
 
 	SYSCON->SYSAHBCLKCTRL0 |=  (__SYSCON_SYSAHBCLKCTRL0_SWM_MASK );	// Habilitación del SW.
 
@@ -322,14 +322,14 @@ int8_t CTimer::SwitchMatrix_Config_MAT( uint8_t inputMATport, uint8_t inputMATpi
 	if ( channel >= __CTimer_MAX_MR )
 		return -1;
 
-	switch ( inputMATport ) {
+	switch ( input_MATport ) {
 		case Port0:
-			if ( inputMATpin >= __LPC845_PORT0_MAX_PINS )
+			if ( input_MATpin >= __LPC845_PORT0_MAX_PINS )
 				return -1;
 		break;
 
 		case Port1:
-			if ( inputMATpin >= __LPC845_PORT1_MAX_PINS )
+			if ( input_MATpin >= __LPC845_PORT1_MAX_PINS )
 				return -1;
 		break;
 
@@ -337,18 +337,18 @@ int8_t CTimer::SwitchMatrix_Config_MAT( uint8_t inputMATport, uint8_t inputMATpi
 			return -1;
 	}
 
-	this->__MAT[channel].port = inputMATport;
-	this->__MAT[channel].pin  = inputMATpin;
+	this->__MAT[channel].port = input_MATport;
+	this->__MAT[channel].pin  = input_MATpin;
 
 	// # Habilitación de los pines MATCH #
 	if ( channel < 3 ) {
 		// Limpiamos el registro lleno de bits en 1.
 		SWM0->PINASSIGN_DATA[13] &= ~(0xFF << (__PINASSIGN13_TO_MAT_0_OFFSET * (channel + 1)));
-		SWM0->PINASSIGN_DATA[13] |=  ((inputMATport * __PINASSIGN_PORT_OFFSET + inputMATpin) << (__PINASSIGN13_TO_MAT_0_OFFSET * (channel + 1)));
+		SWM0->PINASSIGN_DATA[13] |=  ((input_MATport * __PINASSIGN_PORT_OFFSET + input_MATpin) << (__PINASSIGN13_TO_MAT_0_OFFSET * (channel + 1)));
 	} else {
 		// Limpiamos el registro lleno de bits en 1.
 		SWM0->PINASSIGN_DATA[14] &= ~(0xFF << (__PINASSIGN14_TO_MAT_3_OFFSET * (channel + 1)));
-		SWM0->PINASSIGN_DATA[14] |=  (inputMATport * __PINASSIGN_PORT_OFFSET + inputMATpin);
+		SWM0->PINASSIGN_DATA[14] |=  (input_MATport * __PINASSIGN_PORT_OFFSET + input_MATpin);
 	}
 
 
@@ -363,7 +363,7 @@ int8_t CTimer::SwitchMatrix_Config_MAT( uint8_t inputMATport, uint8_t inputMATpi
  * \brief: 	Cambia de funcionalidad los pines seleccionados según SW
  * 			para habilitar la función de CAP.
  */
-int8_t CTimer::SwitchMatrix_Config_CAP( uint8_t inputCAPport, uint8_t inputCAPpin, uint8_t channel ) {
+int8_t CTimer::SwitchMatrix_Config_CAP( uint8_t input_CAPport, uint8_t input_CAPpin, uint8_t channel ) {
 
 	SYSCON->SYSAHBCLKCTRL0 |=  (__SYSCON_SYSAHBCLKCTRL0_SWM_MASK );	// Habilitación del SW.
 
@@ -371,14 +371,14 @@ int8_t CTimer::SwitchMatrix_Config_CAP( uint8_t inputCAPport, uint8_t inputCAPpi
 	if ( channel >= __CTimer_MAX_CR - 1 )	// 1 CANAL MENOS DISPONIBLE POR HW.
 		return -1;
 
-	switch ( inputCAPport ) {
+	switch ( input_CAPport ) {
 		case Port0:
-			if ( inputCAPpin >= __LPC845_PORT0_MAX_PINS )
+			if ( input_CAPpin >= __LPC845_PORT0_MAX_PINS )
 				return -1;
 		break;
 
 		case Port1:
-			if ( inputCAPpin >= __LPC845_PORT1_MAX_PINS )
+			if ( input_CAPpin >= __LPC845_PORT1_MAX_PINS )
 				return -1;
 		break;
 
@@ -386,13 +386,13 @@ int8_t CTimer::SwitchMatrix_Config_CAP( uint8_t inputCAPport, uint8_t inputCAPpi
 			return -1;
 	}
 
-	this->__CAP[channel].port = inputCAPport;
-	this->__CAP[channel].pin  = inputCAPpin;
+	this->__CAP[channel].port = input_CAPport;
+	this->__CAP[channel].pin  = input_CAPpin;
 
 	// # Habilitación de los pines CAP #
 	// Limpiamos el registro lleno de bits en 1.
 	SWM0->PINASSIGN_DATA[14] &= ~(0xFF << (__PINASSIGN14_TO_CAP_0_OFFSET * (channel + 1)));
-	SWM0->PINASSIGN_DATA[14] |=  ((inputCAPport * __PINASSIGN_PORT_OFFSET + inputCAPpin) << (__PINASSIGN14_TO_CAP_0_OFFSET * (channel + 1)));
+	SWM0->PINASSIGN_DATA[14] |=  ((input_CAPport * __PINASSIGN_PORT_OFFSET + input_CAPpin) << (__PINASSIGN14_TO_CAP_0_OFFSET * (channel + 1)));
 
 
 	SYSCON->SYSAHBCLKCTRL0 &= ~(__SYSCON_SYSAHBCLKCTRL0_SWM_MASK );	// Deshabilitación del SW.
@@ -408,7 +408,7 @@ int8_t CTimer::SwitchMatrix_Config_CAP( uint8_t inputCAPport, uint8_t inputCAPpi
  * \input:
  * 	 \--->	A:	A
  */
-void CTimer::Config_PWM( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel, uint32_t valuePWM ) {
+void CTimer::Config_PWM( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel, uint32_t valuePWM ) {
 
 }
 
@@ -421,7 +421,7 @@ void CTimer::Config_PWM( uint8_t inputMATport, uint8_t inputMATpin, uint8_t chan
  * \input:
  * 	 \--->	A:	A
  */
-void CTimer::Set_PWM_MAT_channel( uint8_t inputMATport, uint8_t inputMATpin, uint8_t channel, bool enable ) {
+void CTimer::Set_PWM_MAT_channel( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel, bool enable ) {
 
 }
 
@@ -472,11 +472,11 @@ int8_t CTimer::Get_available_CAP_channel() {
  * \brief: 	Habilita o deshabilita el Timer y el Prescale.
  *
  * \input:
- * 	 \--->	inputEnableValue:	Valor para habilitar o deshabilitar
+ * 	 \--->	input_EnableValue:	Valor para habilitar o deshabilitar
  * 	 							el TC y el PC.
  */
-void CTimer::Enable_Timer_Prescale( bool inputEnableValue ) {
-	CTIMER->TCR |= inputEnableValue << __CTIMER0_TCR_CEN_OFFSET;
+void CTimer::Enable_Timer_Prescale( bool input_EnableValue ) {
+	CTIMER->TCR |= input_EnableValue << __CTIMER0_TCR_CEN_OFFSET;
 }
 
 
@@ -501,19 +501,19 @@ void CTimer::Reset_Timer_Prescale() {
  * \input:
  * 	 \--->	inputPort_CAP:				Puerto para el CAP.
  * 	 \--->	inputPin_CAP:				Pin para el CAP.
- * 	 \--->	inputMode:					Modo del CTCR (Timer, Counter Rising,
+ * 	 \--->	input_CTCRmode:				Modo del CTCR (Timer, Counter Rising,
  * 	 |									Counter Falling, Counter Double Edge).
  * 	 \--->	clearTCwithCaptureEdge:		Booleano para limpiar o no el valor de
  * 	 |									TC y PR en evento de CAPx.
- * 	 \--->	inputEdge:					Evento elegido para el CAPx.
+ * 	 \--->	input_Edge:					Evento elegido para el CAPx.
  */
-void CTimer::Config_CountControlRegister( uint8_t					inputCAPchannel,
-										  CTCR_TimerCounter_Mode_t 	inputMode,
+void CTimer::Config_CountControlRegister( uint8_t					input_CAPchannel,
+										  CTCR_TimerCounter_Mode_t 	input_CTCRmode,
 									      bool 						clearTCwithCaptureEdge,
-									      CTCR_Edge_t 				inputEdge ) {
+									      CTCR_Edge_t 				input_Edge ) {
 
 //	CTIMER->CTCR &= ~(0x01);		// Timer Mode.
-	CTIMER->CTCR |=    inputMode;
+	CTIMER->CTCR |=    input_CTCRmode;
 
 	// # Reset (ENCC) #
 //	CTIMER->CTCR |=  (0x01 << 4);	// Habilitamos el reset por Capture Input x.
@@ -521,7 +521,7 @@ void CTimer::Config_CountControlRegister( uint8_t					inputCAPchannel,
 
 	// # Reset (SELCC) #
 //	CTIMER->CTCR &= ~(0x07 << 5);	// El reset es por Capture Input 0, rising edge.
-	CTIMER->CTCR &= ~((__CTIMER0_CTCR_CHANNELS_OFFSET * inputCAPchannel + inputEdge)
+	CTIMER->CTCR &= ~((__CTIMER0_CTCR_CHANNELS_OFFSET * input_CAPchannel + input_Edge)
 						<< __CTIMER0_CTCR_SELCC_OFFSET);
 	// \--> Esto se hace así para que, cuando se detecte una subida
 	//		por el pin de ECHO, reinicie la cuenta.
@@ -549,61 +549,67 @@ void CTimer::Config_PrescalerFrequency( uint32_t prescalerFrequency ) {
 
 
 /*********************************************
- * Config_ExternalMatchOutput
+ * Config_ExternalMatchRegister
  *********************************************
  * \brief: 	Configura la funcionalidad de los pines
  * 			de External Match, de a 1 modo a la vez.
  *
  * \input:
- * 	 \--->	inputMatchDemeanor:		Comportamiento del EMx elegido.
+ * 	 \--->	input_ExternalMatchDemeanor:		Comportamiento del EMx elegido.
  */
-//void CTimer::Config_ExternalMatchOutput( uint8_t inputMATchannel, EMR_Mode_t inputMatchDemeanor ) {
-void CTimer::Config_ExternalMatchOutput( uint8_t inputMATchannel, uint32_t inputMatchDemeanor ) {
-	CTIMER->EMR |= (uint32_t) ( inputMatchDemeanor << ((uint32_t) (__CTIMER0_EMR_EMC0_OFFSET + (__CTIMER0_EMR_CHANNELS_OFFSET * inputMATchannel))) );
+void CTimer::Config_ExternalMatchRegister( uint8_t input_MATchannel, EMR_Demeanor_t input_ExternalMatchDemeanor ) {
+//void CTimer::Config_ExternalMatchRegister( uint8_t input_MATchannel, uint32_t input_ExternalMatchDemeanor ) {
+	CTIMER->EMR |= (uint32_t) ( input_ExternalMatchDemeanor << ((uint32_t) (__CTIMER0_EMR_EMC0_OFFSET + (__CTIMER0_EMR_CHANNELS_OFFSET * input_MATchannel))) );
 }
 
 
 /*********************************************
- * Config_MatchOutput
+ * Config_MatchControlRegister
  *********************************************
  * \brief: 	Configura el comportamiento de
  * 			los Match Output, de a 1 modo a la vez.
  *
  * \input:
- * 	 \--->	inputMCRmode:		Modo del MCR (0 ~ 3).
+ * 	 \--->	input_MATchannel:	Canal MAT.
+ * 	 \--->	input_MCRmode:		Modo del MCR (0 ~ 3).
  * 	 \--->	bitValueMCR:		Valor binario para habilitar o deshabilitar
  * 	 							la función elegida.
- * 	 \--->	microSecondsMATCH:	Período configurado del registro MATx.
+ * 	 \--->	reloadWithMatchShadow:	Booleano para habilitar o deshabilitar el MATCH SHADOW.
  */
-void CTimer::Config_MatchOutput( uint8_t		inputMATchannel,
-		  	  	  	  	  	  	 MCRtriggers_t 	inputMCRmode,
-								 bool			bitValueMCR,
-								 bool			reloadWithMatchShadow,
-								 uint32_t 		microSecondsMATCH ) {
+void CTimer::Config_MatchControlRegister( uint8_t		input_MATchannel,
+		  	  	  	  	  	  	 MCRtriggers_t 	input_MCRmode,
+								 bool			bitValueMCR ) {
 	// # Protección contra límites físicos (HW) #
-	if ( inputMATchannel >= __CTimer_MAX_MR ) {
+	if ( input_MATchannel >= __CTimer_MAX_MR ) {
 		return;
 	}
 
 	// # Limpieza del registro #
-	CTIMER->MCR &= ~(0x01 << (__CTIMER0_MCR_CHANNELS_OFFSET * inputMATchannel + inputMCRmode));
+	CTIMER->MCR &= ~(0x01 << (__CTIMER0_MCR_CHANNELS_OFFSET * input_MATchannel + input_MCRmode));
 
 	// # Configuración de comportamiento de MATx #
-	CTIMER->MCR |=   bitValueMCR << (__CTIMER0_MCR_CHANNELS_OFFSET * inputMATchannel + inputMCRmode);
+	CTIMER->MCR |=   bitValueMCR << (__CTIMER0_MCR_CHANNELS_OFFSET * input_MATchannel + input_MCRmode);
 
-	// # Asignación del tiempo deseado para el MATCH en microsegundos (x 10^(-6)) #
-	if ( bitValueMCR )
-		this->SetMATxValue(inputMATchannel, microSecondsMATCH);
-
-	if ( reloadWithMatchShadow )
-		CTIMER->MCR |=   0x01 << __CTIMER0_MCR_MR0RL_OFFSET;
-	else
-		CTIMER->MCR &= ~(0x01 << __CTIMER0_MCR_MR0RL_OFFSET);
 }
 
 
+
+void CTimer::Config_MatchShadow( uint8_t		input_MATchannel,
+								 bool			reloadWithMatchShadow ) {
+	// # Protección contra límites físicos (HW) #
+	if ( input_MATchannel >= __CTimer_MAX_MR ) {
+		return;
+	}
+
+	if ( reloadWithMatchShadow ) {
+		CTIMER->MCR |=   0x01 << (__CTIMER0_MCR_MR0RL_OFFSET + input_MATchannel);
+	} else {
+		CTIMER->MCR &= ~(0x01 << (__CTIMER0_MCR_MR0RL_OFFSET + input_MATchannel));
+	}
+}
+
 /*********************************************
- * Config_CaptureInput
+ * Config_CaptureControlRegister
  *********************************************
  * \brief: 	Configura el comportamiento de
  * 			los Capture Input, de a 1 modo a la vez.
@@ -613,21 +619,21 @@ void CTimer::Config_MatchOutput( uint8_t		inputMATchannel,
  * 	 \--->	bitValueCCR:		Valor binario para habilitar o deshabilitar
  * 	 							la función elegida.
  */
-int8_t CTimer::Config_CaptureInput( uint8_t			inputCAPchannel,
+void CTimer::Config_CaptureControlRegister( uint8_t			input_CAPchannel,
 	  	  	  	 	 	 	 	  	CCRtriggers_t 	inputCCRmode,
 									bool 			bitValueCCR ) {
 	// # Protección contra límites físicos (HW) #
-	if ( inputCAPchannel >= __CTimer_MAX_CR - 1 ) {		// 1 CANAL MENOS DISPONIBLE POR HW.
-		return -1;
+	if ( input_CAPchannel >= __CTimer_MAX_CR - 1 ) {		// 1 CANAL MENOS DISPONIBLE POR HW.
+		return;
 	}
 
 	// # Limpieza del registro #
-	CTIMER->CCR &= ~(0x01 << (__CTIMER0_CCR_CHANNELS_OFFSET * inputCAPchannel + inputCCRmode));
+	CTIMER->CCR &= ~(0x01 << (__CTIMER0_CCR_CHANNELS_OFFSET * input_CAPchannel + inputCCRmode));
 
 	// # Configuración de comportamiento de CAPx #
-	CTIMER->CCR |=  bitValueCCR << (__CTIMER0_CCR_CHANNELS_OFFSET * inputCAPchannel + inputCCRmode);
+	CTIMER->CCR |=  bitValueCCR << (__CTIMER0_CCR_CHANNELS_OFFSET * input_CAPchannel + inputCCRmode);
 
-	return inputCAPchannel;
+//	return input_CAPchannel;
 }
 
 
@@ -646,9 +652,20 @@ __I uint32_t CTimer::GetCAPxValue( uint8_t channel ) const {
  *********************************************
  * \brief: 	Escribe el valor de MATx elegido.
  */
-void CTimer::SetMATxValue( uint8_t channel, uint32_t	inputMATvalue ) {
-//	CTIMER->MR[channel] = inputMATvalue - 1;
-	CTIMER->MR[channel] = inputMATvalue;
+void CTimer::SetMATxValue( uint8_t channel, uint32_t	input_MATvalue ) {
+//	CTIMER->MR[channel] = input_MATvalue - 1;
+	CTIMER->MR[channel] = input_MATvalue;
+}
+
+
+/*********************************************
+ * SetMSRxValue
+ *********************************************
+ * \brief: 	Escribe el valor de MSRx elegido (Match Shadow).
+ */
+void CTimer::SetMSRxValue( uint8_t channel, uint32_t	input_MSRvalue ) {
+//	CTIMER->MSR[channel] = input_MSRvalue - 1;
+	CTIMER->MSR[channel] = input_MSRvalue;
 }
 
 
