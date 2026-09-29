@@ -37,7 +37,7 @@
      * ### VARIABLES GLOBALES PÚBLICAS ###
      * ########################################### */
 	extern CTimer ctimerObject;
-	extern Ultrasonido sensor_hc_sr04;
+	extern Us_HC_SR04 sensor_hc_sr04;
 
 
     /* ###########################################

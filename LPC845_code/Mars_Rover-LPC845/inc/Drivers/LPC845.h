@@ -31,7 +31,7 @@
 #define __LPC845_PORT0_MAX_PINS 	32
 #define __LPC845_PORT1_MAX_PINS 	22
 
-
+// TODO: configurar frecuencia del reloj (FRO) o hacer macros modulares con condicionales...
 //#define FREQ_CLOCK	(30000000UL)	// 30 MHz = 30 x 10^6 Hz
 #define FREQ_CLOCK	(12e6)
 
@@ -126,6 +126,12 @@ typedef struct {
 
 #define SYSCON_SYSAHBCLKCTRL0_UART0_MASK         (0x4000U)
 #define SYSCON_SYSAHBCLKCTRL0_UART0_SHIFT        (14U)
+
+#define SYSCON_SYSAHBCLKCTRL0_IOCON_SHIFT        (18U)
+#define SYSCON_SYSAHBCLKCTRL0_IOCON_MASK		 (0x1 << SYSCON_SYSAHBCLKCTRL0_IOCON_SHIFT)
+
+#define SYSCON_SYSAHBCLKCTRL0_CTIMER_SHIFT       (25U)
+#define SYSCON_SYSAHBCLKCTRL0_CTIMER_MASK		 (0x1 << SYSCON_SYSAHBCLKCTRL0_CTIMER_SHIFT)
 
 #define SYSCON_SYSAHBCLKCTRL0_DAC0_MASK          (0x8000000U)
 #define SYSCON_SYSAHBCLKCTRL0_DAC0_SHIFT         (27U)
@@ -1023,11 +1029,11 @@ typedef struct {
 //#define SysTick    ( (SysTick_t *) 0xE000E010UL)   /*!< SysTick configuration struct */
 
 
-#define   SYS_CSR		SysTick-> W_syst_csr
-	#define   SYS_CSR_ENABLE		SysTick-> _enable
-	#define   SYS_CSR_TICKINT		SysTick->  _tickint
-	#define   SYS_CSR_CLKSOURCE	SysTick-> _clksource
-	#define   SYS_CSR_COUNTFLAG	SysTick-> _countflag
+#define   SYST_CSR		SysTick-> W_syst_csr
+	#define   SYST_CSR_ENABLE		SysTick-> _enable
+	#define   SYST_CSR_TICKINT		SysTick->  _tickint
+	#define   SYST_CSR_CLKSOURCE	SysTick-> _clksource
+	#define   SYST_CSR_COUNTFLAG	SysTick-> _countflag
 #define SYST_RVR		SysTick->_syst_rvr
 #define SYST_CVR 		SysTick->_syst_cvr
 #define SYST_CALIB	SysTick->_syst_calib
@@ -1053,6 +1059,7 @@ typedef struct {
 	__I  uint32_t 	CR[__CTimer_MAX_CR];	// Capture Register.
 											// OJO QUE HAY 1 MÁS, POR MÁS DE QUE POR HW HAYAN 3.
 	__IO uint32_t 	EMR;					// External Match Register.
+	__I	 uint32_t	__RESERVED[12];
 	__IO uint32_t 	CTCR;					// Count Control Register.
 	__IO uint32_t 	PWMC;					// PWM  Control Register.
 	__IO uint32_t 	MSR[__CTimer_MAX_MSR];	// Match Shadow Registers.
@@ -2062,5 +2069,18 @@ typedef struct {
 #define DAC1_BASE                                (0x40018000u)
 /** Peripheral DAC1 base pointer */
 #define DAC1                                     ((DAC_Type *)DAC1_BASE)
+
+
+
+/** IOCON **/
+#define IOCON_PIOX_Y_MODE_OFFSET			3
+#define IOCON_PIOX_Y_HYS_OFFSET				5
+#define IOCON_PIOX_Y_INV_OFFSET				6
+#define IOCON_PIOX_Y_I2C_MODE_OFFSET		8
+#define IOCON_PIOX_Y_OD_OFFSET				10
+#define IOCON_PIOX_Y_S_MODE_OFFSET			11
+#define IOCON_PIOX_Y_CLK_DIV_OFFSET			13
+#define IOCON_PIOX_Y_DAC_MODE_OFFSET		16
+
 
 #endif /* LPC845_H_ */

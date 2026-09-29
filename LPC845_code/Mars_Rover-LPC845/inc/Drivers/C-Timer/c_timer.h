@@ -19,6 +19,8 @@
      * ########################################### */
 	#include "Drivers/LPC845.h"
 	#include "Drivers/tipos.h"
+	#include "Drivers/SwitchMatrix/swm.h"
+	#include "Drivers/IOCON/iocon.h"
 	#include "Modulos/includeModulos.h"
 
 
@@ -61,7 +63,7 @@
 				__IO uint32_t		* const EMRx;
 				__IO uint32_t		* const MCRx;
 				__IO uint32_t 		* const MRx;
-				void				(*__callback)();
+				volatile void		(*__callback)();
 			} MAT_data_t;
 
 			typedef struct CAP_data_s {
@@ -70,7 +72,7 @@
 				__IO uint32_t 		* const CCRmode;
 				__IO uint32_t 		* const CTCRedge;
 				__I  uint32_t 		* const CRx;
-				void				(*__callback)();
+				volatile void		(*__callback)();
 			} CAP_data_t;
 
     	public:
@@ -130,7 +132,7 @@
 						CTimer();
 						CTimer( uint32_t prescalerFrequency = CTIMER_DEFAULT_FREQ );
 			void 		Set_Callback( registerSelection_MAT_CAP_t registerSelection,
-									  uint8_t channel, void (* inputCallback)(void) );
+									  uint8_t channel,  volatile void (* inputCallback)(void) );
 			int8_t 		SwitchMatrix_Config_MAT( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel );
 			int8_t 		SwitchMatrix_Config_CAP( uint8_t input_CAPport, uint8_t input_CAPpin, uint8_t channel );
 			void 		Config_PWM( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel, uint32_t valuePWM );
@@ -154,7 +156,7 @@
 //			void 		Config_ExternalMatchRegister( uint8_t input_MATchannel, uint32_t input_ExternalMatchDemeanor );
 			void 		Reset_Timer_Prescale();
 			void 		Enable_Timer_Prescale( bool input_EnableValue );
-		__I uint32_t	GetCAPxValue( uint8_t channel ) const;
+		    uint32_t	GetCAPxValue( uint8_t channel ) const;
 			void 		SetMATxValue( uint8_t channel, uint32_t	input_MATvalue );
 			void  		SetMSRxValue( uint8_t channel, uint32_t	input_MSRvalue );
     };

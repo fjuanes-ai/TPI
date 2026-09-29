@@ -18,9 +18,15 @@
 
 int main( void ) {
 
+//	GPIO temp_GPIO_ECHO_CAP0( GPIO::PORT0, 17, GPIO::direccion_e::ENTRADA, GPIO::actividad_e::ALTO);
+//	uint32_t temp_counter = 0;
+
 	Inicializar();
 
     while ( 1 ) {
+//    	if ( temp_GPIO_ECHO_CAP0.GetPin() ) {
+//    		++temp_counter;
+//    	}
 
     }
 

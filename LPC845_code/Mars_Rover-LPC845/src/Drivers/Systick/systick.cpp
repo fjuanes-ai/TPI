@@ -63,18 +63,22 @@ uint32_t SysTick_Config( uint32_t ms ) {
 
 	uint32_t frecuenciaSystick, ticks;
 
-	frecuenciaSystick = 1000 / ms;				 	// frecuenciaSystick = 1 / ( ms * 0.001)
+	frecuenciaSystick = FREQ_CLOCK / 1000;
 
-	ticks = FREQ_CLOCK / frecuenciaSystick;  		// ticks = Tsystic / Tclock ;
+//	frecuenciaSystick = 1000 / ms;				 	// frecuenciaSystick = 1 / ( ms * 0.001)
+
+//	ticks = FREQ_CLOCK / frecuenciaSystick;  		// ticks = Tsystic / Tclock ;
+
+	ticks = frecuenciaSystick * ms;
 
 	if (ticks > __MAX_TICKS)
 		return 1 ;
 
 	SYST_RVR  =  ticks - 1UL;
 	SYST_CVR  =  0UL;			// Metemos el valor actual en 0 para que entre instantáneamente al IRQ.
-	SYS_CSR = 0x7UL;			// Metemos una máscara para habilitar "ENABLE", "CLKSOURCE" y "TICKINT" al mismo tiempo.
+	SYST_CSR  =  0x7UL;			// Metemos una máscara para habilitar "ENABLE", "CLKSOURCE" y "TICKINT" al mismo tiempo.
 								// Manualmente NO funciona (por alguna razón...).
-	//o…. SYS_CSR  = 7;
+	//o…. SYST_CSR  = 7;
 
 
 	// # Función de interrupción CALLBACK #

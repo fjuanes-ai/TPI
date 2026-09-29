@@ -32,11 +32,11 @@
  * ########################################### */
 #if defined (__cplusplus)
 	extern "C" {
-		static void MdE_Ultrasonido_MidiendoTiempoECHO();
-		static void MdE_Ultrasonido_DelayReinicio();
-		static void MdE_Ultrasonido_PulsoTRIGalto();
-		static void MdE_Ultrasonido_SetupDelayReinicio();
-		static void MdE_Ultrasonido_EsperandoECHO();
+		static volatile void MdE_Ultrasonido_MidiendoTiempoECHO();
+		static volatile void MdE_Ultrasonido_DelayReinicio();
+		static volatile void MdE_Ultrasonido_PulsoTRIGalto();
+		static volatile void MdE_Ultrasonido_SetupDelayReinicio();
+		static volatile void MdE_Ultrasonido_EsperandoECHO();
 	}
 #endif
 
@@ -44,7 +44,7 @@
 /* ###########################################
  * ### VARIABLES GLOBALES PÚBLICAS ###
  * ########################################### */
-void (*ultrasonido_secuencia[__HC_SR04_MDE_STEPS])(void) = {
+volatile void (*ultrasonido_secuencia[__HC_SR04_MDE_STEPS])(void) = {
 		MdE_Ultrasonido_PulsoTRIGalto,
 		MdE_Ultrasonido_EsperandoECHO,
 		MdE_Ultrasonido_MidiendoTiempoECHO,
@@ -82,7 +82,7 @@ static uint8_t	ultrasonido_indice_mde = 0;
  * Sale con:
  * 	|--> EMRx en BAJO (si TC = MRx).
  */
-void MdE_Ultrasonido_PulsoTRIGalto() {
+volatile void MdE_Ultrasonido_PulsoTRIGalto() {
 	// Si TC = MRx  =>  pasa a bajo.
 	ctimerObject.Config_ExternalMatchRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::EMR_Demeanor_t::EMR_CLEAR );
 
@@ -123,7 +123,7 @@ void MdE_Ultrasonido_PulsoTRIGalto() {
  * 	|--> B.
  * 	|--> B.
  */
-void MdE_Ultrasonido_EsperandoECHO() {
+volatile void MdE_Ultrasonido_EsperandoECHO() {
 	// # Deshabilitación del MATx/EMRx #
 	ctimerObject.Config_MatchControlRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::MCRtriggers_t::STOP_MCR, false );
 	ctimerObject.Config_MatchControlRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::MCRtriggers_t::RESET_MCR, false );
@@ -164,7 +164,7 @@ void MdE_Ultrasonido_EsperandoECHO() {
  * 	|--> B.
  * 	|--> B.
  */
-void MdE_Ultrasonido_MidiendoTiempoECHO() {
+volatile void MdE_Ultrasonido_MidiendoTiempoECHO() {
 	// # Interrupción por flanco descendente #
 	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::RISING_CCR, false );
 	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::FALLING_CCR, true );
@@ -192,9 +192,9 @@ void MdE_Ultrasonido_MidiendoTiempoECHO() {
  * 	|--> B.
  * 	|--> B.
  */
-void MdE_Ultrasonido_SetupDelayReinicio() {
+volatile void MdE_Ultrasonido_SetupDelayReinicio() {
 	// Continuación...
-	nullptr = 2;
+//	nullptr = 2;
 
 	// # Deshabilitación del CAPx #
 	// # Interrupción por flanco ascendente #
@@ -239,20 +239,9 @@ void MdE_Ultrasonido_SetupDelayReinicio() {
  * 	|--> B.
  * 	|--> B.
  */
-void MdE_Ultrasonido_DelayReinicio() {
-	// Si TC = MRx  =>  pasa a bajo.
-//	ctimerObject.Config_ExternalMatchRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::EMR_Demeanor_t::EMR_CLEAR );
-//
-//	ctimerObject.Config_MatchControlRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::MCRtriggers_t::STOP_MCR, false );
-//	ctimerObject.Config_MatchControlRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::MCRtriggers_t::RESET_MCR, true );
-//	// Al interrumpir en el siguiente paso de la secuencia, deshabilita MAT y habilita CAP.
-//	ctimerObject.Config_MatchControlRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::MCRtriggers_t::INTERRUPT_MCR, true );
-//
-//	ctimerObject.Config_MatchShadow( sensor_hc_sr04.__MATchannelTRIG, false );
-//	ctimerObject.SetMSRxValue( sensor_hc_sr04.__MATchannelTRIG, 20e3 );
-
+volatile void MdE_Ultrasonido_DelayReinicio() {
 	// Continuación...
-	nullptr = 2;
+//	nullptr = 2;
 
 	ctimerObject.Config_ExternalMatchRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::EMR_Demeanor_t::EMR_SET );
 
@@ -286,7 +275,41 @@ void MdE_Ultrasonido_DelayReinicio() {
  * Problablemente en desuso debido a ejecución de interrupciones por HARDWARE,
  * controlado por CTimer.
  */
-void HC_SR04_IRQ ( void ) {
-	ultrasonido_secuencia[ultrasonido_indice_mde]();
+volatile void HC_SR04_IRQ ( void ) {
+//	ultrasonido_secuencia[ultrasonido_indice_mde]();
+}
+
+
+
+/* #############################################
+ * InicioDeSecuencia
+ * #############################################
+ * \brief:			Inicia la secuencia por máquina de estados.
+ */
+volatile void HC_SR04_InicioDeSecuencia() {
+	// Frena el timer.
+	ctimerObject.Enable_Timer_Prescale( false );
+
+
+	ctimerObject.Config_MatchControlRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::MCRtriggers_t::STOP_MCR, false );
+	ctimerObject.Config_MatchControlRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::MCRtriggers_t::RESET_MCR, true );
+	// Interrumpe a los 20 ms. Recarga con 10 us al resetear TC.
+	ctimerObject.Config_MatchControlRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::MCRtriggers_t::INTERRUPT_MCR, true );
+	// (Delay entre ECHO -> 0 y TRIG -> 1).
+	ctimerObject.SetMATxValue( sensor_hc_sr04.__MATchannelTRIG, 20e3 );
+
+	ctimerObject.Config_MatchShadow( sensor_hc_sr04.__MATchannelTRIG, true );
+	ctimerObject.SetMSRxValue( sensor_hc_sr04.__MATchannelTRIG, 10 );
+
+
+	// Si TC = MAT => se prende la salida.
+	ctimerObject.Config_ExternalMatchRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::EMR_Demeanor_t::EMR_SET );
+
+	ctimerObject.Set_Callback( CTimer::registerSelection_MAT_CAP_t::MAT_REGISTER, sensor_hc_sr04.__MATchannelTRIG, ultrasonido_secuencia[0] );
+
+	// Arranca el timer.
+	ctimerObject.Enable_Timer_Prescale( true );
+
+	ctimerObject.Reset_Timer_Prescale();
 }
 

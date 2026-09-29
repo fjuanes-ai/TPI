@@ -31,15 +31,16 @@
     /* ###########################################
      * ### VARIABLES GLOBALES PÚBLICAS ###
      * ########################################### */
-    extern void (*ultrasonido_secuencia[])(void);
+    extern volatile void (*ultrasonido_secuencia[])(void);
 	extern CTimer ctimerObject;
-	extern class Ultrasonido sensor_hc_sr04;
+	extern class Us_HC_SR04 sensor_hc_sr04;
 
 
     /* ###########################################
      * ### PROTOTIPOS DE FUNCIONES PÚBLICAS ###
      * ########################################### */
-    void HC_SR04_IRQ( void );
+	volatile void HC_SR04_IRQ( void );
+	volatile void HC_SR04_InicioDeSecuencia();
 
 
     /* ###########################################

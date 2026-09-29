@@ -26,10 +26,19 @@
  * ### MACROS & TIPOS DE DATOS PRIVADOS ###
  * ########################################### */
 
-#define __SYSCON_PRESETCTRL1_FRG0_MASK		( (0x01 << 3) )
-#define __SYSCON_PRESETCTRL1_FRG1_MASK		( (0x01 << 4) )
-#define	__SYSCON_SYSAHBCLKCTRL0_SWM_MASK	( (0x01 << 7)  )
-#define	__CTIMER0_SYSCON_MASK				( (0x01 << 25) )
+//#define __SYSCON_SYSAHBCLKCTRL0_IOCON_MASK	(0x01 << 18)
+//#define __IOCON_PIOX_Y_MODE_OFFSET		3
+//#define __IOCON_PIOX_Y_HYS_OFFSET		5
+//#define __IOCON_PIOX_Y_INV_OFFSET		6
+//#define __IOCON_PIOX_Y_I2C_MODE_OFFSET	8
+//#define __IOCON_PIOX_Y_OD_OFFSET		10
+//#define __IOCON_PIOX_Y_S_MODE_OFFSET	11
+//#define __IOCON_PIOX_Y_CLK_DIV_OFFSET	13
+//#define __IOCON_PIOX_Y_DAC_MODE_OFFSET	16
+//#define	__SYSCON_SYSAHBCLKCTRL0_SWM_MASK	(0x01 << 7)
+#define __SYSCON_PRESETCTRL1_FRG0_MASK		(0x01 << 3)
+#define __SYSCON_PRESETCTRL1_FRG1_MASK		(0x01 << 4)
+//#define	__CTIMER0_SYSCON_MASK				(0x01 << 25)
 #define	__CTIMER0_CCR_CHANNELS_OFFSET	3
 #define	__CTIMER0_MCR_CHANNELS_OFFSET	3
 #define __CTIMER0_MCR_MR0RL_OFFSET   	24
@@ -168,33 +177,40 @@ CTimer::CAP_data_t  CTimer::__CAP[__CTimer_MAX_CR] = {
  * decidir en base a esa información.
  */
 void CTIMER0_IRQHandler() {
-	uint8_t		__tempChannelRead;
+	uint8_t		__bitValueInterruption, __tempChannel;
+	uint32_t	interruptRegister_Read = CTIMER->IR;
 
 	// # MAT #
 	for ( uint8_t index = 0; index < __CTimer_MAX_MR; index++ ) {	// Separación canales.
-		__tempChannelRead = (uint8_t) ( CTIMER->IR & (0x01 << index) );
+		__bitValueInterruption = (uint8_t) ( interruptRegister_Read & (0x01 << index) );
 
-		if ( __tempChannelRead != 0x00 ) {
-			CTIMER->IR |= (0x01 << index);		// Reiniciamos el IR con un 1.
+		if ( __bitValueInterruption != 0x00 ) {
+//			interruptRegister_Read &= ~(0x01 << index);
+			interruptRegister_Read |=  (0x01 << index);		// Reiniciamos el IR con un 1.
 
-			if ( CTimer::__MAT[__tempChannelRead].__callback != nullptr )
-				CTimer::__MAT[__tempChannelRead].__callback();
+			__tempChannel = index;
+
+			if ( CTimer::__MAT[__tempChannel].__callback != nullptr )
+				CTimer::__MAT[__tempChannel].__callback();
 		}
 	}
 
 	// # CAP #
 	for ( uint8_t index = 0; index < __CTimer_MAX_CR; index++ ) {	// Separación canales.
-		__tempChannelRead = (uint8_t) ( CTIMER->IR & (0x01 << (index + __CTIMER0_IRQ_CR_OFFSET)) );
+		__bitValueInterruption = (uint8_t) ( interruptRegister_Read & (0x01 << (index + __CTIMER0_IRQ_CR_OFFSET)) );
 
-		if ( __tempChannelRead != 0x00 ) {
-			CTIMER->IR |= (0x01 << (index + __CTIMER0_IRQ_CR_OFFSET));		// Reiniciamos el IR con un 1.
+		if ( __bitValueInterruption != 0x00 ) {
+//			interruptRegister_Read &= ~(0x01 << (index + __CTIMER0_IRQ_CR_OFFSET));
+			interruptRegister_Read |=  (0x01 << (index + __CTIMER0_IRQ_CR_OFFSET));		// Reiniciamos el IR con un 1.
 
-			__tempChannelRead = __tempChannelRead >> __CTIMER0_IRQ_CR_OFFSET;
+			__tempChannel = index;
 
-			if ( CTimer::__CAP[__tempChannelRead].__callback != nullptr )
-				CTimer::__CAP[__tempChannelRead].__callback();
+			if ( CTimer::__CAP[__tempChannel].__callback != nullptr )
+				CTimer::__CAP[__tempChannel].__callback();
 		}
 	}
+
+	CTIMER->IR = interruptRegister_Read;
 }
 
 
@@ -221,7 +237,7 @@ CTimer::CTimer() {
 		__isSetup = true;
 
 		// # Habilitación del periférico C-Timer #
-		SYSCON->SYSAHBCLKCTRL0 |= (__CTIMER0_SYSCON_MASK);
+		SYSCON->SYSAHBCLKCTRL0 |= (SYSCON_SYSAHBCLKCTRL0_CTIMER_MASK);
 
 		// # Reseto del periférico "Fractional Baud Rate Generator" 0 y 1 #
 		SYSCON->PRESETCTRL1 &= (uint8_t) ~(__SYSCON_PRESETCTRL1_FRG0_MASK | __SYSCON_PRESETCTRL1_FRG1_MASK);	// Apaga.
@@ -232,6 +248,9 @@ CTimer::CTimer() {
 		// # Counter/Timer Mode (CTMODE) #
 		CTIMER->CTCR  =   0x00000000;	// Limpiamos el registro con 0s.
 
+		// ## Timer Control register (TCR) ##
+		CTIMER->TCR   =   0x00000000;	// Limpiamos el registro con 0s.
+
 		// ## Configuración de MCR/CCR (Match/Capture Control Register) ##
 		CTIMER->MCR   =   0x00;			// Limpieza del MCR y del CCR.
 		CTIMER->CCR   =   0x00;
@@ -239,11 +258,11 @@ CTimer::CTimer() {
 		// ## Habilitación del Vector de Interrupciones (NVIC) ##
 		NVIC->ISER[0] |=  (0x01 << 23);		// Se habilita la interrupción en el vector.
 
-		// ## Timer Control register (TCR) ##
-		CTIMER->TCR   =   0x00000000;	// Limpiamos el registro con 0s.
 		// # Counter enable (CEN) #
 		this->Enable_Timer_Prescale( true );
 		this->Reset_Timer_Prescale();
+
+		CTIMER0_IRQHandler();	// Limpia las banderas por ruido.
 	}
 }
 
@@ -254,7 +273,7 @@ CTimer::CTimer( uint32_t prescalerFrequency ) :
 		__isSetup = true;
 
 		// # Habilitación del periférico C-Timer #
-		SYSCON->SYSAHBCLKCTRL0 |= (__CTIMER0_SYSCON_MASK);
+		SYSCON->SYSAHBCLKCTRL0 |= (SYSCON_SYSAHBCLKCTRL0_CTIMER_MASK);
 
 		// # Reseto del periférico "Fractional Baud Rate Generator" 0 y 1 #
 		SYSCON->PRESETCTRL1 &= (uint32_t) ~((0x01 << 3) | (0x01 << 4));	// Apaga.
@@ -267,9 +286,6 @@ CTimer::CTimer( uint32_t prescalerFrequency ) :
 
 		// ## Timer Control register (TCR) ##
 		CTIMER->TCR   =   0x00000000;	// Limpiamos el registro con 0s.
-		// # Counter enable (CEN) #
-		this->Enable_Timer_Prescale( true );
-		this->Reset_Timer_Prescale();
 
 		// ## Configuración de MCR/CCR (Match/Capture Control Register) ##
 		CTIMER->MCR   =   0x00;			// Limpieza del MCR y del CCR.
@@ -277,6 +293,12 @@ CTimer::CTimer( uint32_t prescalerFrequency ) :
 
 		// ## Habilitación del Vector de Interrupciones (NVIC) ##
 		NVIC->ISER[0] |=  (0x01 << 23);		// Se habilita la interrupción en el vector.
+
+		// # Counter enable (CEN) #
+		this->Enable_Timer_Prescale( true );
+		this->Reset_Timer_Prescale();
+
+		CTIMER0_IRQHandler();	// Limpia las banderas por ruido.
 	}
 }
 
@@ -293,7 +315,7 @@ CTimer::CTimer( uint32_t prescalerFrequency ) :
  * 	 							la interrupción habilitada.
  */
 void CTimer::Set_Callback( registerSelection_MAT_CAP_t registerSelection,
-						   uint8_t channel, void (* inputCallback)(void) ) {
+						   uint8_t channel, volatile void (* inputCallback)(void) ) {
 
 	switch ( registerSelection ) {
 		case MAT_REGISTER:
@@ -316,7 +338,7 @@ void CTimer::Set_Callback( registerSelection_MAT_CAP_t registerSelection,
  */
 int8_t CTimer::SwitchMatrix_Config_MAT( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel ) {
 
-	SYSCON->SYSAHBCLKCTRL0 |=  (__SYSCON_SYSAHBCLKCTRL0_SWM_MASK );	// Habilitación del SW.
+//	SwitchMatrix_EnableDisable( true );
 
 	// # Protección contra límites físicos (HW) #
 	if ( channel >= __CTimer_MAX_MR )
@@ -341,18 +363,36 @@ int8_t CTimer::SwitchMatrix_Config_MAT( uint8_t input_MATport, uint8_t input_MAT
 	this->__MAT[channel].pin  = input_MATpin;
 
 	// # Habilitación de los pines MATCH #
-	if ( channel < 3 ) {
-		// Limpiamos el registro lleno de bits en 1.
-		SWM0->PINASSIGN_DATA[13] &= ~(0xFF << (__PINASSIGN13_TO_MAT_0_OFFSET * (channel + 1)));
-		SWM0->PINASSIGN_DATA[13] |=  ((input_MATport * __PINASSIGN_PORT_OFFSET + input_MATpin) << (__PINASSIGN13_TO_MAT_0_OFFSET * (channel + 1)));
-	} else {
-		// Limpiamos el registro lleno de bits en 1.
-		SWM0->PINASSIGN_DATA[14] &= ~(0xFF << (__PINASSIGN14_TO_MAT_3_OFFSET * (channel + 1)));
-		SWM0->PINASSIGN_DATA[14] |=  (input_MATport * __PINASSIGN_PORT_OFFSET + input_MATpin);
-	}
+//	if ( channel < 3 ) {
+//		// Limpiamos el registro lleno de bits en 1.
+//		SWM0->PINASSIGN_DATA[13] &= ~(0xFF << (__PINASSIGN13_TO_MAT_0_OFFSET * (channel + 1)));
+//		SWM0->PINASSIGN_DATA[13] |=  ((input_MATport * __PINASSIGN_PORT_OFFSET + input_MATpin) << (__PINASSIGN13_TO_MAT_0_OFFSET * (channel + 1)));
+//	} else {
+//		// Limpiamos el registro lleno de bits en 1.
+//		SWM0->PINASSIGN_DATA[14] &= ~(0xFF << (__PINASSIGN14_TO_MAT_3_OFFSET * (channel + 1)));
+//		SWM0->PINASSIGN_DATA[14] |=  (input_MATport * __PINASSIGN_PORT_OFFSET + input_MATpin);
+//	}
+
+	PINASSIGN_Config( PA_T0_MAT0 + input_MATport, input_MATport, input_MATpin );
 
 
-	SYSCON->SYSAHBCLKCTRL0 &= ~(__SYSCON_SYSAHBCLKCTRL0_SWM_MASK );	// Deshabilitación del SW.
+//	SwitchMatrix_EnableDisable( false );
+
+
+	// ## EXTRA ##
+	// # Configuración de IOCON #
+//	SYSCON->SYSAHBCLKCTRL0 |=   __SYSCON_SYSAHBCLKCTRL0_IOCON_MASK;
+//
+//	IOCON->PIO[input_MATport + (input_MATpin % 32)]  =   0x00;
+//	IOCON->PIO[input_MATport + (input_MATpin % 32)] |=   0x01 << __IOCON_PIOX_Y_MODE_OFFSET; // Pull-down interno.
+//	IOCON->PIO[input_MATport + (input_MATpin % 32)] &= ~(0x01 << __IOCON_PIOX_Y_HYS_OFFSET); // Sin histéresis.
+//
+//	SYSCON->SYSAHBCLKCTRL0 &= ~(__SYSCON_SYSAHBCLKCTRL0_IOCON_MASK);
+
+	IOCON_Config_PIO( input_MATport, input_MATpin, 0xFFFFFFFF, false );
+	IOCON_Config_PIO( input_MATport, input_MATpin, __IOCON_MODE_PULL_DOWN_MASK, true );
+	IOCON_Config_PIO( input_MATport, input_MATpin, __IOCON_HYS_MASK, false );
+
 	return 0;
 }
 
@@ -365,7 +405,7 @@ int8_t CTimer::SwitchMatrix_Config_MAT( uint8_t input_MATport, uint8_t input_MAT
  */
 int8_t CTimer::SwitchMatrix_Config_CAP( uint8_t input_CAPport, uint8_t input_CAPpin, uint8_t channel ) {
 
-	SYSCON->SYSAHBCLKCTRL0 |=  (__SYSCON_SYSAHBCLKCTRL0_SWM_MASK );	// Habilitación del SW.
+//	SYSCON->SYSAHBCLKCTRL0 |=  (__SYSCON_SYSAHBCLKCTRL0_SWM_MASK );	// Habilitación del SW.
 
 	// # Protección contra límites físicos (HW) #
 	if ( channel >= __CTimer_MAX_CR - 1 )	// 1 CANAL MENOS DISPONIBLE POR HW.
@@ -391,11 +431,30 @@ int8_t CTimer::SwitchMatrix_Config_CAP( uint8_t input_CAPport, uint8_t input_CAP
 
 	// # Habilitación de los pines CAP #
 	// Limpiamos el registro lleno de bits en 1.
-	SWM0->PINASSIGN_DATA[14] &= ~(0xFF << (__PINASSIGN14_TO_CAP_0_OFFSET * (channel + 1)));
-	SWM0->PINASSIGN_DATA[14] |=  ((input_CAPport * __PINASSIGN_PORT_OFFSET + input_CAPpin) << (__PINASSIGN14_TO_CAP_0_OFFSET * (channel + 1)));
+
+//	SWM0->PINASSIGN_DATA[14] &= ~(0xFF << (__PINASSIGN14_TO_CAP_0_OFFSET * (channel + 1)));
+//	SWM0->PINASSIGN_DATA[14] |=  ((input_CAPport * __PINASSIGN_PORT_OFFSET + input_CAPpin) << (__PINASSIGN14_TO_CAP_0_OFFSET * (channel + 1)));
+
+	PINASSIGN_Config( PA_T0_CAP0 + input_CAPport, input_CAPport, input_CAPpin );
 
 
-	SYSCON->SYSAHBCLKCTRL0 &= ~(__SYSCON_SYSAHBCLKCTRL0_SWM_MASK );	// Deshabilitación del SW.
+//	SYSCON->SYSAHBCLKCTRL0 &= ~(__SYSCON_SYSAHBCLKCTRL0_SWM_MASK );	// Deshabilitación del SW.
+
+
+	// ## EXTRA ##
+	// # Configuración de IOCON #
+//	SYSCON->SYSAHBCLKCTRL0 |=   SYSCON_SYSAHBCLKCTRL0_IOCON_MASK;
+//
+//	IOCON->PIO[input_CAPport + (input_CAPpin % 32)]  =   0x00;
+//	IOCON->PIO[input_CAPport + (input_CAPpin % 32)] |=   0x01 << __IOCON_PIOX_Y_MODE_OFFSET; // Pull-down interno.
+//	IOCON->PIO[input_CAPport + (input_CAPpin % 32)] &= ~(0x01 << __IOCON_PIOX_Y_HYS_OFFSET); // Sin histéresis.
+//
+//	SYSCON->SYSAHBCLKCTRL0 &= ~(SYSCON_SYSAHBCLKCTRL0_IOCON_MASK);
+
+	IOCON_Config_PIO( input_CAPport, input_CAPpin, 0xFFFFFFFF, false );
+	IOCON_Config_PIO( input_CAPport, input_CAPpin, __IOCON_MODE_PULL_DOWN_MASK, true );
+	IOCON_Config_PIO( input_CAPport, input_CAPpin, __IOCON_HYS_MASK, true );
+
 	return 0;
 }
 
@@ -476,7 +535,10 @@ int8_t CTimer::Get_available_CAP_channel() {
  * 	 							el TC y el PC.
  */
 void CTimer::Enable_Timer_Prescale( bool input_EnableValue ) {
-	CTIMER->TCR |= input_EnableValue << __CTIMER0_TCR_CEN_OFFSET;
+	if ( input_EnableValue )
+		CTIMER->TCR |=   0x01 << __CTIMER0_TCR_CEN_OFFSET;
+	else
+		CTIMER->TCR &= ~(0x01 << __CTIMER0_TCR_CEN_OFFSET);
 }
 
 
@@ -517,11 +579,17 @@ void CTimer::Config_CountControlRegister( uint8_t					input_CAPchannel,
 
 	// # Reset (ENCC) #
 //	CTIMER->CTCR |=  (0x01 << 4);	// Habilitamos el reset por Capture Input x.
-	CTIMER->CTCR |=   (clearTCwithCaptureEdge << __CTIMER0_CTCR_ENCC_OFFSET);
+	if ( clearTCwithCaptureEdge )
+		CTIMER->CTCR |=   (0x01 << __CTIMER0_CTCR_ENCC_OFFSET);
+	else
+		CTIMER->CTCR &=  ~(0x01 << __CTIMER0_CTCR_ENCC_OFFSET);
 
 	// # Reset (SELCC) #
 //	CTIMER->CTCR &= ~(0x07 << 5);	// El reset es por Capture Input 0, rising edge.
-	CTIMER->CTCR &= ~((__CTIMER0_CTCR_CHANNELS_OFFSET * input_CAPchannel + input_Edge)
+	// # Limpieza del registro #
+	CTIMER->CTCR &= ~((0x7) << __CTIMER0_CTCR_SELCC_OFFSET);
+
+	CTIMER->CTCR |=  ((__CTIMER0_CTCR_CHANNELS_OFFSET * input_CAPchannel + input_Edge)
 						<< __CTIMER0_CTCR_SELCC_OFFSET);
 	// \--> Esto se hace así para que, cuando se detecte una subida
 	//		por el pin de ECHO, reinicie la cuenta.
@@ -538,12 +606,16 @@ void CTimer::Config_CountControlRegister( uint8_t					input_CAPchannel,
  */
 void CTimer::Config_PrescalerFrequency( uint32_t prescalerFrequency ) {
 
-	__ticksFrequency = prescalerFrequency;
+	if ( prescalerFrequency == 0 )
+		return;
+	else {
+		__ticksFrequency = prescalerFrequency;
 
-	CTIMER->PR 	  	 =   FREQ_CLOCK / __ticksFrequency - 1;
-//	CTIMER->PR 	  	 =   FREQ_CLOCK / __ticksFrequency;
-	// Cada 30 ciclos del APB (FRO = 30 M Hz), se incrementa en 1 el TC.
-	// Con este método, 1 tick = 1 us = 1 x 10^(-6)s.
+		CTIMER->PR 	  	 =   FREQ_CLOCK / __ticksFrequency - 1;
+	//	CTIMER->PR 	  	 =   FREQ_CLOCK / __ticksFrequency;
+		// Cada 30 ciclos del APB (FRO = 30 M Hz), se incrementa en 1 el TC.
+		// Con este método, 1 tick = 1 us = 1 x 10^(-6)s.
+	}
 }
 
 
@@ -558,7 +630,9 @@ void CTimer::Config_PrescalerFrequency( uint32_t prescalerFrequency ) {
  * 	 \--->	input_ExternalMatchDemeanor:		Comportamiento del EMx elegido.
  */
 void CTimer::Config_ExternalMatchRegister( uint8_t input_MATchannel, EMR_Demeanor_t input_ExternalMatchDemeanor ) {
-//void CTimer::Config_ExternalMatchRegister( uint8_t input_MATchannel, uint32_t input_ExternalMatchDemeanor ) {
+	// # Limpieza del registro #
+	CTIMER->EMR &= (uint32_t) ~( 0x03 << ((uint32_t) (__CTIMER0_EMR_EMC0_OFFSET + (__CTIMER0_EMR_CHANNELS_OFFSET * input_MATchannel))) );
+
 	CTIMER->EMR |= (uint32_t) ( input_ExternalMatchDemeanor << ((uint32_t) (__CTIMER0_EMR_EMC0_OFFSET + (__CTIMER0_EMR_CHANNELS_OFFSET * input_MATchannel))) );
 }
 
@@ -588,8 +662,10 @@ void CTimer::Config_MatchControlRegister( uint8_t		input_MATchannel,
 	CTIMER->MCR &= ~(0x01 << (__CTIMER0_MCR_CHANNELS_OFFSET * input_MATchannel + input_MCRmode));
 
 	// # Configuración de comportamiento de MATx #
-	CTIMER->MCR |=   bitValueMCR << (__CTIMER0_MCR_CHANNELS_OFFSET * input_MATchannel + input_MCRmode);
-
+	if ( bitValueMCR )
+		CTIMER->MCR |=   0x01 << (__CTIMER0_MCR_CHANNELS_OFFSET * input_MATchannel + input_MCRmode);
+	else
+		CTIMER->MCR &= ~(0x01 << (__CTIMER0_MCR_CHANNELS_OFFSET * input_MATchannel + input_MCRmode));
 }
 
 
@@ -631,7 +707,10 @@ void CTimer::Config_CaptureControlRegister( uint8_t			input_CAPchannel,
 	CTIMER->CCR &= ~(0x01 << (__CTIMER0_CCR_CHANNELS_OFFSET * input_CAPchannel + inputCCRmode));
 
 	// # Configuración de comportamiento de CAPx #
-	CTIMER->CCR |=  bitValueCCR << (__CTIMER0_CCR_CHANNELS_OFFSET * input_CAPchannel + inputCCRmode);
+	if ( bitValueCCR )
+		CTIMER->CCR |=   0x01 << (__CTIMER0_CCR_CHANNELS_OFFSET * input_CAPchannel + inputCCRmode);
+	else
+		CTIMER->CCR &= ~(0x01 << (__CTIMER0_CCR_CHANNELS_OFFSET * input_CAPchannel + inputCCRmode));
 
 //	return input_CAPchannel;
 }
@@ -642,7 +721,7 @@ void CTimer::Config_CaptureControlRegister( uint8_t			input_CAPchannel,
  *********************************************
  * \brief: 	Devuelve el valor de CAPx pedido.
  */
-__I uint32_t CTimer::GetCAPxValue( uint8_t channel ) const {
+uint32_t CTimer::GetCAPxValue( uint8_t channel ) const {
 	return CTIMER->CR[channel];
 }
 
@@ -652,7 +731,7 @@ __I uint32_t CTimer::GetCAPxValue( uint8_t channel ) const {
  *********************************************
  * \brief: 	Escribe el valor de MATx elegido.
  */
-void CTimer::SetMATxValue( uint8_t channel, uint32_t	input_MATvalue ) {
+void CTimer::SetMATxValue( uint8_t channel, uint32_t input_MATvalue ) {
 //	CTIMER->MR[channel] = input_MATvalue - 1;
 	CTIMER->MR[channel] = input_MATvalue;
 }
@@ -663,7 +742,7 @@ void CTimer::SetMATxValue( uint8_t channel, uint32_t	input_MATvalue ) {
  *********************************************
  * \brief: 	Escribe el valor de MSRx elegido (Match Shadow).
  */
-void CTimer::SetMSRxValue( uint8_t channel, uint32_t	input_MSRvalue ) {
+void CTimer::SetMSRxValue( uint8_t channel, uint32_t input_MSRvalue ) {
 //	CTIMER->MSR[channel] = input_MSRvalue - 1;
 	CTIMER->MSR[channel] = input_MSRvalue;
 }
