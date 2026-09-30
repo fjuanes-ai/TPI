@@ -19,16 +19,16 @@
 /* ###########################################
  * ### VARIABLES GLOBALES PÚBLICAS ###
  * ########################################### */
-//
+extern Uart test_UART;
 
 
 /* ###########################################
  * ### MACROS & TIPOS DE DATOS PRIVADOS ###
  * ########################################### */
-#define		__MAX_TICKS_MEASUREMENT		10					// us = 10^(-6) s.
-#define		__MAX_TICKS_UPDATE			10					// ms = 10^(-3) s.
-#define		__DISTANCE_MIN				20U					// mm = 10^(-3) m.
-#define		__DISTANCE_MAX				4000U				// mm = 10^(-3) m.
+#define		__MAX_TICKS_UPDATE			100					// ms = 10^(-3) s.
+//#define		__MAX_TICKS_MEASUREMENT		10					// us = 10^(-6) s.
+//#define		__DISTANCE_MIN				20U					// mm = 10^(-3) m.
+//#define		__DISTANCE_MAX				4000U				// mm = 10^(-3) m.
 
 
 /* ###########################################
@@ -119,12 +119,8 @@ Us_HC_SR04::Us_HC_SR04( uint8_t portTrig, uint8_t pinTrig,
 
 
 	// Resetea TC a flanco ascendente del CAP (ECHO).
-//	__CTimerFeatures->Config_CountControlRegister( __CAPchannelECHO, CTimer::CTCR_TimerCounter_Mode_t::TIMER_MODE,
-//												   true, CTimer::CTCR_Edge_t::CAP_RISING_EDGE );
+	__CTimerFeatures->Config_CountControlRegister( __CAPchannelECHO, CTimer::CTCR_TimerCounter_Mode_t::TIMER_MODE, true, CTimer::CTCR_Edge_t::CAP_RISING_EDGE );
 
-	// ## DEBUG ##
-	__CTimerFeatures->Config_CountControlRegister( __CAPchannelECHO, CTimer::CTCR_TimerCounter_Mode_t::TIMER_MODE, false, CTimer::CTCR_Edge_t::CAP_RISING_EDGE );
-	// ## DEBUG ##
 
 	__CTimerFeatures->Reset_Timer_Prescale();
 
@@ -175,22 +171,16 @@ void Us_HC_SR04::Time_microSec_to_Distance_millimeters() {
 
 	uint32_t measuredTime_microSec = this->Measure_Time();
 
-	switch ( measuredTime_microSec ) {
-		case Us_HC_SR04::TIME_MIN:
-			__distance_millimeters = Us_HC_SR04::DISTANCE_MIN;
-			break;
+	if ( measuredTime_microSec <= Us_HC_SR04::TIME_MIN )
+		__distance_millimeters = Us_HC_SR04::DISTANCE_MIN;
 
-		case Us_HC_SR04::TIME_MAX:
-			__distance_millimeters = Us_HC_SR04::DISTANCE_MAX;
-			break;
+	if ( (measuredTime_microSec >= Us_HC_SR04::TIME_MAX) && (measuredTime_microSec <  Us_HC_SR04::TIME_NO_OBSTACLE) )
+		__distance_millimeters = Us_HC_SR04::DISTANCE_MAX;
 
-		case Us_HC_SR04::TIME_NO_OBSTACLE:
-			__distance_millimeters = Us_HC_SR04::DISTANCE_NO_OBSTACLE;
-			break;
-	
-		default:
-			__distance_millimeters = measuredTime_microSec * 10 / 58.0;
-	}
+	if ( measuredTime_microSec >=  Us_HC_SR04::TIME_NO_OBSTACLE )
+		__distance_millimeters = Us_HC_SR04::DISTANCE_NO_OBSTACLE;
+
+	__distance_millimeters = measuredTime_microSec * 10 / 58.0;
 }
 
 
@@ -234,8 +224,42 @@ void Us_HC_SR04::HandlerDelPeriferico() {
 		// ## DEBUG ##
 //		this->Measure_Time();
 		this->Time_microSec_to_Distance_millimeters();
-		__distance_millimeters = __distance_millimeters;
+//		__distance_millimeters = __distance_millimeters;
+//		test_UART.Transmit( (void *) (& __distance_millimeters), sizeof(__distance_millimeters) );
+		test_UART.Message( (void *) "Hola\n" );
 		// ## DEBUG ##
 	}
+}
+
+
+/* #############################################
+ * Debug_HC_SR04
+ * #############################################
+ * \brief:			DEBUGEO del sensor (ECHO + TRIG).
+ */
+void Debug_HC_SR04() {
+	ctimerObject.Enable_Timer_Prescale( false );
+
+	// # Deshabilitación del MATx/EMRx #
+	ctimerObject.Config_MatchControlRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::MCRtriggers_t::STOP_MCR, false );
+	ctimerObject.Config_MatchControlRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::MCRtriggers_t::RESET_MCR, false );
+	ctimerObject.Config_MatchControlRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::MCRtriggers_t::INTERRUPT_MCR, false );
+	ctimerObject.Config_ExternalMatchRegister( sensor_hc_sr04.__MATchannelTRIG, CTimer::EMR_Demeanor_t::EMR_TOGGLE );
+
+	ctimerObject.SetMATxValue( sensor_hc_sr04.__MATchannelTRIG, 500e3 );
+	ctimerObject.Config_MatchShadow( sensor_hc_sr04.__MATchannelTRIG, false );
+
+	// # Habilitación del CAPx #
+	// # Interrupción por flanco ascendente #
+	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::RISING_CCR, true );
+	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::FALLING_CCR, true );
+	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::INTERRUPT_CCR, true );
+
+
+	ctimerObject.Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, sensor_hc_sr04.__CAPchannelECHO, HC_SR04_IRQ );
+
+	ctimerObject.Enable_Timer_Prescale( true );
+
+	ctimerObject.Reset_Timer_Prescale();
 }
 

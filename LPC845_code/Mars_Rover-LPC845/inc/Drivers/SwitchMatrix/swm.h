@@ -102,7 +102,7 @@
 #define		PA_T0_CAP0			57
 #define		PA_T0_CAP1			58
 #define		PA_T0_CAP2			59
-
+// CAP3 en desuso...
 #define		PE_ACMP_I1			0
 #define		PE_ACMP_I2			1
 #define		PE_ACMP_I3			2

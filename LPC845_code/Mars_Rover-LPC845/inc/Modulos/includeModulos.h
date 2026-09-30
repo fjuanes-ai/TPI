@@ -23,6 +23,7 @@
 	#include 	"Modulos/05-SalidasDigitales/digital_outputs.h"
 	#include 	"Modulos/06-PerifericosTemporizados/perifericotemporizado.h"
 	#include 	"Modulos/07-InterrupcionesExternas/intext.h"
+	#include	"Modulos/12-USART/Uart.h"
 
 
 #endif          /* MODULOS_INCLUDEMODULOS_H_ */

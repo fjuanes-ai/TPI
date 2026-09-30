@@ -338,8 +338,6 @@ void CTimer::Set_Callback( registerSelection_MAT_CAP_t registerSelection,
  */
 int8_t CTimer::SwitchMatrix_Config_MAT( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel ) {
 
-//	SwitchMatrix_EnableDisable( true );
-
 	// # Protección contra límites físicos (HW) #
 	if ( channel >= __CTimer_MAX_MR )
 		return -1;
@@ -363,35 +361,14 @@ int8_t CTimer::SwitchMatrix_Config_MAT( uint8_t input_MATport, uint8_t input_MAT
 	this->__MAT[channel].pin  = input_MATpin;
 
 	// # Habilitación de los pines MATCH #
-//	if ( channel < 3 ) {
-//		// Limpiamos el registro lleno de bits en 1.
-//		SWM0->PINASSIGN_DATA[13] &= ~(0xFF << (__PINASSIGN13_TO_MAT_0_OFFSET * (channel + 1)));
-//		SWM0->PINASSIGN_DATA[13] |=  ((input_MATport * __PINASSIGN_PORT_OFFSET + input_MATpin) << (__PINASSIGN13_TO_MAT_0_OFFSET * (channel + 1)));
-//	} else {
-//		// Limpiamos el registro lleno de bits en 1.
-//		SWM0->PINASSIGN_DATA[14] &= ~(0xFF << (__PINASSIGN14_TO_MAT_3_OFFSET * (channel + 1)));
-//		SWM0->PINASSIGN_DATA[14] |=  (input_MATport * __PINASSIGN_PORT_OFFSET + input_MATpin);
-//	}
-
-	PINASSIGN_Config( PA_T0_MAT0 + input_MATport, input_MATport, input_MATpin );
-
-
-//	SwitchMatrix_EnableDisable( false );
+	PINASSIGN_Config( PA_T0_MAT0 + channel, input_MATport, input_MATpin );
 
 
 	// ## EXTRA ##
 	// # Configuración de IOCON #
-//	SYSCON->SYSAHBCLKCTRL0 |=   __SYSCON_SYSAHBCLKCTRL0_IOCON_MASK;
-//
-//	IOCON->PIO[input_MATport + (input_MATpin % 32)]  =   0x00;
-//	IOCON->PIO[input_MATport + (input_MATpin % 32)] |=   0x01 << __IOCON_PIOX_Y_MODE_OFFSET; // Pull-down interno.
-//	IOCON->PIO[input_MATport + (input_MATpin % 32)] &= ~(0x01 << __IOCON_PIOX_Y_HYS_OFFSET); // Sin histéresis.
-//
-//	SYSCON->SYSAHBCLKCTRL0 &= ~(__SYSCON_SYSAHBCLKCTRL0_IOCON_MASK);
-
-	IOCON_Config_PIO( input_MATport, input_MATpin, 0xFFFFFFFF, false );
-	IOCON_Config_PIO( input_MATport, input_MATpin, __IOCON_MODE_PULL_DOWN_MASK, true );
-	IOCON_Config_PIO( input_MATport, input_MATpin, __IOCON_HYS_MASK, false );
+//	IOCON_Config_PIO( input_MATport, input_MATpin, 0xFFFFFFFF, false );
+//	IOCON_Config_PIO( input_MATport, input_MATpin, __IOCON_MODE_PULL_DOWN_MASK, true );
+//	IOCON_Config_PIO( input_MATport, input_MATpin, __IOCON_HYS_MASK, false );
 
 	return 0;
 }
@@ -429,31 +406,16 @@ int8_t CTimer::SwitchMatrix_Config_CAP( uint8_t input_CAPport, uint8_t input_CAP
 	this->__CAP[channel].port = input_CAPport;
 	this->__CAP[channel].pin  = input_CAPpin;
 
+
 	// # Habilitación de los pines CAP #
-	// Limpiamos el registro lleno de bits en 1.
-
-//	SWM0->PINASSIGN_DATA[14] &= ~(0xFF << (__PINASSIGN14_TO_CAP_0_OFFSET * (channel + 1)));
-//	SWM0->PINASSIGN_DATA[14] |=  ((input_CAPport * __PINASSIGN_PORT_OFFSET + input_CAPpin) << (__PINASSIGN14_TO_CAP_0_OFFSET * (channel + 1)));
-
-	PINASSIGN_Config( PA_T0_CAP0 + input_CAPport, input_CAPport, input_CAPpin );
-
-
-//	SYSCON->SYSAHBCLKCTRL0 &= ~(__SYSCON_SYSAHBCLKCTRL0_SWM_MASK );	// Deshabilitación del SW.
+	PINASSIGN_Config( PA_T0_CAP0 + channel, input_CAPport, input_CAPpin );
 
 
 	// ## EXTRA ##
 	// # Configuración de IOCON #
-//	SYSCON->SYSAHBCLKCTRL0 |=   SYSCON_SYSAHBCLKCTRL0_IOCON_MASK;
-//
-//	IOCON->PIO[input_CAPport + (input_CAPpin % 32)]  =   0x00;
-//	IOCON->PIO[input_CAPport + (input_CAPpin % 32)] |=   0x01 << __IOCON_PIOX_Y_MODE_OFFSET; // Pull-down interno.
-//	IOCON->PIO[input_CAPport + (input_CAPpin % 32)] &= ~(0x01 << __IOCON_PIOX_Y_HYS_OFFSET); // Sin histéresis.
-//
-//	SYSCON->SYSAHBCLKCTRL0 &= ~(SYSCON_SYSAHBCLKCTRL0_IOCON_MASK);
-
-	IOCON_Config_PIO( input_CAPport, input_CAPpin, 0xFFFFFFFF, false );
-	IOCON_Config_PIO( input_CAPport, input_CAPpin, __IOCON_MODE_PULL_DOWN_MASK, true );
-	IOCON_Config_PIO( input_CAPport, input_CAPpin, __IOCON_HYS_MASK, true );
+//	IOCON_Config_PIO( input_CAPport, input_CAPpin, 0xFFFFFFFF, false );
+//	IOCON_Config_PIO( input_CAPport, input_CAPpin, __IOCON_MODE_PULL_DOWN_MASK, true );
+//	IOCON_Config_PIO( input_CAPport, input_CAPpin, __IOCON_HYS_MASK, true );
 
 	return 0;
 }

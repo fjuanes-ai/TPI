@@ -277,6 +277,8 @@ volatile void MdE_Ultrasonido_DelayReinicio() {
  */
 volatile void HC_SR04_IRQ ( void ) {
 //	ultrasonido_secuencia[ultrasonido_indice_mde]();
+	uint8_t temp = 0;
+	++temp;
 }
 
 

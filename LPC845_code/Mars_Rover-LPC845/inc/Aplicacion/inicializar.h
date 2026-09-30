@@ -38,6 +38,7 @@
      * ########################################### */
 	extern CTimer ctimerObject;
 	extern Us_HC_SR04 sensor_hc_sr04;
+	extern Uart test_UART;
 
 
     /* ###########################################

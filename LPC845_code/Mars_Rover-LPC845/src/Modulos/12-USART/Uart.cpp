@@ -120,9 +120,11 @@ Uart::Uart(
 				| ( 0 << 11 )					// 0=ASINCRONICA 1=SINCRONICA
 				| ( 1 << 15 );				// LOOP
 
-	// OSR vale por default 16
-//	USARTS[usart]->BRG = (( FREQ_CLOCK / baudrate ) / ( m_usart->OSR + 1 )) - 1;
-	USARTS[usart]->BRG = (( 48e3 / baudrate ) / ( m_usart->OSR + 1 )) - 1;
+	// OSR vale por default 16 = 0xF
+	USARTS[usart]->BRG = (( FREQ_CLOCK / baudrate ) / ( m_usart->OSR + 1 )) - 1;
+//	USARTS[usart]->BRG = (( 12e3 / baudrate ) / ( m_usart->OSR + 1 )) - 1;
+//	USARTS[usart]->BRG = (( 24e3 / baudrate ) / ( m_usart->OSR + 1 )) - 1;
+//	USARTS[usart]->BRG = (( 48e3 / baudrate ) / ( m_usart->OSR + 1 )) - 1;
 
 	USARTS[usart]->INTENSET |= ( 1 << 0 );		// RX interrupcion
 

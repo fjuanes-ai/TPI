@@ -57,8 +57,7 @@ void PINASSIGN_Config( uint8_t pin_movible , uint8_t port , uint8_t pin )
 	PIN_ASSIGN[ pin_movible / 4 ] &= ~(0xff << (( pin_movible % 4 ) * 8 ));
 	PIN_ASSIGN[ pin_movible / 4 ] |= pin << (( pin_movible % 4 ) * 8 );
 
-	// ## DEBUG ##
-//	SwitchMatrix_EnableDisable(false);
+	SwitchMatrix_EnableDisable(false);
 }
 
 void PINENABLE_Config( uint8_t pin_config , uint8_t enable )
@@ -71,6 +70,5 @@ void PINENABLE_Config( uint8_t pin_config , uint8_t enable )
 	else
 		PINENABLE[ pin_config / 32 ] &= ~( 1 <<  ( pin_config % 32 ) );
 
-	// ## DEBUG ##
-//	SwitchMatrix_EnableDisable(false);
+	SwitchMatrix_EnableDisable(false);
 }

@@ -97,18 +97,13 @@ void IOCON_Config_PIO( uint8_t input_port, uint8_t input_pin,
 
 	SYSCON->SYSAHBCLKCTRL0 |=   SYSCON_SYSAHBCLKCTRL0_IOCON_MASK;
 
-//	IOCON->PIO[__IOCON_PIO_Register_Table[input_port][input_pin]]  =   0x00;
-
-//	IOCON->PIO[__IOCON_PIO_Register_Table[input_port][input_pin]] |=   0x01 << __IOCON_PIOX_Y_MODE_OFFSET; // Pull-down interno.
-//	IOCON->PIO[input_port + (input_pin % 32)] &= ~(0x01 << __IOCON_PIOX_Y_HYS_OFFSET); // Sin histéresis.
 
 	if ( enable )
 		IOCON->PIO[__IOCON_PIO_Register_Table[input_port][input_pin]] |=   input_mask;
 	else
 		IOCON->PIO[__IOCON_PIO_Register_Table[input_port][input_pin]] &= ~(input_mask); // Sin histéresis.
 
-	// ## DEBUG ##
-	// No lo apagamos, a ver si cambia en algo...
-//	SYSCON->SYSAHBCLKCTRL0 &= ~(SYSCON_SYSAHBCLKCTRL0_IOCON_MASK);
+
+	SYSCON->SYSAHBCLKCTRL0 &= ~(SYSCON_SYSAHBCLKCTRL0_IOCON_MASK);
 }
 

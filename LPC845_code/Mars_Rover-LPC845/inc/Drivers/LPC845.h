@@ -33,7 +33,7 @@
 
 // TODO: configurar frecuencia del reloj (FRO) o hacer macros modulares con condicionales...
 //#define FREQ_CLOCK	(30000000UL)	// 30 MHz = 30 x 10^6 Hz
-#define FREQ_CLOCK	(12e6)
+#define FREQ_CLOCK	((uint32_t) 12e6)
 
 /***********************************************************************************************************************************
  *** TIPO DE DATOS GLOBALES
