@@ -20,6 +20,11 @@
  * ### MACROS & TIPOS DE DATOS PRIVADOS ###
  * ########################################### */
 #define	__CTIMER_PRESCALER_FREQ		((uint32_t) 1e6)
+
+/***************************
+ *** PINOUT ***
+ ***************************/
+// HC_SR04: Sensor ultrasónico
 #define __HC_SR04_TRIG_PORT			1
 #define __HC_SR04_TRIG_PIN			0
 #define __HC_SR04_ECHO_PORT			1
@@ -70,16 +75,10 @@ Uart test_UART( 0, 24, 0, 25, 0,
 void Inicializar() {
 //	 ### Systick ###
 	SysTick_Config( 1 );
-//	lpcLED.SetPin();
 
 
 //	### Sensor Ultrasónico HC-SR04 ###
-	sensor_hc_sr04.Set_Callback_Sequence( ultrasonido_secuencia );
 	sensor_hc_sr04.InicioDeSecuencia();
-
-	// ## DEBUG ##
-//	Debug_HC_SR04();
-	// ## DEBUG ##
 }
 
 

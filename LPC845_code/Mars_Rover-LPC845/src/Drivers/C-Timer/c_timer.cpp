@@ -25,20 +25,8 @@
 /* ###########################################
  * ### MACROS & TIPOS DE DATOS PRIVADOS ###
  * ########################################### */
-
-//#define __SYSCON_SYSAHBCLKCTRL0_IOCON_MASK	(0x01 << 18)
-//#define __IOCON_PIOX_Y_MODE_OFFSET		3
-//#define __IOCON_PIOX_Y_HYS_OFFSET		5
-//#define __IOCON_PIOX_Y_INV_OFFSET		6
-//#define __IOCON_PIOX_Y_I2C_MODE_OFFSET	8
-//#define __IOCON_PIOX_Y_OD_OFFSET		10
-//#define __IOCON_PIOX_Y_S_MODE_OFFSET	11
-//#define __IOCON_PIOX_Y_CLK_DIV_OFFSET	13
-//#define __IOCON_PIOX_Y_DAC_MODE_OFFSET	16
-//#define	__SYSCON_SYSAHBCLKCTRL0_SWM_MASK	(0x01 << 7)
 #define __SYSCON_PRESETCTRL1_FRG0_MASK		(0x01 << 3)
 #define __SYSCON_PRESETCTRL1_FRG1_MASK		(0x01 << 4)
-//#define	__CTIMER0_SYSCON_MASK				(0x01 << 25)
 #define	__CTIMER0_CCR_CHANNELS_OFFSET	3
 #define	__CTIMER0_MCR_CHANNELS_OFFSET	3
 #define __CTIMER0_MCR_MR0RL_OFFSET   	24
@@ -363,13 +351,6 @@ int8_t CTimer::SwitchMatrix_Config_MAT( uint8_t input_MATport, uint8_t input_MAT
 	// # Habilitación de los pines MATCH #
 	PINASSIGN_Config( PA_T0_MAT0 + channel, input_MATport, input_MATpin );
 
-
-	// ## EXTRA ##
-	// # Configuración de IOCON #
-//	IOCON_Config_PIO( input_MATport, input_MATpin, 0xFFFFFFFF, false );
-//	IOCON_Config_PIO( input_MATport, input_MATpin, __IOCON_MODE_PULL_DOWN_MASK, true );
-//	IOCON_Config_PIO( input_MATport, input_MATpin, __IOCON_HYS_MASK, false );
-
 	return 0;
 }
 
@@ -413,37 +394,34 @@ int8_t CTimer::SwitchMatrix_Config_CAP( uint8_t input_CAPport, uint8_t input_CAP
 
 	// ## EXTRA ##
 	// # Configuración de IOCON #
-//	IOCON_Config_PIO( input_CAPport, input_CAPpin, 0xFFFFFFFF, false );
-//	IOCON_Config_PIO( input_CAPport, input_CAPpin, __IOCON_MODE_PULL_DOWN_MASK, true );
-//	IOCON_Config_PIO( input_CAPport, input_CAPpin, __IOCON_HYS_MASK, true );
+	IOCON_Config_PIO( input_CAPport, input_CAPpin, 0xFFFFFFFF, false );
+	IOCON_Config_PIO( input_CAPport, input_CAPpin, __IOCON_MODE_PULL_DOWN_MASK, true );
+	IOCON_Config_PIO( input_CAPport, input_CAPpin, __IOCON_HYS_MASK, true );
 
 	return 0;
 }
 
 
 /*********************************************
- * Config_PWM
- *********************************************
- * \brief: 	Configura los pines de PWM.
- *
- * \input:
- * 	 \--->	A:	A
- */
-void CTimer::Config_PWM( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel, uint32_t valuePWM ) {
-
-}
-
-
-/*********************************************
  * Set_PWM_MAT_channel
  *********************************************
- * \brief: 	Configura el canal MAT utilizado para PWM (
+ * \brief: 	Configura el canal MAT utilizado para PWM.
+ * 			Aquel que sea PWM es manejado según reglas de PWM (duty cycle).
+ * 			El que maneje el período NO TIENE que ser configurado como PWM.
  *
  * \input:
- * 	 \--->	A:	A
+ * 	 \--->	channel:		Canal MAT (0 ~ 3).
+ * 	 \--->	enable:			Booleano para habilitar o deshabilitar la funcionalidad PWM del canal.
  */
-void CTimer::Set_PWM_MAT_channel( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel, bool enable ) {
+void CTimer::Set_PWM_MAT_channel( uint8_t channel, bool enable ) {
+	// # Protección contra límites físicos (HW) #
+	if ( channel >= __CTimer_MAX_MR )
+		return;
 
+	if ( enable )
+		CTIMER->PWMC |=   0x01 << channel;
+	else
+		CTIMER->PWMC &= ~(0x01 << channel);
 }
 
 

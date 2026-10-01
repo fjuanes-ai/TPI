@@ -94,7 +94,7 @@ volatile void MdE_Ultrasonido_PulsoTRIGalto() {
 	ctimerObject.Config_MatchShadow( sensor_hc_sr04.__MATchannelTRIG, false );
 	ctimerObject.SetMSRxValue( sensor_hc_sr04.__MATchannelTRIG, 20e3 );
 
-//	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::RISING_CCR, true );
+//	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::RISING_CCR, true );
 
 	++ultrasonido_indice_mde;
 	ultrasonido_indice_mde %= __HC_SR04_MDE_STEPS;
@@ -132,19 +132,19 @@ volatile void MdE_Ultrasonido_EsperandoECHO() {
 
 	// # Habilitación del CAPx #
 	// # Interrupción por flanco ascendente #
-	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::RISING_CCR, true );
-	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::FALLING_CCR, false );
-	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::INTERRUPT_CCR, true );
+	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::RISING_CCR, true );
+	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::FALLING_CCR, false );
+	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::INTERRUPT_CCR, true );
 
 	// Resetea TC a flanco ascendente del CAP (ECHO).
-//	ctimerObject.Config_CountControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CTCR_TimerCounter_Mode_t::TIMER_MODE,
+//	ctimerObject.Config_CountControlRegister( sensor_hc_sr04.__CAPchannelECHO_risingEdge, CTimer::CTCR_TimerCounter_Mode_t::TIMER_MODE,
 //												   true, CTimer::CTCR_Edge_t::CAP_RISING_EDGE );
 
 	++ultrasonido_indice_mde;
 	ultrasonido_indice_mde %= __HC_SR04_MDE_STEPS;
 
 	// Mete como callback de interrupción asociado al MAT el siguiente.
-	ctimerObject.Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, sensor_hc_sr04.__CAPchannelECHO, ultrasonido_secuencia[ultrasonido_indice_mde] );
+	ctimerObject.Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, sensor_hc_sr04.__CAPchannelECHO_risingEdge, ultrasonido_secuencia[ultrasonido_indice_mde] );
 }
 
 
@@ -166,14 +166,14 @@ volatile void MdE_Ultrasonido_EsperandoECHO() {
  */
 volatile void MdE_Ultrasonido_MidiendoTiempoECHO() {
 	// # Interrupción por flanco descendente #
-	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::RISING_CCR, false );
-	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::FALLING_CCR, true );
-	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::INTERRUPT_CCR, true );
+	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::RISING_CCR, false );
+	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::FALLING_CCR, true );
+	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::INTERRUPT_CCR, true );
 
 	++ultrasonido_indice_mde;
 	ultrasonido_indice_mde %= __HC_SR04_MDE_STEPS;
 
-	ctimerObject.Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, sensor_hc_sr04.__CAPchannelECHO, ultrasonido_secuencia[ultrasonido_indice_mde] );
+	ctimerObject.Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, sensor_hc_sr04.__CAPchannelECHO_risingEdge, ultrasonido_secuencia[ultrasonido_indice_mde] );
 }
 
 
@@ -198,9 +198,9 @@ volatile void MdE_Ultrasonido_SetupDelayReinicio() {
 
 	// # Deshabilitación del CAPx #
 	// # Interrupción por flanco ascendente #
-	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::RISING_CCR, false );
-	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::FALLING_CCR, false );
-	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO, CTimer::CCRtriggers_t::INTERRUPT_CCR, false );
+	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::RISING_CCR, false );
+	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::FALLING_CCR, false );
+	ctimerObject.Config_CaptureControlRegister( sensor_hc_sr04.__CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::INTERRUPT_CCR, false );
 
 
 	// # Habilitación del MATx #

@@ -43,7 +43,8 @@
     /* ###########################################
      * ### PROTOTIPOS DE FUNCIONES PÚBLICAS ###
      * ########################################### */
-    void Debug_HC_SR04();
+//    void Debug_HC_SR04();
+    volatile void Callback_Save_Time();
 
 
     /* ###########################################
@@ -65,13 +66,24 @@
 							DISTANCE_NO_OBSTACLE =  __MY_DOUBLE_POS_INFINITY
 			} HC_SR04_DistanceValues_millimeters_t;
 
-		// # Variables #
+		// ### Variables ###
+			// TODO:
+		// Estos son públicos solamente para que las funciones callback funcionen.
+		// En caso de que funcionen sin callbacks, PONERLAS PRIVADAS.
+//		private:
 		public:
-			uint8_t		__MATchannelTRIG;
-			uint8_t		__CAPchannelECHO;
+			// # MAT = TRIG #
+			uint8_t			__MATchannelTRIG;
+			const uint8_t	__MATchannelPWM;
+			// # CAP = ECHO #
+			uint8_t			__CAPchannelECHO_risingEdge;
+			uint8_t			__CAPchannelECHO_fallingEdge;
 
 		private:
+			uint32_t	__measuredTime_microSec;
 			uint16_t	__ticksUpdateCount;
+			uint32_t	__PWM_period;
+			uint32_t	__PWM_dutyCicle;
 
 			CTimer		*__CTimerFeatures;
 
@@ -86,17 +98,23 @@
 			double		__distance_millimeters;
 
 
-		// # Métodos #
+		// ### Métodos ###
 		public:
 						Us_HC_SR04( uint8_t portTrig, uint8_t pinTrig,
 									 uint8_t portEcho, uint8_t pinEcho,
 									 CTimer *inputCTimerObject = nullptr );
-			uint32_t 	Measure_Time();
-			void 		Time_microSec_to_Distance_millimeters();
-			void 		Set_Callback_Sequence( volatile void (**inputCallback)(void) );
+			void 		Measure_Time();
+			void		Set_PWM_dutyCycle( uint32_t dutyCycle );
+			void		Set_PWM_period( uint32_t period );
+			void 		Save_Distance_millimeters_from_Time_microSec();
 			void 		InicioDeSecuencia();
 			void		HandlerDelPeriferico();
 //						~Ultrasonido();
+
+		private:
+			void		Config_TRIG( uint8_t portTrig, uint8_t pinTrig );
+			void		Config_ECHO( uint8_t portEcho, uint8_t pinEcho );
+			void  		Debug_HC_SR04();
 	};
 
 

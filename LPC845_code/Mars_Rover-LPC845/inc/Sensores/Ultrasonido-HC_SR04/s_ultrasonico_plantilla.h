@@ -40,23 +40,13 @@
      * ### DEFINICIONES DE CLASES ###
      * ########################################### */
 	class Ultrasonido {
-		// # Variables #
-		private:
-			uint16_t	__ticksUpdateCount;
-
-			volatile void 	(**__sequenceCallbacks)(void);
-
-		public:
-			double		__distance_millimeters;
-
-
 		// # Métodos #
 		public:
 //			virtual				Ultrasonido( uint8_t portTrig, uint8_t pinTrig,
 //									 	 	 uint8_t portEcho, uint8_t pinEcho ) = 0;
-			virtual uint32_t 	Measure_Time() = 0;
-			virtual void 		Time_microSec_to_Distance_millimeters() = 0;
-			virtual void 		Set_Callback_Sequence( volatile void (**inputCallback)(void) ) = 0;
+			virtual void 		Measure_Time() = 0;
+			virtual void 		Save_Distance_millimeters_from_Time_microSec() = 0;
+//			virtual void 		Set_Callback_Sequence( volatile void (**inputCallback)(void) ) = 0;
 			virtual void 		InicioDeSecuencia() = 0;
 //						~Ultrasonido();
 	};

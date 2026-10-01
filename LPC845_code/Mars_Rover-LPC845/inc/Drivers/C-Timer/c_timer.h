@@ -135,8 +135,7 @@
 									  uint8_t channel,  volatile void (* inputCallback)(void) );
 			int8_t 		SwitchMatrix_Config_MAT( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel );
 			int8_t 		SwitchMatrix_Config_CAP( uint8_t input_CAPport, uint8_t input_CAPpin, uint8_t channel );
-			void 		Config_PWM( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel, uint32_t valuePWM );
-			void 		Set_PWM_MAT_channel( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel, bool enable );
+			void 		Set_PWM_MAT_channel( uint8_t channel, bool enable );
 			int8_t 		Get_available_MAT_channel();
 			int8_t 		Get_available_CAP_channel();
 			void		Config_CountControlRegister( uint8_t					input_CAPchannel,
