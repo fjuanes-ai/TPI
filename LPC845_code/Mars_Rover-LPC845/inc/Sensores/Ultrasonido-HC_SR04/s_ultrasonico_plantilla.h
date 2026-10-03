@@ -47,7 +47,7 @@
 			virtual void 		Measure_Time() = 0;
 			virtual void 		Save_Distance_millimeters_from_Time_microSec() = 0;
 //			virtual void 		Set_Callback_Sequence( volatile void (**inputCallback)(void) ) = 0;
-			virtual void 		InicioDeSecuencia() = 0;
+//			virtual void 		InicioDeSecuencia() = 0;
 //						~Ultrasonido();
 	};
 

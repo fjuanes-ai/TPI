@@ -24,7 +24,7 @@
 	#include "Drivers/LPC845.h"
 	#include "Drivers/C-Timer/c_timer.h"
 	#include "Sensores/Ultrasonido-HC_SR04/HC_SR04.h"
-	#include "Sensores/Ultrasonido-HC_SR04/HC_SR04-IRQ.h"
+//	#include "Sensores/Ultrasonido-HC_SR04/HC_SR04-IRQ.h"
 
 
     /* ###########################################
@@ -45,6 +45,5 @@
      * ### PROTOTIPOS DE FUNCIONES PÚBLICAS ###
      * ########################################### */
     void Inicializar();
-//    void SecuenciaTRIG();
 
 #endif          /* APLICACION_INICIALIZAR_H_ */

@@ -20,7 +20,6 @@
 	#include "Modulos/includeModulos.h"
 	#include "Drivers/C-Timer/c_timer.h"
 	#include "Sensores/Ultrasonido-HC_SR04/s_ultrasonico_plantilla.h"
-	#include "Sensores/Ultrasonido-HC_SR04/HC_SR04-IRQ.h"
 
 
     /* ###########################################
@@ -30,8 +29,6 @@
 	#define		__MY_FLOAT_NEG_INFINITY		0xFF800000
 	#define		__MY_DOUBLE_POS_INFINITY	0x7FF0000000000000
 	#define		__MY_DOUBLE_NEG_INFINITY	0xFFF0000000000000
-	#define		__SEQ_TRIG_STEPS			4
-	#define		__SEQ_ECHO_STEPS			4
 
 
     /* ###########################################
@@ -43,8 +40,7 @@
     /* ###########################################
      * ### PROTOTIPOS DE FUNCIONES PÚBLICAS ###
      * ########################################### */
-//    void Debug_HC_SR04();
-    volatile void Callback_Save_Time();
+//    volatile void Callback_Save_Time();
 
 
     /* ###########################################
@@ -67,11 +63,14 @@
 			} HC_SR04_DistanceValues_millimeters_t;
 
 		// ### Variables ###
-			// TODO:
+		public:
+			double		__distance_millimeters;
+
+		// TODO:
 		// Estos son públicos solamente para que las funciones callback funcionen.
 		// En caso de que funcionen sin callbacks, PONERLAS PRIVADAS.
-//		private:
-		public:
+		private:
+//		public:
 			// # MAT = TRIG #
 			uint8_t			__MATchannelTRIG;
 			const uint8_t	__MATchannelPWM;
@@ -79,7 +78,7 @@
 			uint8_t			__CAPchannelECHO_risingEdge;
 			uint8_t			__CAPchannelECHO_fallingEdge;
 
-		private:
+//		private:
 			uint32_t	__measuredTime_microSec;
 			uint16_t	__ticksUpdateCount;
 			uint32_t	__PWM_period;
@@ -87,15 +86,12 @@
 
 			CTimer		*__CTimerFeatures;
 
-			volatile void 	(**__sequenceCallbacks)(void);
+//			volatile void 	(**__sequenceCallbacks)(void);
 
-			typedef enum pulse_e {
-				N_PULSE	= 0,
-				Y_PULSE	= 1
-			} pulse_t;
-
-		public:
-			double		__distance_millimeters;
+//			typedef enum pulse_e {
+//				N_PULSE	= 0,
+//				Y_PULSE	= 1
+//			} pulse_t;
 
 
 		// ### Métodos ###
@@ -107,7 +103,6 @@
 			void		Set_PWM_dutyCycle( uint32_t dutyCycle );
 			void		Set_PWM_period( uint32_t period );
 			void 		Save_Distance_millimeters_from_Time_microSec();
-			void 		InicioDeSecuencia();
 			void		HandlerDelPeriferico();
 //						~Ultrasonido();
 

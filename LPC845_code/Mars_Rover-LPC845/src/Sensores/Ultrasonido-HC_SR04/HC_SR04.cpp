@@ -13,7 +13,7 @@
  * ### INCLUDES ###
  * ########################################### */
 #include "Sensores/Ultrasonido-HC_SR04/HC_SR04.h"
-#include "Sensores/Ultrasonido-HC_SR04/HC_SR04-IRQ.h"
+//#include "Sensores/Ultrasonido-HC_SR04/HC_SR04-IRQ.h"
 
 
 /* ###########################################
@@ -26,14 +26,11 @@ extern Uart test_UART;
  * ### MACROS & TIPOS DE DATOS PRIVADOS ###
  * ########################################### */
 #define		__PWM_MAT_CHANNEL_DEFAULT	3
-#define 	__PWM_PERIOD_DEFAULT		50e3				// us = 10^(-6) s.
+#define 	__PWM_PERIOD_DEFAULT		100e3				// us = 10^(-6) s.
 #define 	__PWM_DUTY_CYCLE_DEFAULT	10					// us = 10^(-6) s.
 //#define 	__PWM_PERIOD_DEFAULT		1e6					// us = 10^(-6) s.
 //#define 	__PWM_DUTY_CYCLE_DEFAULT	100e3				// us = 10^(-6) s.
 #define		__MAX_TICKS_UPDATE			100					// ms = 10^(-3) s.
-//#define		__MAX_TICKS_MEASUREMENT		10					// us = 10^(-6) s.
-//#define		__DISTANCE_MIN				20U					// mm = 10^(-3) m.
-//#define		__DISTANCE_MAX				4000U				// mm = 10^(-3) m.
 
 
 /* ###########################################
@@ -45,14 +42,6 @@ extern Uart test_UART;
 /* ###########################################
  * ### PROTOTIPOS DE FUNCIONES PRIVADAS ###
  * ########################################### */
-//#if defined (__cplusplus)
-//	extern "C" {
-//		static void MdE_Ultrasonido_MidiendoTiempoECHO();
-//		static void MdE_Ultrasonido_DelayReinicio();
-//		static void MdE_Ultrasonido_PulsoTRIGalto();
-//		static void MdE_Ultrasonido_EsperandoECHO();
-//	}
-//#endif
 
 
 // ====================================================================================
@@ -87,8 +76,6 @@ Us_HC_SR04::Us_HC_SR04( uint8_t portTrig, uint8_t pinTrig,
 			__PWM_period( __PWM_PERIOD_DEFAULT ),
 			__PWM_dutyCicle( __PWM_DUTY_CYCLE_DEFAULT ),
 			__CTimerFeatures( inputCTimerObject ) {
-
-//	__ticksCount_microSeconds = __MAX_TICKS_MEASUREMENT;
 
 	if ( __CTimerFeatures == nullptr ) {
 		return;		// < ERROR >
@@ -219,11 +206,6 @@ void Us_HC_SR04::Config_ECHO( uint8_t portEcho, uint8_t pinEcho ) {
 	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_fallingEdge, CTimer::CCRtriggers_t::RISING_CCR, false );
 	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_fallingEdge, CTimer::CCRtriggers_t::FALLING_CCR, true );
 	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_fallingEdge, CTimer::CCRtriggers_t::INTERRUPT_CCR, false );
-
-	//	__CTimerFeatures->Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, __CAPchannelECHO_fallingEdge, Callback_Save_Time );
-
-		// Resetea TC a flanco descendente del CAP (ECHO).
-	//	__CTimerFeatures->Config_CountControlRegister( __CAPchannelECHO_fallingEdge, CTimer::CTCR_TimerCounter_Mode_t::TIMER_MODE, true, CTimer::CTCR_Edge_t::CAP_FALLING_EDGE );
 }
 
 
@@ -257,17 +239,6 @@ void Us_HC_SR04::Set_PWM_dutyCycle( uint32_t dutyCycle ) {
 void Us_HC_SR04::Set_PWM_period( uint32_t period ) {
 	__PWM_period = period;
 	__CTimerFeatures->SetMATxValue( __MATchannelPWM, __PWM_period );
-}
-
-
-/* #############################################
- * InicioDeSecuencia
- * #############################################
- * \brief:			Inicia la secuencia por máquina de estados.
- */
-void Us_HC_SR04::InicioDeSecuencia() {
-//	HC_SR04_InicioDeSecuencia();
-//	this->Debug_HC_SR04();
 }
 
 
@@ -343,16 +314,6 @@ void Us_HC_SR04::HandlerDelPeriferico() {
 
 
 /* #############################################
- * Callback_Save_Time (IRQ) <EN DESUSO ACTUALMENTE>
- * #############################################
- * \brief:			Función asíncrona (entra por interrupción de CTIMER->CAP)
- */
-volatile void Callback_Save_Time() {
-	sensor_hc_sr04.Measure_Time();
-}
-
-
-/* #############################################
  * Debug_HC_SR04
  * #############################################
  * \brief:			DEBUGEO del sensor (ECHO + TRIG).
@@ -385,7 +346,7 @@ void Us_HC_SR04::Debug_HC_SR04() {
 	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::INTERRUPT_CCR, true );
 
 
-	__CTimerFeatures->Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, __CAPchannelECHO_risingEdge, Callback_Save_Time );
+//	__CTimerFeatures->Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, __CAPchannelECHO_risingEdge, Callback_Save_Time );
 
 	__CTimerFeatures->Enable_Timer_Prescale( true );
 	__CTimerFeatures->Reset_Timer_Prescale();
@@ -397,5 +358,7 @@ void Us_HC_SR04::Debug_HC_SR04() {
  * #############################################
  * \brief:			DEBUGEO del sensor (ECHO + TRIG).
  */
-//void Debug_HC_SR04() {...}
+//void Debug_HC_SR04() {
+//	...
+//}
 

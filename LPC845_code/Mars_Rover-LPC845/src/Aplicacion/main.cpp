@@ -27,7 +27,7 @@ int main( void ) {
 //    	if ( temp_GPIO_ECHO_CAP0.GetPin() ) {
 //    		++temp_counter;
 //    	}
-
+    	test_UART.Transmit( "Messi   " );
     }
 
 

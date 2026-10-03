@@ -73,6 +73,9 @@ Uart::Uart(
 		case 0:
 			g_usart[ 0 ] = this ;
 			SYSCON->SYSAHBCLKCTRL0 |= ( 1 << 14 );
+			// Reseteo del periférico:
+			SYSCON->PRESETCTRL0 &= ~(0x1 << 14);
+			SYSCON->PRESETCTRL0 |=  (0x1 << 14);
 			iser = 3 ;
 			SYSCON->FCLKSEL[ 0 ] = 1;
 			PINASSIGN_Config(PA_U0_TXD, portTx, pinTx);
@@ -81,6 +84,9 @@ Uart::Uart(
 		case 1:
 			g_usart[ 1 ] = this ;
 			SYSCON->SYSAHBCLKCTRL0 |= ( 1 << 15 );
+			// Reseteo del periférico:
+			SYSCON->PRESETCTRL0 &= ~(0x1 << 15);
+			SYSCON->PRESETCTRL0 |=  (0x1 << 15);
 			iser = 4 ;
 			SYSCON->FCLKSEL[ 1 ] = 1;
 			PINASSIGN_Config(PA_U1_TXD, portTx, pinTx);
@@ -89,6 +95,9 @@ Uart::Uart(
 		case 2:
 			g_usart[ 2 ] = this ;
 			SYSCON->SYSAHBCLKCTRL0 |= ( 1 << 16 );
+			// Reseteo del periférico:
+			SYSCON->PRESETCTRL0 &= ~(0x1 << 16);
+			SYSCON->PRESETCTRL0 |=  (0x1 << 16);
 			iser = 5 ;
 			SYSCON->FCLKSEL[ 2 ] = 1;
 			PINASSIGN_Config(PA_U2_TXD, portTx, pinTx);
@@ -97,6 +106,9 @@ Uart::Uart(
 		case 3:
 			g_usart[ 3 ] = this ;
 			SYSCON->SYSAHBCLKCTRL0 |= ( 1 << 30 );
+			// Reseteo del periférico:
+			SYSCON->PRESETCTRL0 &= ~(0x1 << 30);
+			SYSCON->PRESETCTRL0 |=  (0x1 << 30);
 			iser = 30 ;
 			SYSCON->FCLKSEL[ 3 ] = 1;
 			PINASSIGN_Config(PA_U3_TXD, portTx, pinTx);
@@ -105,12 +117,16 @@ Uart::Uart(
 		case 4:
 			g_usart[ 4 ] = this ;
 			SYSCON->SYSAHBCLKCTRL0 |= ( 1 << 31 );
+			// Reseteo del periférico:
+			SYSCON->PRESETCTRL0 &= ~(0x1 << 31);
+			SYSCON->PRESETCTRL0 |=  (0x1 << 31);
 			iser = 31 ;
 			SYSCON->FCLKSEL[ 4 ] = 1;
 			PINASSIGN_Config(PA_U4_TXD, portTx, pinTx);
 			PINASSIGN_Config(PA_U4_RXD, portRx, pinRx);
 			break;
 	}
+
 
 	USARTS[usart]->CFG = ( 0 << 0 )				// 0=DISABLE 1=ENABLE
 				| ( BitsDeDatos << 2 )			// 0=7BITS 1=8BITS 2=9BITS
@@ -121,14 +137,18 @@ Uart::Uart(
 				| ( 1 << 15 );				// LOOP
 
 	// OSR vale por default 16 = 0xF
+	m_usart->OSR = 0xF;
 	USARTS[usart]->BRG = (( FREQ_CLOCK / baudrate ) / ( m_usart->OSR + 1 )) - 1;
 //	USARTS[usart]->BRG = (( 12e3 / baudrate ) / ( m_usart->OSR + 1 )) - 1;
 //	USARTS[usart]->BRG = (( 24e3 / baudrate ) / ( m_usart->OSR + 1 )) - 1;
+//	USARTS[usart]->BRG = (( 30e3 / baudrate ) / ( m_usart->OSR + 1 )) - 1;
 //	USARTS[usart]->BRG = (( 48e3 / baudrate ) / ( m_usart->OSR + 1 )) - 1;
 
 	USARTS[usart]->INTENSET |= ( 1 << 0 );		// RX interrupcion
 
 	NVIC->ISER[0] |= ( 1 << iser ); 			// habilitamos UART_IRQ
+
+//	USARTS[usart]->CTL |=	(0x1 << 6);			// Se deshabilita transmisión (Tx) después de cada caracter.
 
 	USARTS[usart]->CFG |= 	( 1 << 0 );			// habilitamos USART
 }
@@ -187,6 +207,10 @@ void Uart::Transmit ( const char * msg)
 			m_flagTx = true ;
 			Tx_EnableInterupt (  );
 		}
+
+		// TODO: checkear en alguna parte el registro STAT que tira
+		// data de si está IDLE Rx/Tx (1) o si ESTÁN PROCESANDO
+		// RECEPCIÓN/TRANSMIMSIÓN (0).
 	}
 }
 
