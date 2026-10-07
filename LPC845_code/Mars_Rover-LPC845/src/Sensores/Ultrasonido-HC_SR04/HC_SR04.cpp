@@ -8,12 +8,34 @@
  *
  *********************************************/
 
+/* ### Canales MAT/CAP utilizados ###
+ *
+ * # MAT #
+ * ------------------------------------------------
+ * Ut?	N°	Descripción
+ * ------------------------------------------------
+ * [X]	0	Canal de pulsos PWM para alimentar al TRIG.
+ * [X]	1	Canal de delay/retardo entre pulso en TRIG y lectura en ECHO. CON INTERRUPCIÓN.
+ * [ ]	2
+ * [X]	3	Canal que dicta el período total de la señal PWM. RESETEA CUENTA
+ * ------------------------------------------------
+ *
+ * # CAP #
+ * ------------------------------------------------
+ * Ut?	N°	Descripción
+ * ------------------------------------------------
+ * [X]	0	Canal de lectura de TC en flanco ascendente.
+ * [X]	1 	Canal de lectura de TC en flanco descendente. CON INTERRUPCIÓN.
+ * [ ]	2
+ * [ ]	3
+ * ------------------------------------------------
+ */
+
 
 /* ###########################################
  * ### INCLUDES ###
  * ########################################### */
 #include "Sensores/Ultrasonido-HC_SR04/HC_SR04.h"
-//#include "Sensores/Ultrasonido-HC_SR04/HC_SR04-IRQ.h"
 
 
 /* ###########################################
@@ -28,15 +50,13 @@ extern Uart test_UART;
 #define		__PWM_MAT_CHANNEL_DEFAULT	3
 #define 	__PWM_PERIOD_DEFAULT		100e3				// us = 10^(-6) s.
 #define 	__PWM_DUTY_CYCLE_DEFAULT	10					// us = 10^(-6) s.
-//#define 	__PWM_PERIOD_DEFAULT		1e6					// us = 10^(-6) s.
-//#define 	__PWM_DUTY_CYCLE_DEFAULT	100e3				// us = 10^(-6) s.
-#define		__MAX_TICKS_UPDATE			100					// ms = 10^(-3) s.
+#define		__MAX_TICKS_UPDATE			1000				// ms = 10^(-3) s.
 
 
 /* ###########################################
  * ### VARIABLES GLOBALES PRIVADAS ###
  * ########################################### */
-//
+extern Us_HC_SR04 sensor_hc_sr04;
 
 
 /* ###########################################
@@ -51,7 +71,13 @@ extern Uart test_UART;
 /* ###########################################
  * ### FUNCIONES PRIVADAS ###
  * ########################################### */
-//
+#if defined (__cplusplus)
+	extern "C" {
+    	volatile void Callback_CAP_Save_Rising_Edge_Value();
+    	volatile void Callback_CAP_Save_Falling_Edge_Value();
+    	volatile void Callback_CAP_Save_Time();
+	}
+#endif
 
 
 // ====================================================================================
@@ -63,6 +89,35 @@ extern Uart test_UART;
  * *** FUNCIONES PÚBLICAS ***
  *********************************************/
 
+/* #############################################
+ * Callback_CAP_Save_Rising_Edge_Value (IRQ)
+ * #############################################
+ * Función asíncrona que guarda el tiempo entre lecturas del CAP.
+ */
+volatile void Callback_CAP_Save_Rising_Edge_Value() {
+	sensor_hc_sr04.CAP_Save_Rising_Edge_Value();
+}
+
+
+/* #############################################
+ * Callback_CAP_Save_Falling_Edge_Value (IRQ)
+ * #############################################
+ * Función asíncrona que guarda el tiempo entre lecturas del CAP.
+ */
+volatile void Callback_CAP_Save_Falling_Edge_Value() {
+	sensor_hc_sr04.CAP_Save_Falling_Edge_Value();
+}
+
+
+/* #############################################
+ * Callback_CAP_Save_Time (IRQ)
+ * #############################################
+ * Función asíncrona que guarda el tiempo entre lecturas del CAP.
+ */
+volatile void Callback_CAP_Save_Time() {
+	sensor_hc_sr04.Measure_Time();
+}
+
 
 /* #############################################
  * Ultrasonido (CONSTRUCTOR)
@@ -72,9 +127,13 @@ extern Uart test_UART;
 Us_HC_SR04::Us_HC_SR04( uint8_t portTrig, uint8_t pinTrig,
 						uint8_t portEcho, uint8_t pinEcho,
 						CTimer *inputCTimerObject ) :
+			__ticksUpdateCount( 0 ),
+			__trigPulseState( PULSE_IDLE_READY ),
 			__MATchannelPWM( __PWM_MAT_CHANNEL_DEFAULT ),
-			__PWM_period( __PWM_PERIOD_DEFAULT ),
-			__PWM_dutyCicle( __PWM_DUTY_CYCLE_DEFAULT ),
+			__PWM_totalPeriod( __PWM_PERIOD_DEFAULT ),
+			__PWM_onPeriod( __PWM_DUTY_CYCLE_DEFAULT ),
+			__initialCAPvalue( 0 ),
+			__finalCAPvalue( 0 ),
 			__CTimerFeatures( inputCTimerObject ) {
 
 	if ( __CTimerFeatures == nullptr ) {
@@ -126,7 +185,7 @@ void Us_HC_SR04::Config_TRIG( uint8_t portTrig, uint8_t pinTrig ) {
 		return;		// < ERROR >
 	}
 
-	// # MAT3 = PWM (period) #
+	// # MAT3 = PWM (totalPeriod) #
 	__tempErrorBuffer = __CTimerFeatures->Get_available_MAT_channel();	// No lo usamos, pero dejamos en claro que tomamos un canal.
 	if ( __tempErrorBuffer < 0 ) {
 		return;		// < ERROR >
@@ -136,19 +195,18 @@ void Us_HC_SR04::Config_TRIG( uint8_t portTrig, uint8_t pinTrig ) {
 								// No hace falta SWM porque no es de salida.
 
 	__CTimerFeatures->Set_PWM_MAT_channel( __MATchannelPWM, false );	// El NO configurado como PWM define Período total.
-	this->Set_PWM_period( __PWM_period );
+	__CTimerFeatures->Set_PWM_totalPeriod( __MATchannelPWM, __PWM_totalPeriod );
 //	__CTimerFeatures->Config_ExternalMatchRegister( __MATchannelPWM, CTimer::EMR_Demeanor_t::EMR_NOTHING );		// Como no es salida, lo dejamos para que no haga nada.
 	__CTimerFeatures->Config_MatchControlRegister( __MATchannelPWM, CTimer::MCRtriggers_t::INTERRUPT_MCR, false );
 	__CTimerFeatures->Config_MatchControlRegister( __MATchannelPWM, CTimer::MCRtriggers_t::RESET_MCR, true );
 	__CTimerFeatures->Config_MatchControlRegister( __MATchannelPWM, CTimer::MCRtriggers_t::STOP_MCR, false );
 
 	__CTimerFeatures->Set_PWM_MAT_channel( __MATchannelTRIG, true );	// El configurado como PWM define Duty Cycle individual.
-	this->Set_PWM_dutyCycle( __PWM_dutyCicle );
+	__CTimerFeatures->Set_PWM_onPeriod( __MATchannelTRIG, __MATchannelPWM, __PWM_onPeriod );
 //	__CTimerFeatures->Config_ExternalMatchRegister( __MATchannelTRIG, CTimer::EMR_Demeanor_t::EMR_NOTHING );	// Como no es salida, lo dejamos para que no haga nada.
-	__CTimerFeatures->Config_MatchControlRegister( __MATchannelTRIG, CTimer::MCRtriggers_t::INTERRUPT_MCR, false );
+	__CTimerFeatures->Config_MatchControlRegister( __MATchannelTRIG, CTimer::MCRtriggers_t::INTERRUPT_MCR, true );
 	__CTimerFeatures->Config_MatchControlRegister( __MATchannelTRIG, CTimer::MCRtriggers_t::RESET_MCR, false );
 	__CTimerFeatures->Config_MatchControlRegister( __MATchannelTRIG, CTimer::MCRtriggers_t::STOP_MCR, false );
-
 }
 
 
@@ -190,6 +248,7 @@ void Us_HC_SR04::Config_ECHO( uint8_t portEcho, uint8_t pinEcho ) {
 	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::FALLING_CCR, false );
 	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::INTERRUPT_CCR, false );
 
+
 	// # CAPy = ECHO 2 (falling edge) #
 	__tempErrorBuffer = __CTimerFeatures->Get_available_CAP_channel();
 	if ( __tempErrorBuffer < 0 ) {
@@ -205,45 +264,52 @@ void Us_HC_SR04::Config_ECHO( uint8_t portEcho, uint8_t pinEcho ) {
 
 	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_fallingEdge, CTimer::CCRtriggers_t::RISING_CCR, false );
 	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_fallingEdge, CTimer::CCRtriggers_t::FALLING_CCR, true );
-	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_fallingEdge, CTimer::CCRtriggers_t::INTERRUPT_CCR, false );
+	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_fallingEdge, CTimer::CCRtriggers_t::INTERRUPT_CCR, true );
+
+
+	// ## CALLBACKS ##
+
+	// # CAPx = ECHO 1 (rising edge) #
+	__CTimerFeatures->Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, __CAPchannelECHO_risingEdge, Callback_CAP_Save_Rising_Edge_Value );
+
+	// # CAPy = ECHO 2 (falling edge) #
+
+//	__CTimerFeatures->Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, __CAPchannelECHO_fallingEdge, Callback_CAP_Save_Time );
+	__CTimerFeatures->Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, __CAPchannelECHO_fallingEdge, Callback_CAP_Save_Falling_Edge_Value );
+
+
+	// # IOCON: Para reducir ruido #
+	IOCON_Config_PIO( portEcho, pinEcho, 0xFFFFFFFF, false );
+	IOCON_Config_PIO( portEcho, pinEcho, __IOCON_MODE_PULL_DOWN_MASK, true );
 }
 
 
 /* #############################################
- * Set_PWM_dutyCycle
+ * CAP_Save_Rising_Edge_Value (IRQ)
  * #############################################
- * \brief:			Establece el ciclo de trabajo o actividad.
+ * \brief:			A
  *
- * Notar que funciona AL REVÉS. Es decir. debido a que los de NXP piensan todo al revés,
- * utilizar un canal MATx como PWM y ponerle un valor hace que:
- * 1)	Arranque en 0.
- * 2)	Cambie al estado ALTO (1) cuando TC = MATx.
- *
- * Para que no revierta el ciclo de actividad, se puede pensar que la señal arranca cuando
- * nuestro PWM pasó al estado BAJO (0). Entonces, hay que cargarle un valor de:
- * __PWM_period - __PWM_dutyCicle
- * para que pase ese período de actividad en alto, y cuando llegue al valor de __PWM_period,
- * se hace 0 y reinicia.
+ * Entra por interrupción en CAP0 (canal por flanco ascendente).
  */
-void Us_HC_SR04::Set_PWM_dutyCycle( uint32_t dutyCycle ) {
-	__PWM_dutyCicle = dutyCycle;
-	__CTimerFeatures->SetMATxValue( __MATchannelTRIG, __PWM_period - __PWM_dutyCicle );
+void Us_HC_SR04::CAP_Save_Rising_Edge_Value() {
+	__initialCAPvalue = __CTimerFeatures->CTimer::GetCAPxValue( __CAPchannelECHO_risingEdge );
 }
 
 
 /* #############################################
- * Set_PWM_period
+ * CAP_Save_Falling_Edge_Value (IRQ)
  * #############################################
- * \brief:			Configura el período total de la/s señal/es PWM.
+ * \brief:			A
+ *
+ * Entra por interrupción en CAP1 (canal por flanco descendente).
  */
-void Us_HC_SR04::Set_PWM_period( uint32_t period ) {
-	__PWM_period = period;
-	__CTimerFeatures->SetMATxValue( __MATchannelPWM, __PWM_period );
+void Us_HC_SR04::CAP_Save_Falling_Edge_Value() {
+	__finalCAPvalue = __CTimerFeatures->CTimer::GetCAPxValue( __CAPchannelECHO_fallingEdge );
 }
 
 
 /* #############################################
- * Measure_Time
+ * Measure_Time (IRQ)
  * #############################################
  * \brief:			Mide el tiempo de pulso recibido en "ECHO".
  *
@@ -253,13 +319,11 @@ void Us_HC_SR04::Set_PWM_period( uint32_t period ) {
  * 	N/O: 36  mS.	(No Obstacle)
  */
 void Us_HC_SR04::Measure_Time() {
-	uint32_t initialCAPvalue;
-	uint32_t finalCAPvalue;
-
-	initialCAPvalue = __CTimerFeatures->CTimer::GetCAPxValue( __CAPchannelECHO_risingEdge );
-	finalCAPvalue = __CTimerFeatures->CTimer::GetCAPxValue( __CAPchannelECHO_fallingEdge );
-
-	__measuredTime_microSec = (finalCAPvalue - initialCAPvalue);
+	if (__finalCAPvalue > __initialCAPvalue) {
+		__measuredTime_microSec =  __finalCAPvalue - __initialCAPvalue;
+	} else {
+		__measuredTime_microSec = 0;
+	}
 }
 
 
@@ -277,18 +341,20 @@ void Us_HC_SR04::Measure_Time() {
  */
 //uint32_t Ultrasonido::Save_Distance_millimeters_from_Time_microSec( uint32_t inputTime_microSec ) {
 void Us_HC_SR04::Save_Distance_millimeters_from_Time_microSec() {
-
 	this->Measure_Time();
 
-	__distance_millimeters = __measuredTime_microSec * 10 / 58.0;
+	__distance_millimeters = (__measuredTime_microSec * 343) / 2000;
+//	__distance_millimeters = __measuredTime_microSec * (343.0 / 1000.0) / 2;
+//	__distance_millimeters = __measuredTime_microSec * 100 / 583;	// Aproximación de la mitad de la velocidad del sonido.
+//	__distance_millimeters = __measuredTime_microSec * 10 / 58.0;
 
-	if ( __measuredTime_microSec <= Us_HC_SR04::TIME_MIN )
+	if ( __measuredTime_microSec <= (uint32_t) Us_HC_SR04::TIME_MIN )
 		__distance_millimeters = Us_HC_SR04::DISTANCE_MIN;
 
-	if ( (__measuredTime_microSec >= Us_HC_SR04::TIME_MAX) && (__measuredTime_microSec <  Us_HC_SR04::TIME_NO_OBSTACLE) )
+	if ( (__measuredTime_microSec >= (uint32_t) Us_HC_SR04::TIME_MAX) && (__measuredTime_microSec < (uint32_t) Us_HC_SR04::TIME_NO_OBSTACLE) )
 		__distance_millimeters = Us_HC_SR04::DISTANCE_MAX;
 
-	if ( __measuredTime_microSec >=  Us_HC_SR04::TIME_NO_OBSTACLE )
+	if ( __measuredTime_microSec >= (uint32_t) Us_HC_SR04::TIME_NO_OBSTACLE )
 		__distance_millimeters = Us_HC_SR04::DISTANCE_NO_OBSTACLE;
 }
 
@@ -319,37 +385,7 @@ void Us_HC_SR04::HandlerDelPeriferico() {
  * \brief:			DEBUGEO del sensor (ECHO + TRIG).
  */
 void Us_HC_SR04::Debug_HC_SR04() {
-	__CTimerFeatures->Enable_Timer_Prescale( false );
 
-	// ### Deshabilitación del MATx/EMRx ###
-	// # MATx = TRIG (duty cycle) #
-	__CTimerFeatures->Config_MatchControlRegister( __MATchannelTRIG, CTimer::MCRtriggers_t::STOP_MCR, false );
-	__CTimerFeatures->Config_MatchControlRegister( __MATchannelTRIG, CTimer::MCRtriggers_t::RESET_MCR, false );
-	__CTimerFeatures->Config_MatchControlRegister( __MATchannelTRIG, CTimer::MCRtriggers_t::INTERRUPT_MCR, false );
-	__CTimerFeatures->Config_ExternalMatchRegister( __MATchannelTRIG, CTimer::EMR_Demeanor_t::EMR_NOTHING );
-
-	__CTimerFeatures->SetMATxValue( __MATchannelTRIG, __PWM_DUTY_CYCLE_DEFAULT );
-	__CTimerFeatures->Config_MatchShadow( __MATchannelTRIG, false );
-
-
-	// # MAT3 = PWM period #
-	__CTimerFeatures->Config_MatchControlRegister( __MATchannelPWM, CTimer::MCRtriggers_t::STOP_MCR, false );
-	__CTimerFeatures->Config_MatchControlRegister( __MATchannelPWM, CTimer::MCRtriggers_t::RESET_MCR, false );
-	__CTimerFeatures->Config_MatchControlRegister( __MATchannelPWM, CTimer::MCRtriggers_t::INTERRUPT_MCR, false );
-	__CTimerFeatures->SetMATxValue( __MATchannelPWM, __PWM_PERIOD_DEFAULT );
-
-
-	// # Habilitación del CAPx #
-	// # Interrupción por flanco ascendente #
-	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::RISING_CCR, false );
-	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::FALLING_CCR, true );
-	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::INTERRUPT_CCR, true );
-
-
-//	__CTimerFeatures->Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, __CAPchannelECHO_risingEdge, Callback_Save_Time );
-
-	__CTimerFeatures->Enable_Timer_Prescale( true );
-	__CTimerFeatures->Reset_Timer_Prescale();
 }
 
 
@@ -361,4 +397,3 @@ void Us_HC_SR04::Debug_HC_SR04() {
 //void Debug_HC_SR04() {
 //	...
 //}
-

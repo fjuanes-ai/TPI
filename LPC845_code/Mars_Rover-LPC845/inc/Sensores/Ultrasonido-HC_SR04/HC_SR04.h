@@ -25,22 +25,27 @@
     /* ###########################################
      * ### MACROS & TIPOS DE DATOS GLOBALES ###
      * ########################################### */
-	#define		__MY_FLOAT_POS_INFINITY		0x7F800000
-	#define		__MY_FLOAT_NEG_INFINITY		0xFF800000
-	#define		__MY_DOUBLE_POS_INFINITY	0x7FF0000000000000
-	#define		__MY_DOUBLE_NEG_INFINITY	0xFFF0000000000000
+//	#define		__MY_FLOAT_POS_INFINITY		0x7F800000
+//	#define		__MY_FLOAT_NEG_INFINITY		0xFF800000
+//	#define		__MY_DOUBLE_POS_INFINITY	0x7FF0000000000000
+//	#define		__MY_DOUBLE_NEG_INFINITY	0xFFF0000000000000
 
 
     /* ###########################################
      * ### VARIABLES GLOBALES PÚBLICAS ###
      * ########################################### */
-    //
+//    extern Us_HC_SR04 sensor_hc_sr04;
 
 
     /* ###########################################
      * ### PROTOTIPOS DE FUNCIONES PÚBLICAS ###
      * ########################################### */
-//    volatile void Callback_Save_Time();
+//	#if defined (__cplusplus)
+//		extern "C" {
+//	    	volatile void Callback_CAP_Save_Time();
+//	    	volatile void Callback_MAT_Enable_CAP_Readings();
+//		}
+//	#endif
 
 
     /* ###########################################
@@ -57,53 +62,65 @@
 			} HC_SR04_TimeValues_microSeconds_t;
 
 			typedef enum HC_SR04_DistanceValues_millimeters_e {
-							DISTANCE_MIN		 =	20,
-							DISTANCE_MAX		 =	4000,
-							DISTANCE_NO_OBSTACLE =  __MY_DOUBLE_POS_INFINITY
+							DISTANCE_MIN		 	=	20,
+							DISTANCE_MAX		 	=	4000,
+							DISTANCE_NO_OBSTACLE  	=  	0,
+							DISTANCE_OUT_OF_RANGE 	=  	-1
 			} HC_SR04_DistanceValues_millimeters_t;
+
+		private:
+			typedef enum HC_SR04_PulseState_e {
+							PULSE_IDLE_READY 	 	= 	0,
+							PULSE_OVER_WAITING_DELAY,
+							PULSE_DELAY_OVER
+			} HC_SR04_PulseState_t;
+
 
 		// ### Variables ###
 		public:
-			double		__distance_millimeters;
+//			double			__distance_millimeters;
+			uint16_t		__distance_millimeters;
 
-		// TODO:
-		// Estos son públicos solamente para que las funciones callback funcionen.
-		// En caso de que funcionen sin callbacks, PONERLAS PRIVADAS.
 		private:
-//		public:
+			uint16_t		__ticksUpdateCount;
+			HC_SR04_PulseState_t	__trigPulseState;
+
 			// # MAT = TRIG #
 			uint8_t			__MATchannelTRIG;
 			const uint8_t	__MATchannelPWM;
+//			uint8_t			__MATchannelDelay;
+
+//			const uint32_t	__MAT_delayValue;
+			uint32_t		__PWM_totalPeriod;
+			uint32_t		__PWM_onPeriod;
+
 			// # CAP = ECHO #
 			uint8_t			__CAPchannelECHO_risingEdge;
 			uint8_t			__CAPchannelECHO_fallingEdge;
+			uint32_t		__initialCAPvalue;
+			uint32_t		__finalCAPvalue;
 
-//		private:
-			uint32_t	__measuredTime_microSec;
-			uint16_t	__ticksUpdateCount;
-			uint32_t	__PWM_period;
-			uint32_t	__PWM_dutyCicle;
+			uint16_t		__measuredTime_microSec;
 
-			CTimer		*__CTimerFeatures;
+			CTimer		   *__CTimerFeatures;
 
 //			volatile void 	(**__sequenceCallbacks)(void);
-
-//			typedef enum pulse_e {
-//				N_PULSE	= 0,
-//				Y_PULSE	= 1
-//			} pulse_t;
 
 
 		// ### Métodos ###
 		public:
 						Us_HC_SR04( uint8_t portTrig, uint8_t pinTrig,
-									 uint8_t portEcho, uint8_t pinEcho,
-									 CTimer *inputCTimerObject = nullptr );
+									uint8_t portEcho, uint8_t pinEcho,
+									CTimer *inputCTimerObject = nullptr );
+			void		PulseSent_TRIG();
+			void 		Enable_ECHO_CAP_Readings();
 			void 		Measure_Time();
-			void		Set_PWM_dutyCycle( uint32_t dutyCycle );
-			void		Set_PWM_period( uint32_t period );
 			void 		Save_Distance_millimeters_from_Time_microSec();
+			void		CAP_Save_Rising_Edge_Value();
+			void		CAP_Save_Falling_Edge_Value();
 			void		HandlerDelPeriferico();
+//			void		Set_PWM_onPeriod( uint32_t onPeriod );
+//			void		Set_PWM_totalPeriod( uint32_t totalPeriod );
 //						~Ultrasonido();
 
 		private:

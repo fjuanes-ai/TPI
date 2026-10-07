@@ -59,19 +59,14 @@
 			typedef struct MAT_data_s {
 				int16_t				port;
 				int16_t				pin;
-				uint32_t			period;
-				__IO uint32_t		* const EMRx;
-				__IO uint32_t		* const MCRx;
-				__IO uint32_t 		* const MRx;
+				uint32_t			totalPeriod;
+				bool				isPWM;
 				volatile void		(*__callback)();
 			} MAT_data_t;
 
 			typedef struct CAP_data_s {
 				int16_t				port;
 				int16_t				pin;
-				__IO uint32_t 		* const CCRmode;
-				__IO uint32_t 		* const CTCRedge;
-				__I  uint32_t 		* const CRx;
 				volatile void		(*__callback)();
 			} CAP_data_t;
 
@@ -126,7 +121,7 @@
 
 
 		// ## Métodos ##
-//    	private:
+//    	// private:
 
     	public:
 						CTimer();
@@ -136,6 +131,10 @@
 			int8_t 		SwitchMatrix_Config_MAT( uint8_t input_MATport, uint8_t input_MATpin, uint8_t channel );
 			int8_t 		SwitchMatrix_Config_CAP( uint8_t input_CAPport, uint8_t input_CAPpin, uint8_t channel );
 			void 		Set_PWM_MAT_channel( uint8_t channel, bool enable );
+			void		Set_PWM_totalPeriod( uint32_t totalPeriod );
+			void		Set_PWM_totalPeriod( uint8_t channel, uint32_t totalPeriod );
+			void		Set_PWM_onPeriod( uint8_t channel, uint8_t totalPeriod_channel, uint32_t onPeriod );
+			void		Set_PWM_onPeriod( uint8_t channel, uint32_t onPeriod );
 			int8_t 		Get_available_MAT_channel();
 			int8_t 		Get_available_CAP_channel();
 			void		Config_CountControlRegister( uint8_t					input_CAPchannel,
@@ -152,7 +151,6 @@
 	  	 	 	 	 	  	  	  	  	  	 CCRtriggers_t 	inputCCRmode,
 					  	  	  	  	  	 	 bool 			bitValueCCR );
 			void		Config_ExternalMatchRegister( uint8_t input_MATchannel, EMR_Demeanor_t input_ExternalMatchDemeanor );
-//			void 		Config_ExternalMatchRegister( uint8_t input_MATchannel, uint32_t input_ExternalMatchDemeanor );
 			void 		Reset_Timer_Prescale();
 			void 		Enable_Timer_Prescale( bool input_EnableValue );
 		    uint32_t	GetCAPxValue( uint8_t channel ) const;

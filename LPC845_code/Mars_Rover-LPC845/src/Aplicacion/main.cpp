@@ -6,7 +6,7 @@
  * @brief           Prueba de interrupciones externas. + Práctica de
  * 					timers en secuencia.
  *
- * @author          Francisco Juanes
+ * @author			Francisco Juanes
  * 					Mateo Román
  * 					Iván Yopolo
  *
@@ -27,7 +27,7 @@ int main( void ) {
 //    	if ( temp_GPIO_ECHO_CAP0.GetPin() ) {
 //    		++temp_counter;
 //    	}
-    	test_UART.Transmit( "Messi   " );
+//    	test_UART.Transmit( "Messi   " );
     }
 
 

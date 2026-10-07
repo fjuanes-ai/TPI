@@ -69,37 +69,41 @@ CTimer::MAT_data_t  CTimer::__MAT[__CTimer_MAX_MR] = {
 	{	// # Channel 0 #
 		.port = -1,
 		.pin = -1,
-		.period = 0,
-		.EMRx = &(CTIMER->EMR),
-		.MCRx = &(CTIMER->MCR),
-		.MRx = CTIMER->MR,
+		.totalPeriod = 0,
+//		.EMRx = &(CTIMER->EMR),
+//		.MCRx = &(CTIMER->MCR),
+//		.MRx = CTIMER->MR,
+		.isPWM = false,
 		.__callback = nullptr
 	},
 	{
 		.port = -1,
 		.pin = -1,
-		.period = 0,
-		.EMRx = &(CTIMER->EMR) + 1,
-		.MCRx = &(CTIMER->MCR) + 1,
-		.MRx = CTIMER->MR + 1,
+		.totalPeriod = 0,
+//		.EMRx = &(CTIMER->EMR) + 1,
+//		.MCRx = &(CTIMER->MCR) + 1,
+//		.MRx = CTIMER->MR + 1,
+		.isPWM = false,
 		.__callback = nullptr
 	},
 	{
 		.port = -1,
 		.pin = -1,
-		.period = 0,
-		.EMRx = &(CTIMER->EMR) + 2,
-		.MCRx = &(CTIMER->MCR) + 2,
-		.MRx = CTIMER->MR + 2,
+		.totalPeriod = 0,
+//		.EMRx = &(CTIMER->EMR) + 2,
+//		.MCRx = &(CTIMER->MCR) + 2,
+//		.MRx = CTIMER->MR + 2,
+		.isPWM = false,
 		.__callback = nullptr
 	},
 	{
 		.port = -1,
 		.pin = -1,
-		.period = 0,
-		.EMRx = &(CTIMER->EMR) + 3,
-		.MCRx = &(CTIMER->MCR) + 3,
-		.MRx = CTIMER->MR + 3,
+		.totalPeriod = 0,
+//		.EMRx = &(CTIMER->EMR) + 3,
+//		.MCRx = &(CTIMER->MCR) + 3,
+//		.MRx = CTIMER->MR + 3,
+		.isPWM = false,
 		.__callback = nullptr
 	}
 };
@@ -108,33 +112,33 @@ CTimer::CAP_data_t  CTimer::__CAP[__CTimer_MAX_CR] = {
 	{	// # Channel 0 #
 		.port = -1,
 		.pin = -1,
-		.CCRmode = &(CTIMER->CCR),
-		.CTCRedge = &(CTIMER->CTCR),
-		.CRx = CTIMER->CR,
+//		.CCRmode = &(CTIMER->CCR),
+//		.CTCRedge = &(CTIMER->CTCR),
+//		.CRx = CTIMER->CR,
 		.__callback = nullptr
 	},
 	{
 		.port = -1,
 		.pin = -1,
-		.CCRmode = &(CTIMER->CCR) + 1,
-		.CTCRedge = &(CTIMER->CTCR) + 1,
-		.CRx = CTIMER->CR + 1,
+//		.CCRmode = &(CTIMER->CCR) + 1,
+//		.CTCRedge = &(CTIMER->CTCR) + 1,
+//		.CRx = CTIMER->CR + 1,
 		.__callback = nullptr
 	},
 	{
 		.port = -1,
 		.pin = -1,
-		.CCRmode = &(CTIMER->CCR) + 2,
-		.CTCRedge = &(CTIMER->CTCR) + 2,
-		.CRx = CTIMER->CR + 2,
+//		.CCRmode = &(CTIMER->CCR) + 2,
+//		.CTCRedge = &(CTIMER->CTCR) + 2,
+//		.CRx = CTIMER->CR + 2,
 		.__callback = nullptr
 	},
 	{
 		.port = -1,
 		.pin = -1,
-		.CCRmode = &(CTIMER->CCR) + 3,
-		.CTCRedge = &(CTIMER->CTCR) + 3,
-		.CRx = CTIMER->CR + 3,
+//		.CCRmode = &(CTIMER->CCR) + 3,
+//		.CTCRedge = &(CTIMER->CTCR) + 3,
+//		.CRx = CTIMER->CR + 3,
 		.__callback = nullptr
 	},
 };
@@ -418,10 +422,98 @@ void CTimer::Set_PWM_MAT_channel( uint8_t channel, bool enable ) {
 	if ( channel >= __CTimer_MAX_MR )
 		return;
 
-	if ( enable )
+	if ( enable ) {
 		CTIMER->PWMC |=   0x01 << channel;
-	else
+		this->__MAT[channel].isPWM = true;
+	} else {
 		CTIMER->PWMC &= ~(0x01 << channel);
+		this->__MAT[channel].isPWM = false;
+	}
+}
+
+
+/*********************************************
+ * Set_PWM_totalPeriod
+ *********************************************
+ * \brief: 	Establece el período total para los canales PWM.
+ *
+ * \input:
+ * 	 \--->	totalPeriod:			Período total de la señal.
+ */
+void CTimer::Set_PWM_totalPeriod( uint8_t channel, uint32_t totalPeriod ) {
+	if ( channel >= __CTimer_MAX_MR )
+		return;
+
+	this->SetMATxValue( channel, totalPeriod );
+}
+// # Sobrecarga ASUMIENDO que todos los canales menos 1 son PWM #
+void CTimer::Set_PWM_totalPeriod( uint32_t totalPeriod ) {
+	uint8_t 	temp_channelPWM;
+
+	// Busca automáticamente el canal seteado como PWM.
+	// Este establece el período total de la señal.
+	for ( uint8_t index = 0; index < __CTimer_MAX_MR; ++index ) {
+		if ( this->__MAT[index].isPWM == false ) {
+			temp_channelPWM = index;
+			break;
+		}
+	}
+
+
+	this->SetMATxValue( temp_channelPWM, totalPeriod );
+}
+
+
+/*********************************************
+ * Set_PWM_onPeriod
+ *********************************************
+ * \brief: 	Carga el valor de período en alto del canal PWM.
+ *
+ * \input:
+ * 	 \--->	channel:		Canal MAT a meterle dicho período.
+ * 	 \--->	onPeriod:		Período del ciclo de trabajo (en alto).
+ */
+void CTimer::Set_PWM_onPeriod( uint8_t channel, uint8_t totalPeriod_channel, uint32_t onPeriod ) {
+	uint32_t 	temp_totalPeriodValue;
+
+	if ( (channel >= __CTimer_MAX_MR) || (totalPeriod_channel >= __CTimer_MAX_MR) )
+		return;
+
+	temp_totalPeriodValue = this->__MAT[totalPeriod_channel].totalPeriod;
+
+	if( temp_totalPeriodValue - onPeriod < 0 )
+		return;		// < ERROR >
+
+	// Por regla de PWM del CTimer, el canal empieza en 0
+	// y cambia a 1 cuando TC = MATx.
+	// Cargándolo con la diferencia de períodos, invertimos el comportamiento,
+	// obteniendo la señal deseada.
+	this->SetMATxValue( channel, temp_totalPeriodValue - onPeriod );
+}
+// # Sobrecarga ASUMIENDO que todos los canales MAT menos uno están como PWM #
+void CTimer::Set_PWM_onPeriod( uint8_t channel, uint32_t onPeriod ) {
+	uint32_t 	temp_totalPeriodValue;
+
+	if ( channel >= __CTimer_MAX_MR )
+		return;
+
+	// Busca automáticamente el canal seteado como PWM.
+	// Este establece el período total de la señal.
+	for ( uint8_t index = 0; index < __CTimer_MAX_MR; ++index ) {
+		if ( this->__MAT[index].isPWM == false ) {
+			temp_totalPeriodValue = this->__MAT[index].totalPeriod;
+			break;
+		}
+	}
+
+	if( temp_totalPeriodValue - onPeriod < 0 )
+		return;		// < ERROR >
+
+	// Por regla de PWM del CTimer, el canal empieza en 0
+	// y cambia a 1 cuando TC = MATx.
+	// Cargándolo con la diferencia de períodos, invertimos el comportamiento,
+	// obteniendo la señal deseada.
+	this->SetMATxValue( channel, temp_totalPeriodValue - onPeriod );
 }
 
 
@@ -673,6 +765,7 @@ uint32_t CTimer::GetCAPxValue( uint8_t channel ) const {
  */
 void CTimer::SetMATxValue( uint8_t channel, uint32_t input_MATvalue ) {
 //	CTIMER->MR[channel] = input_MATvalue - 1;
+	this->__MAT[channel].totalPeriod = input_MATvalue;
 	CTIMER->MR[channel] = input_MATvalue;
 }
 

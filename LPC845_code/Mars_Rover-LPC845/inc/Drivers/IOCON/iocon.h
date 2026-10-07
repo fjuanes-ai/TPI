@@ -42,7 +42,7 @@
 	#define __IOCON_OD_MASK					(0x1 << __IOCON_OD_SHIFT)
 
 	#define __IOCON_S_MODE_SHIFT			11
-	#define __IOCON_S_MODE_MASK				(0x1 << __IOCON_S_MODE_SHIFT)
+	#define __IOCON_S_MODE_MASK(x)			((uint32_t) x << __IOCON_S_MODE_SHIFT)	// Values: 0 ~ 3
 
 	#define __IOCON_CLK_DIV_SHIFT			13
 	#define __IOCON_CLK_DIV_MASK			(0x1 << __IOCON_CLK_DIV_SHIFT)

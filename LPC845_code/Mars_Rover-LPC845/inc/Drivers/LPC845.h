@@ -296,11 +296,11 @@ typedef struct {
  *    Synchronization may be bypassed (this bit may be set) if the selected trigger source is already
  *    synchronous with the main system clock (eg. coming from an on-chip, system-clock-based timer).
  *    Whether this bit is set or not, a trigger pulse must be maintained for at least one system
- *    clock period. Asynchronous mode (the ASYNMODE in the CTRL register = 1): Synchronization may be
+ *    clock totalPeriod. Asynchronous mode (the ASYNMODE in the CTRL register = 1): Synchronization may be
  *    bypassed (this bit may be set) if it is certain that the duration of a trigger input pulse
  *    will be at least one cycle of the ADC clock (regardless of whether the trigger comes from and
  *    on-chip or off-chip source). If this bit is NOT set, the trigger pulse must at least be
- *    maintained for one system clock period.
+ *    maintained for one system clock totalPeriod.
  *  0b0..Enable trigger synchronization. The hardware trigger bypass is not enabled.
  *  0b1..Bypass trigger synchronization. The hardware trigger bypass is enabled.
  */
