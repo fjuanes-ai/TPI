@@ -246,7 +246,7 @@ void Us_HC_SR04::Config_ECHO( uint8_t portEcho, uint8_t pinEcho ) {
 
 	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::RISING_CCR, true );
 	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::FALLING_CCR, false );
-	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::INTERRUPT_CCR, false );
+	__CTimerFeatures->Config_CaptureControlRegister( __CAPchannelECHO_risingEdge, CTimer::CCRtriggers_t::INTERRUPT_CCR, true );
 
 
 	// # CAPy = ECHO 2 (falling edge) #
