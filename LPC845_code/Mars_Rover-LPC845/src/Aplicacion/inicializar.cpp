@@ -37,8 +37,8 @@
 #define __UART_RX_PIN				24
 #define __UART_USART_x				0
 #define __UART_BAUDRATE				9600
-#define __UART_MAX_RX				8
-#define __UART_MAX_TX				8
+#define __UART_MAX_RX				1024
+#define __UART_MAX_TX				1024
 
 
 /* ###########################################
@@ -53,8 +53,9 @@
 CTimer ctimerObject( __CTIMER_PRESCALER_FREQ );
 Us_HC_SR04 sensor_hc_sr04( __HC_SR04_TRIG_PORT, __HC_SR04_TRIG_PIN,
 						   __HC_SR04_ECHO_PORT, __HC_SR04_ECHO_PIN,
+						   "[]",
 						   &ctimerObject );
-Uart test_UART( __UART_TX_PORT, __UART_TX_PIN, __UART_RX_PORT, __UART_RX_PIN, __UART_USART_x,
+Uart serialCOMS_LPC_ESP( __UART_TX_PORT, __UART_TX_PIN, __UART_RX_PORT, __UART_RX_PIN, __UART_USART_x,
 				__UART_BAUDRATE, Uart::bits_de_datos::ocho_bits, Uart::paridad_t::NoParidad,
 				__UART_MAX_RX, __UART_MAX_TX );
 //GPIO lpcLED( GPIO::puertos_e::PORT1, 1, GPIO::direccion_e::SALIDA, GPIO::actividad_e::BAJO );

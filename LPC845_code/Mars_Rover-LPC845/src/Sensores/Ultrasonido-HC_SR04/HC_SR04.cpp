@@ -17,7 +17,7 @@
  * [X]	0	Canal de pulsos PWM para alimentar al TRIG.
  * [X]	1	Canal de delay/retardo entre pulso en TRIG y lectura en ECHO. CON INTERRUPCIÓN.
  * [ ]	2
- * [X]	3	Canal que dicta el período total de la señal PWM. RESETEA CUENTA
+ * [ ]	3
  * ------------------------------------------------
  *
  * # CAP #
@@ -41,7 +41,7 @@
 /* ###########################################
  * ### VARIABLES GLOBALES PÚBLICAS ###
  * ########################################### */
-extern Uart test_UART;
+extern Uart serialCOMS_LPC_ESP;
 
 
 /* ###########################################
@@ -51,6 +51,7 @@ extern Uart test_UART;
 #define 	__PWM_PERIOD_DEFAULT		100e3				// us = 10^(-6) s.
 #define 	__PWM_DUTY_CYCLE_DEFAULT	10					// us = 10^(-6) s.
 #define		__MAX_TICKS_UPDATE			1000				// ms = 10^(-3) s.
+#define		__MSG_SIZE_IN_BYTES			4
 
 
 /* ###########################################
@@ -126,9 +127,9 @@ volatile void Callback_CAP_Save_Time() {
  */
 Us_HC_SR04::Us_HC_SR04( uint8_t portTrig, uint8_t pinTrig,
 						uint8_t portEcho, uint8_t pinEcho,
+						const char inputTrama[],
 						CTimer *inputCTimerObject ) :
 			__ticksUpdateCount( 0 ),
-			__trigPulseState( PULSE_IDLE_READY ),
 			__MATchannelPWM( __PWM_MAT_CHANNEL_DEFAULT ),
 			__PWM_totalPeriod( __PWM_PERIOD_DEFAULT ),
 			__PWM_onPeriod( __PWM_DUTY_CYCLE_DEFAULT ),
@@ -136,6 +137,7 @@ Us_HC_SR04::Us_HC_SR04( uint8_t portTrig, uint8_t pinTrig,
 			__finalCAPvalue( 0 ),
 			__CTimerFeatures( inputCTimerObject ) {
 
+	// ## CTimer + drivers ##
 	if ( __CTimerFeatures == nullptr ) {
 		return;		// < ERROR >
 	}
@@ -148,7 +150,10 @@ Us_HC_SR04::Us_HC_SR04( uint8_t portTrig, uint8_t pinTrig,
 	__CTimerFeatures->Enable_Timer_Prescale( true );
 	__CTimerFeatures->Reset_Timer_Prescale();
 
+	// ## Tx ##
+	this->ArmadoDeTrama( inputTrama );
 
+	// ## Callback para Tx + censado de datos ##
 	this->InstalarPerifericoTemporizado( this );
 }
 
@@ -194,16 +199,18 @@ void Us_HC_SR04::Config_TRIG( uint8_t portTrig, uint8_t pinTrig ) {
 								// El constructor asigna dicho valor en la lista inicializadora.
 								// No hace falta SWM porque no es de salida.
 
-	__CTimerFeatures->Set_PWM_MAT_channel( __MATchannelPWM, false );	// El NO configurado como PWM define Período total.
+	// El NO configurado como PWM define Período total.
+	__CTimerFeatures->Set_PWM_MAT_channel( __MATchannelPWM, false );
 	__CTimerFeatures->Set_PWM_totalPeriod( __MATchannelPWM, __PWM_totalPeriod );
-//	__CTimerFeatures->Config_ExternalMatchRegister( __MATchannelPWM, CTimer::EMR_Demeanor_t::EMR_NOTHING );		// Como no es salida, lo dejamos para que no haga nada.
+
 	__CTimerFeatures->Config_MatchControlRegister( __MATchannelPWM, CTimer::MCRtriggers_t::INTERRUPT_MCR, false );
 	__CTimerFeatures->Config_MatchControlRegister( __MATchannelPWM, CTimer::MCRtriggers_t::RESET_MCR, true );
 	__CTimerFeatures->Config_MatchControlRegister( __MATchannelPWM, CTimer::MCRtriggers_t::STOP_MCR, false );
 
-	__CTimerFeatures->Set_PWM_MAT_channel( __MATchannelTRIG, true );	// El configurado como PWM define Duty Cycle individual.
+	// El configurado como PWM define Duty Cycle (período en alto) individual.
+	__CTimerFeatures->Set_PWM_MAT_channel( __MATchannelTRIG, true );
 	__CTimerFeatures->Set_PWM_onPeriod( __MATchannelTRIG, __MATchannelPWM, __PWM_onPeriod );
-//	__CTimerFeatures->Config_ExternalMatchRegister( __MATchannelTRIG, CTimer::EMR_Demeanor_t::EMR_NOTHING );	// Como no es salida, lo dejamos para que no haga nada.
+
 	__CTimerFeatures->Config_MatchControlRegister( __MATchannelTRIG, CTimer::MCRtriggers_t::INTERRUPT_MCR, true );
 	__CTimerFeatures->Config_MatchControlRegister( __MATchannelTRIG, CTimer::MCRtriggers_t::RESET_MCR, false );
 	__CTimerFeatures->Config_MatchControlRegister( __MATchannelTRIG, CTimer::MCRtriggers_t::STOP_MCR, false );
@@ -273,12 +280,11 @@ void Us_HC_SR04::Config_ECHO( uint8_t portEcho, uint8_t pinEcho ) {
 	__CTimerFeatures->Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, __CAPchannelECHO_risingEdge, Callback_CAP_Save_Rising_Edge_Value );
 
 	// # CAPy = ECHO 2 (falling edge) #
-
-//	__CTimerFeatures->Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, __CAPchannelECHO_fallingEdge, Callback_CAP_Save_Time );
 	__CTimerFeatures->Set_Callback( CTimer::registerSelection_MAT_CAP_t::CAP_REGISTER, __CAPchannelECHO_fallingEdge, Callback_CAP_Save_Falling_Edge_Value );
 
 
-	// # IOCON: Para reducir ruido #
+	// ## IOCON: Para reducir ruido ##
+	// # Resistencia a Pulldown #
 	IOCON_Config_PIO( portEcho, pinEcho, 0xFFFFFFFF, false );
 	IOCON_Config_PIO( portEcho, pinEcho, __IOCON_MODE_PULL_DOWN_MASK, true );
 }
@@ -287,7 +293,9 @@ void Us_HC_SR04::Config_ECHO( uint8_t portEcho, uint8_t pinEcho ) {
 /* #############################################
  * CAP_Save_Rising_Edge_Value (IRQ)
  * #############################################
- * \brief:			A
+ * \brief:			Copia automáticamente el valor de CAP0 (TC) al momento
+ * 					en el cual CTimer detecta un flanco ascendente por el
+ * 					pin de ECHO.
  *
  * Entra por interrupción en CAP0 (canal por flanco ascendente).
  */
@@ -299,7 +307,9 @@ void Us_HC_SR04::CAP_Save_Rising_Edge_Value() {
 /* #############################################
  * CAP_Save_Falling_Edge_Value (IRQ)
  * #############################################
- * \brief:			A
+ * \brief:			Copia automáticamente el valor de CAP0 (TC) al momento
+ * 					en el cual CTimer detecta un flanco descendente por el
+ * 					pin de ECHO.
  *
  * Entra por interrupción en CAP1 (canal por flanco descendente).
  */
@@ -314,16 +324,12 @@ void Us_HC_SR04::CAP_Save_Falling_Edge_Value() {
  * \brief:			Mide el tiempo de pulso recibido en "ECHO".
  *
  * # Valores típicos #
- * 	MIN: 100 uS.
- * 	MAX: 18  mS.
- * 	N/O: 36  mS.	(No Obstacle)
+ * 	MIN: 100 	uS.
+ * 	MAX: 18000  uS.
+ * 	N/O: 36000  uS.	(No Obstacle)
  */
 void Us_HC_SR04::Measure_Time() {
-	if (__finalCAPvalue > __initialCAPvalue) {
-		__measuredTime_microSec =  __finalCAPvalue - __initialCAPvalue;
-	} else {
-		__measuredTime_microSec = 0;
-	}
+	__finalCAPvalue = (__finalCAPvalue > __initialCAPvalue) ? (__finalCAPvalue - __initialCAPvalue) : 0;
 }
 
 
@@ -338,8 +344,10 @@ void Us_HC_SR04::Measure_Time() {
  *
  * Viene de la distancia recorrida por el sonido (343 m/s) en una
  * distancia desconocida "d" 2 veces (por rebote), en un tiempo "t" medido.
+ * Se convierte:
+ * |-> 'm' 		-> 	'mm 		= 10^(-3) m'
+ * |-> 'S^(-1)'	->	'(uS)^(-1) 	= (10^(-6) S)^(-1)	= 10^6 S^(-1)'
  */
-//uint32_t Ultrasonido::Save_Distance_millimeters_from_Time_microSec( uint32_t inputTime_microSec ) {
 void Us_HC_SR04::Save_Distance_millimeters_from_Time_microSec() {
 	this->Measure_Time();
 
@@ -371,11 +379,74 @@ void Us_HC_SR04::HandlerDelPeriferico() {
 	if ( !__ticksUpdateCount ) {
 		__ticksUpdateCount = __MAX_TICKS_UPDATE;
 
-		// ## DEBUG ##
 		this->Save_Distance_millimeters_from_Time_microSec();
-		test_UART.Message( (void *) "Hola\n" );
-		// ## DEBUG ##
+
+		// TODO: Armar trama con datos de sensado...
+		this->EnvioDeDatos_UART();
 	}
+}
+
+
+/* #############################################
+ * ArmadoDeTrama
+ * #############################################
+ * \brief:			Arma la trama para envío de datos del sensor (SERIAL/UART).
+ */
+void Us_HC_SR04::ArmadoDeTrama( const char inputTrama[] ) {
+	__datosTx[0] = inputTrama[0];
+	__datosTx[3] = inputTrama[1];
+}
+
+
+/* #############################################
+ * GuardarDatosSerial
+ * #############################################
+ * \brief:			Guardado de datos registrados para ser enviados
+ * 					serialmente (UART).
+ *
+ * 	# Opción A #
+ *  Toma la dirección de memoria de la variable como puntero a char,
+ *  luego guarda ambos Bytes.
+ *
+ *  # Opción B #
+ *  Utiliza uniones para poder transformar datos de tipo uint16_t a
+ *  2 x uint8_t (serialización).
+ */
+void Us_HC_SR04::GuardarDatosSerial() {
+	// # Opción A #
+//	for ( uint8_t index = 0; index < sizeof(__distance_millimeters); index ++ )
+//		__datosTx[index + 1] = ((uint8_t *) &__distance_millimeters)[index];
+
+
+	// # Opción B #
+//	typedef union SERIAL_PROTOCOL_DATA_u {
+//		uint16_t	dataInput;
+//		uint8_t	 	dataOutput[2];
+//	} SERIAL_PROTOCOL_DATA_t;
+
+	SERIAL_PROTOCOL_DATA_t temp_dataTx;
+	temp_dataTx.dataInput = __distance_millimeters;
+
+	for ( uint8_t index = 0; index < sizeof(temp_dataTx.dataInput); ++index )
+		__datosTx[index + 1] = temp_dataTx.dataOutput[index];
+}
+
+
+/* #############################################
+ * EnvioDeDatos_UART
+ * #############################################
+ * \brief:			Envío de datos CRUDOS a la base de datos (PC) mediante
+ * 					datos seriales UART (ESP).
+ */
+void Us_HC_SR04::EnvioDeDatos_UART() {
+	// TODO: Armar trama con datos de sensado...
+//	this->ArmadoDeTrama();
+	this->GuardarDatosSerial();
+
+	serialCOMS_LPC_ESP.Transmit( (void *) __datosTx,
+//								 sizeof(__datosTx) + 2 * sizeof(unsigned const char) );
+//			 	 	 	 	 	 __MSG_SIZE_IN_BYTES );
+								 sizeof(__datosTx) );
 }
 
 

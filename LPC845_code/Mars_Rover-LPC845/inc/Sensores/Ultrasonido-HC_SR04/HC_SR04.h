@@ -34,18 +34,13 @@
     /* ###########################################
      * ### VARIABLES GLOBALES PÚBLICAS ###
      * ########################################### */
-//    extern Us_HC_SR04 sensor_hc_sr04;
+	//
 
 
     /* ###########################################
      * ### PROTOTIPOS DE FUNCIONES PÚBLICAS ###
      * ########################################### */
-//	#if defined (__cplusplus)
-//		extern "C" {
-//	    	volatile void Callback_CAP_Save_Time();
-//	    	volatile void Callback_MAT_Enable_CAP_Readings();
-//		}
-//	#endif
+	//
 
 
     /* ###########################################
@@ -62,39 +57,35 @@
 			} HC_SR04_TimeValues_microSeconds_t;
 
 			typedef enum HC_SR04_DistanceValues_millimeters_e {
-							DISTANCE_MIN		 	=	20,
-							DISTANCE_MAX		 	=	4000,
-							DISTANCE_NO_OBSTACLE  	=  	0,
-							DISTANCE_OUT_OF_RANGE 	=  	-1
+				DISTANCE_MIN		 	=	20,
+				DISTANCE_MAX		 	=	4000,
+				DISTANCE_NO_OBSTACLE  	=  	0,
+				DISTANCE_OUT_OF_RANGE 	=  	-1
 			} HC_SR04_DistanceValues_millimeters_t;
 
 		private:
-			typedef enum HC_SR04_PulseState_e {
-							PULSE_IDLE_READY 	 	= 	0,
-							PULSE_OVER_WAITING_DELAY,
-							PULSE_DELAY_OVER
-			} HC_SR04_PulseState_t;
+			// # Unión entre datos para transmisión #
+			typedef union SERIAL_PROTOCOL_DATA_u {
+				uint16_t	dataInput;
+				uint8_t	 	dataOutput[2];
+			} SERIAL_PROTOCOL_DATA_t;
 
 
 		// ### Variables ###
 		public:
-//			double			__distance_millimeters;
 			uint16_t		__distance_millimeters;
 
 		private:
 			uint16_t		__ticksUpdateCount;
-			HC_SR04_PulseState_t	__trigPulseState;
 
-			// # MAT = TRIG #
+			// ## MAT = TRIG ##
 			uint8_t			__MATchannelTRIG;
 			const uint8_t	__MATchannelPWM;
-//			uint8_t			__MATchannelDelay;
 
-//			const uint32_t	__MAT_delayValue;
 			uint32_t		__PWM_totalPeriod;
 			uint32_t		__PWM_onPeriod;
 
-			// # CAP = ECHO #
+			// ## CAP = ECHO ##
 			uint8_t			__CAPchannelECHO_risingEdge;
 			uint8_t			__CAPchannelECHO_fallingEdge;
 			uint32_t		__initialCAPvalue;
@@ -104,28 +95,39 @@
 
 			CTimer		   *__CTimerFeatures;
 
-//			volatile void 	(**__sequenceCallbacks)(void);
+			// ## Datos seriales (UART) ##
+			uint8_t 		__datosTx[4];
 
 
 		// ### Métodos ###
 		public:
+			// ## Constructor ##
 						Us_HC_SR04( uint8_t portTrig, uint8_t pinTrig,
 									uint8_t portEcho, uint8_t pinEcho,
+									const char inputTrama[] = "[]",
 									CTimer *inputCTimerObject = nullptr );
-			void		PulseSent_TRIG();
-			void 		Enable_ECHO_CAP_Readings();
-			void 		Measure_Time();
-			void 		Save_Distance_millimeters_from_Time_microSec();
+
+			// ## Sensado de datos ##
 			void		CAP_Save_Rising_Edge_Value();
 			void		CAP_Save_Falling_Edge_Value();
+
+			// ## Guardado de datos sensados ##
+			void 		Measure_Time();
+			void 		Save_Distance_millimeters_from_Time_microSec();
 			void		HandlerDelPeriferico();
-//			void		Set_PWM_onPeriod( uint32_t onPeriod );
-//			void		Set_PWM_totalPeriod( uint32_t totalPeriod );
 //						~Ultrasonido();
 
 		private:
+			// ## Configuración TRIG/ECHO ##
 			void		Config_TRIG( uint8_t portTrig, uint8_t pinTrig );
 			void		Config_ECHO( uint8_t portEcho, uint8_t pinEcho );
+
+			// ## Envío de datos por UART ##
+			void 		ArmadoDeTrama( const char inputTrama[] );
+			void 		GuardarDatosSerial();
+			void		EnvioDeDatos_UART();
+
+			// ## DEBUG ##
 			void  		Debug_HC_SR04();
 	};
 
