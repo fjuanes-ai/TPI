@@ -1,3 +1,4 @@
 **/.metadata/**
 **/Debug/**
 **/Release/**
+./.mcuxpressoide_packages_support/**
