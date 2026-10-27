@@ -29,6 +29,7 @@
 //	#define		__MY_FLOAT_NEG_INFINITY		0xFF800000
 //	#define		__MY_DOUBLE_POS_INFINITY	0x7FF0000000000000
 //	#define		__MY_DOUBLE_NEG_INFINITY	0xFFF0000000000000
+	#define 	__TX_BYTES_SIZE 			4
 
 
     /* ###########################################
@@ -96,7 +97,7 @@
 			CTimer		   *__CTimerFeatures;
 
 			// ## Datos seriales (UART) ##
-			uint8_t 		__datosTx[4];
+			uint8_t 		__datosTx[__TX_BYTES_SIZE];
 
 
 		// ### Métodos ###

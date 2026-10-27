@@ -50,7 +50,7 @@ extern Uart serialCOMS_LPC_ESP;
 #define		__PWM_MAT_CHANNEL_DEFAULT	3
 #define 	__PWM_PERIOD_DEFAULT		100e3				// us = 10^(-6) s.
 #define 	__PWM_DUTY_CYCLE_DEFAULT	10					// us = 10^(-6) s.
-#define		__MAX_TICKS_UPDATE			1000				// ms = 10^(-3) s.
+#define		__MAX_TICKS_UPDATE			2500				// ms = 10^(-3) s.
 #define		__MSG_SIZE_IN_BYTES			4
 
 
@@ -444,9 +444,9 @@ void Us_HC_SR04::EnvioDeDatos_UART() {
 	this->GuardarDatosSerial();
 
 	serialCOMS_LPC_ESP.Transmit( (void *) __datosTx,
+								 __TX_BYTES_SIZE );
 //								 sizeof(__datosTx) + 2 * sizeof(unsigned const char) );
 //			 	 	 	 	 	 __MSG_SIZE_IN_BYTES );
-								 sizeof(__datosTx) );
 }
 
 
