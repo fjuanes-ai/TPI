@@ -9,9 +9,16 @@ class conexion : public QObject
 {
     Q_OBJECT
     public:
+        typedef enum puerto_esp_webserver_e {
+            ESP_PORT = 3333
+        } puerto_esp_webserver_t;
+
+        #define ESP_IP "192.168.4.1"
+
+
         explicit conexion(QObject *parent = nullptr);
 
-        void conectar(const QString &host = "192.168.4.1", quint16 puerto = 3333);
+        void conectar(const QString &host = ESP_IP, quint16 puerto = conexion::puerto_esp_webserver_t::ESP_PORT);
         void desconectar();
         bool estaConectado() const;
         void enviarComando(char comando); /*para CONTROLES*/

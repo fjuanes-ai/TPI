@@ -30,27 +30,16 @@ class MainWindow : public QMainWindow
         void alFallarLaConexion(const QString &mensaje);
         void alRecibirImagen(const QImage &imagen);
 
-        void alPresionarVerGraficos();
-        void alPresionarVolver();
-
         /*Parte de controles*/
-        void alPresionarAdelante();
-        void alSoltarAdelante();
-
-        void alPresionarAtras();
-        void alSoltarAtras();
-
-        void alPresionarIzquierda();
-        void alSoltarIzquierda();
-
-        void alPresionarDerecha();
-        void alSoltarDerecha();
+        void comandoPorTeclado();
 
     private:
         Ui::MainWindow *ui;
         conexion *m_conexion;
         sensores  m_sensores;
         camara *m_camara;
+        QPalette palette;
+        QColor color;
 
         /*PARA LOS GRAFICOS*/
         QChart *m_chartAccel;
@@ -58,11 +47,13 @@ class MainWindow : public QMainWindow
         QChartView *m_chartViewAccel;
 
         QChart *m_chartUltra;
-        QLineSeries *m_serieUltra1;
-        QLineSeries *m_serieUltra2;
-        QLineSeries *m_serieUltra3;
+        QLineSeries *m_serieUltra;
         QChartView * m_chartViewUltra;
-        int m_contadorMuestras= 0; /*eje x: numero de muestra*/
+
+        QChart *m_chartMotor;
+        QLineSeries *m_serieMotor;
+        QChartView * m_chartViewMotor;
+        int m_tiempo; /*eje x: tiempo*/
 };
 
 #endif // MAINWINDOW_H
