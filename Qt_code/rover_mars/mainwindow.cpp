@@ -41,10 +41,10 @@ MainWindow::MainWindow(QWidget *parent):
     auto ejesXAccelInit = m_chartAccel->axes(Qt::Horizontal);
     auto ejesYAccelInit = m_chartAccel->axes(Qt::Vertical);
     ejesXAccelInit.first()->setTitleText("Tiempo");
-    ejesYAccelInit.first()->setTitleText("Valor ADC");
+    ejesYAccelInit.first()->setTitleText("Altura [m]");
 
     m_chartViewAccel = new QChartView(m_chartAccel);
-    m_chartViewAccel->setRenderHint(QPainter::Antialiasing);
+    m_chartViewAccel->setRenderHint(QPainter::Antialiasing) ;
 
     QVBoxLayout *layoutAccel = new QVBoxLayout(ui->widgetGraficoAccel);
     layoutAccel->addWidget(m_chartViewAccel);
@@ -72,8 +72,6 @@ MainWindow::MainWindow(QWidget *parent):
 
     /*GRAFICO DEL SENSOR ULTRASÓNICO*/
     m_serieUltra = new QLineSeries();
-    m_serieUltra->setName("Ultra");
-
     m_chartUltra = new QChart();
     m_chartUltra->addSeries(m_serieUltra);
     m_chartUltra->createDefaultAxes();
