@@ -14,58 +14,35 @@
 
 
 
-#include "Aplicacion/LED.h"
-#include "Aplicacion/PULSADOR.h"
+#include "Drivers/LPC845.h"
+#include "pwm.h"
 
+int main()
+{
+    // Crear el objeto PWM
+    SctPwm led(12000000U);
 
+    // Inicializar el SCTimer una sola vez
+    led.init();
 
-int main( void ) {
+    // Configurar el contador L y el pin PIO1_1
+    // Los valores de pinMovible y asignación deben
+    // corresponder al canal SCT_OUT elegido.
+    led.Config(
+        SctCounter::L,
+        /* pinMovible */ 0,
+        /* port */ 1,
+        /* pin */ 1,
+        /* frecuencia */ 1U
+    );
 
-	LED led_G( GPIO::PORT1, 0 );
-	LED led_B( GPIO::PORT1, 1 );
-	LED led_R( GPIO::PORT1, 2 );
-	PULSADOR puls( GPIO::PORT0, 4 );
+    // Ciclo de trabajo del 50 %
+    led.setDutyCycle(50.0f);
 
+    // Arrancar el PWM
+    led.start();
 
-	led_B.Apagar();
-	led_G.Apagar();
-	led_R.Apagar();
-	for ( uint32_t i = 0; i < 50000; i++ );
-
-
-	led_B.Encender();
-	for ( uint32_t i = 0; i < 75000; i++ );
-	led_B.Apagar();
-
-	led_G.Encender();
-	for ( uint32_t i = 0; i < 75000; i++ );
-	led_G.Apagar();
-
-	led_R.Encender();
-	for ( uint32_t i = 0; i < 75000; i++ );
-	led_R.Apagar();
-
-
-    while ( 1 ) {
-    	if ( puls ) {
-
-    		led_B.CambiarEstado();
-    		for ( uint32_t i = 0; i < 50000; i++ );
-
-    		led_G.CambiarEstado();
-    		for ( uint32_t i = 0; i < 50000; i++ );
-
-    		led_R.CambiarEstado();
-    		for ( uint32_t i = 0; i < 50000; i++ );
-    	} else {
-
-    		led_B.Apagar();
-    		led_G.Apagar();
-    		led_R.Apagar();
-    	}
-
+    while (1)
+    {
     }
-
-
-    return 0;
 }

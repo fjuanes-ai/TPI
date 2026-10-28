@@ -20,7 +20,11 @@ GPIO::GPIO( uint8_t port, uint8_t pin, uint8_t direccion, uint8_t actividad ) :
 __port(port), __pin(pin), __direccion(direccion), __actividad(actividad)  {
 //	this->port = port;			// Si hay nombres redundantes, se puede usar "this->" para indicar las variables privadas.
 
-	SYSAHBCLKCTRL0 |= (1 << 6) | (1 << 20);			// No importa que siempre encendamos el CLOCK, con 1 vez alcanza y otras no afectan.
+	// TODO: implementar "modo".
+
+	//SYSCON->SYSAHBCLKCTRL0 |= (SYSCON_SYSAHBCLKCTRL0_GPIO0_MASK << SYSCON_SYSAHBCLKCTRL0_GPIO0_SHIFT);			// No importa que siempre encendamos el CLOCK, con 1 vez alcanza y otras no afectan.
+	SYSCON->SYSAHBCLKCTRL0 |= (1 << 20) | (1 << 6);			// No importa que siempre encendamos el CLOCK, con 1 vez alcanza y otras no afectan.
+
 	// bit 6:	Habilita los puertos de GPIO_0 (puerto 0).
 	// bit 20:	Habilita los puertos de GPIO_1 (puerto 1).
 
@@ -73,4 +77,3 @@ void GPIO::SetDir ( uint8_t direccion ) {
 GPIO::~GPIO() {
 	// TODO Auto-generated destructor stub
 }
-

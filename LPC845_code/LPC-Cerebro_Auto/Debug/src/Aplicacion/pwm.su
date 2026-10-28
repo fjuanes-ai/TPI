@@ -1,0 +1,13 @@
+../src/Aplicacion/pwm.cpp:6:1:SctPwm::SctPwm(uint32_t, uint8_t, uint8_t, uint8_t)	24	static
+../src/Aplicacion/pwm.cpp:13:6:void SctPwm::init()	16	static
+../src/Aplicacion/pwm.cpp:30:6:void SctPwm::Config(SctCounter, uint8_t, uint8_t, uint8_t, uint32_t)	32	static
+../src/Aplicacion/pwm.cpp:103:6:void SctPwm::setFrequency(uint32_t)	16	static
+../src/Aplicacion/pwm.cpp:112:6:void SctPwm::setDutyCycle(float)	16	static
+../src/Aplicacion/pwm.cpp:123:6:void SctPwm::updatePeriodAndDuty()	40	static
+../src/Aplicacion/pwm.cpp:165:6:void SctPwm::start()	16	static
+../src/Aplicacion/pwm.cpp:183:6:void SctPwm::stop()	16	static
+../src/Aplicacion/pwm.cpp:197:6:void SctPwm::setCallback(Callback)	16	static
+../src/Aplicacion/pwm.cpp:204:6:void SctPwm::handler()	16	static
+../src/Aplicacion/pwm.cpp:212:6:void SctPwm::callbackPWM()	16	static
+../src/Aplicacion/pwm.cpp:217:10:uint32_t SctPwm::getCiclosPWM() const	16	static
+../src/Aplicacion/pwm.cpp:225:6:static void SctPwm::SCT_IRQHandler()	8	static

@@ -1,0 +1,9 @@
+C:\Users\franc\Documents\MCUXpressoIDE_25.6.136\workspace\LPC-Cerebro_Auto\inc/Modulos/01-In_Out/in.h:4:8:constexpr IN::IN()	16	static
+C:\Users\franc\Documents\MCUXpressoIDE_25.6.136\workspace\LPC-Cerebro_Auto\inc/Modulos/01-In_Out/out.h:4:8:constexpr OUT::OUT()	16	static
+../src/Modulos/02-GPIO/GPIO.cpp:19:1:GPIO::GPIO(uint8_t, uint8_t, uint8_t, uint8_t)	24	static
+../src/Modulos/02-GPIO/GPIO.cpp:43:6:virtual void GPIO::SetPin() const	24	static
+../src/Modulos/02-GPIO/GPIO.cpp:49:6:virtual void GPIO::ClrPin() const	24	static
+../src/Modulos/02-GPIO/GPIO.cpp:55:6:virtual bool GPIO::GetPin() const	16	static
+../src/Modulos/02-GPIO/GPIO.cpp:61:6:virtual void GPIO::SetDir(uint8_t)	24	static
+../src/Modulos/02-GPIO/GPIO.cpp:77:1:GPIO::~GPIO()	16	static
+../src/Modulos/02-GPIO/GPIO.cpp:77:1:virtual GPIO::~GPIO()	16	static
