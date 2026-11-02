@@ -1,0 +1,5 @@
+../src/Aplicacion/PULSADOR.cpp:10:1:PULSADOR::PULSADOR(uint8_t, uint8_t)	24	static
+../src/Aplicacion/PULSADOR.cpp:16:1:PULSADOR::operator bool()	16	static
+../src/Aplicacion/PULSADOR.cpp:22:6:bool PULSADOR::operator==(PULSADOR&)	24	static
+C:\Users\franc\Documents\MCUXpressoIDE_25.6.136\workspace\LPC-Cerebro_Auto\inc/Aplicacion/PULSADOR.h:13:8:PULSADOR::~PULSADOR()	16	static
+C:\Users\franc\Documents\MCUXpressoIDE_25.6.136\workspace\LPC-Cerebro_Auto\inc/Aplicacion/PULSADOR.h:13:8:virtual PULSADOR::~PULSADOR()	16	static

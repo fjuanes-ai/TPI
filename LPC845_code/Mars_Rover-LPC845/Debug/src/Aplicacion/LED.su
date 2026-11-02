@@ -1,0 +1,6 @@
+../src/Aplicacion/LED.cpp:12:1:LED::LED(uint8_t, uint8_t)	24	static
+../src/Aplicacion/LED.cpp:21:6:void LED::Encender()	16	static
+../src/Aplicacion/LED.cpp:27:6:void LED::Apagar()	16	static
+../src/Aplicacion/LED.cpp:31:6:void LED::CambiarEstado()	16	static
+C:\Users\franc\Documents\MCUXpressoIDE_25.6.136\workspace\LPC-Cerebro_Auto\inc/Aplicacion/LED.h:13:8:LED::~LED()	16	static
+C:\Users\franc\Documents\MCUXpressoIDE_25.6.136\workspace\LPC-Cerebro_Auto\inc/Aplicacion/LED.h:13:8:virtual LED::~LED()	16	static
