@@ -1,11 +1,11 @@
 #ifndef CAMARA_H
 #define CAMARA_H
 
-#include <QObject>
+
+#include "qt_includes.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QImage>
-#include <QByteArray>
 
 class camara : public QObject
 {

@@ -1,12 +1,12 @@
 #ifndef CONEXION_H
 #define CONEXION_H
 
-#include <QObject>
-#include <QTcpSocket>
-#include <QByteArray>
 
-class conexion : public QObject
-{
+#include "qt_includes.h"
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+
+class conexion : public QObject {
     Q_OBJECT
     public:
         typedef enum puerto_esp_webserver_e {

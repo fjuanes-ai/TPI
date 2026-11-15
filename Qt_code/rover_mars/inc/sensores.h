@@ -1,7 +1,8 @@
 #ifndef SENSORES_H
 #define SENSORES_H
 
-#include <QByteArray>
+// #include <QByteArray>
+#include "qt_includes.h"
 
 #define US_MIN_DISTANCE 20
 #define US_MAX_DISTANCE 2000

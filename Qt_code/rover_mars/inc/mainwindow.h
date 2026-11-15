@@ -1,16 +1,16 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QtCharts>
-#include "conexion.h"
-#include "sensores.h"
-#include "camara.h"
+
+#include "qt_includes.h"
+#include "rover_includes.h"
+
 
 QT_BEGIN_NAMESPACE namespace Ui
 {
     class MainWindow;
 }
+
 
 QT_END_NAMESPACE
 

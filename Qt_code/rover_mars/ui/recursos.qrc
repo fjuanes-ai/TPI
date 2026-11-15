@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/new/prefix1">
-        <file>logo_utn.jpg</file>
+        <file>media/logo_utn.jpg</file>
     </qresource>
 </RCC>

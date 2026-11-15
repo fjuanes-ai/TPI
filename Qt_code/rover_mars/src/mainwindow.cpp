@@ -31,65 +31,67 @@ MainWindow::MainWindow(QWidget *parent):
     m_tiempo = 0;
 
     /*GRAFICO DE ACELERÓMETRO*/
-    m_serieAccel = new QLineSeries();
-    m_chartAccel = new QChart();
-    m_chartAccel->addSeries(m_serieAccel);
-    m_chartAccel->createDefaultAxes();
-    m_chartAccel->setTitle("Aceleometro");
-    m_chartAccel->legend()->hide();
+    // m_serieAccel = new QLineSeries();
+    // m_chartAccel = new QChart();
+    // m_chartAccel->addSeries(m_serieAccel);
+    // m_chartAccel->createDefaultAxes();
+    // m_chartAccel->setTitle("Aceleometro");
+    // m_chartAccel->legend()->hide();
 
-    auto ejesXAccelInit = m_chartAccel->axes(Qt::Horizontal);
-    auto ejesYAccelInit = m_chartAccel->axes(Qt::Vertical);
-    ejesXAccelInit.first()->setTitleText("Tiempo");
-    ejesYAccelInit.first()->setTitleText("Altura [m]");
+    // auto ejesXAccelInit = m_chartAccel->axes(Qt::Horizontal);
+    // auto ejesYAccelInit = m_chartAccel->axes(Qt::Vertical);
+    // ejesXAccelInit.first()->setTitleText("Tiempo");
+    // ejesYAccelInit.first()->setTitleText("Altura [m]");
 
-    m_chartViewAccel = new QChartView(m_chartAccel);
-    m_chartViewAccel->setRenderHint(QPainter::Antialiasing) ;
+    // m_chartViewAccel = new QChartView(m_chartAccel);
+    // m_chartViewAccel->setRenderHint(QPainter::Antialiasing) ;
 
-    QVBoxLayout *layoutAccel = new QVBoxLayout(ui->widgetGraficoAccel);
-    layoutAccel->addWidget(m_chartViewAccel);
-    ui->widgetGraficoAccel->setLayout(layoutAccel);
+    // QVBoxLayout *layoutAccel = new QVBoxLayout(ui->widgetGraficoAccel);
+    // layoutAccel->addWidget(m_chartViewAccel);
+    // ui->widgetGraficoAccel->setLayout(layoutAccel);
 
-    /*GRAFICO DE MOTOR*/
-    m_serieMotor = new QLineSeries();
-    m_chartMotor = new QChart();
-    m_chartMotor->addSeries(m_serieMotor);
-    m_chartMotor->createDefaultAxes();
-    m_chartMotor->setTitle("Motor");
-    m_chartMotor->legend()->hide();
+    // /*GRAFICO DE MOTOR*/
+    // m_serieMotor = new QLineSeries();
+    // m_chartMotor = new QChart();
+    // m_chartMotor->addSeries(m_serieMotor);
+    // m_chartMotor->createDefaultAxes();
+    // m_chartMotor->setTitle("Motor");
+    // m_chartMotor->legend()->hide();
 
-    auto ejesXMotorInit = m_chartMotor->axes(Qt::Horizontal);
-    auto ejesYMotorInit = m_chartMotor->axes(Qt::Vertical);
-    ejesXMotorInit.first()->setTitleText("Tiempo");
-    ejesYMotorInit.first()->setTitleText("Velocidad [m/s]");
+    // auto ejesXMotorInit = m_chartMotor->axes(Qt::Horizontal);
+    // auto ejesYMotorInit = m_chartMotor->axes(Qt::Vertical);
+    // ejesXMotorInit.first()->setTitleText("Tiempo");
+    // ejesYMotorInit.first()->setTitleText("Velocidad [m/s]");
 
-    m_chartViewMotor = new QChartView(m_chartMotor);
-    m_chartViewMotor->setRenderHint(QPainter::Antialiasing);
+    // m_chartViewMotor = new QChartView(m_chartMotor);
+    // m_chartViewMotor->setRenderHint(QPainter::Antialiasing);
 
-    QVBoxLayout *layoutMotor = new QVBoxLayout(ui->widgetGraficoMotor);
-    layoutMotor->addWidget(m_chartViewMotor);
-    ui->widgetGraficoMotor->setLayout(layoutMotor);
+    // QVBoxLayout *layoutMotor = new QVBoxLayout(ui->widgetGraficoMotor);
+    // layoutMotor->addWidget(m_chartViewMotor);
+    // ui->widgetGraficoMotor->setLayout(layoutMotor);
 
-    /*GRAFICO DEL SENSOR ULTRASÓNICO*/
-    m_serieUltra = new QLineSeries();
-    m_chartUltra = new QChart();
-    m_chartUltra->addSeries(m_serieUltra);
-    m_chartUltra->createDefaultAxes();
-    m_chartUltra->setTitle("Ultrasónicos");
+    // /*GRAFICO DEL SENSOR ULTRASÓNICO*/
+    // m_serieUltra = new QLineSeries();
+    // m_chartUltra = new QChart();
+    // m_chartUltra->addSeries(m_serieUltra);
+    // m_chartUltra->createDefaultAxes();
+    // m_chartUltra->setTitle("Ultrasónicos");
 
-    auto ejesXUltraInit = m_chartUltra->axes(Qt::Horizontal);
-    auto ejesYUltraInit = m_chartUltra->axes(Qt::Vertical);
-    ejesXUltraInit.first()->setTitleText("Tiempo");
-    ejesYUltraInit.first()->setTitleText("Distancia (mm)");
+    // auto ejesXUltraInit = m_chartUltra->axes(Qt::Horizontal);
+    // auto ejesYUltraInit = m_chartUltra->axes(Qt::Vertical);
+    // ejesXUltraInit.first()->setTitleText("Tiempo");
+    // ejesYUltraInit.first()->setTitleText("Distancia (mm)");
 
-    m_chartViewUltra = new QChartView(m_chartUltra);
-    m_chartViewUltra->setRenderHint(QPainter::Antialiasing);
+    // m_chartViewUltra = new QChartView(m_chartUltra);
+    // m_chartViewUltra->setRenderHint(QPainter::Antialiasing);
 
-    QVBoxLayout *layoutUltra = new QVBoxLayout(ui->widgetGraficoUltra);
-    layoutUltra->addWidget(m_chartViewUltra);
-    ui->widgetGraficoUltra->setLayout(layoutUltra);
+    // QVBoxLayout *layoutUltra = new QVBoxLayout(ui->widgetGraficoUltra);
+    // layoutUltra->addWidget(m_chartViewUltra);
+    // ui->widgetGraficoUltra->setLayout(layoutUltra);
 
     ui->label_estado->setText("Desconectado");
+
+
 }
 
 MainWindow::~MainWindow()
