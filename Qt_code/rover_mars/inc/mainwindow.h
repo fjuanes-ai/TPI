@@ -31,7 +31,12 @@ class MainWindow : public QMainWindow
         void alRecibirImagen(const QImage &imagen);
 
         /*Parte de controles*/
-        void comandoPorTeclado();
+        //void comandoPorTeclado();
+        // void SLOT_Serial_Comando_Avanzar();
+        // void SLOT_Serial_Comando_Retroceder();
+        // void SLOT_Serial_Comando_Derecha();
+        // void SLOT_Serial_Comando_Izquierda();
+        // void SLOT_Serial_Comando_Frenar();
 
     private:
         Ui::MainWindow *ui;
@@ -41,18 +46,9 @@ class MainWindow : public QMainWindow
         QPalette palette;
         QColor color;
 
-        /*PARA LOS GRAFICOS*/
-        QChart *m_chartAccel;
-        QLineSeries *m_serieAccel;
-        QChartView *m_chartViewAccel;
+        ControlRemoto *controlRemoto_Atajos;
 
-        QChart *m_chartUltra;
-        QLineSeries *m_serieUltra;
-        QChartView * m_chartViewUltra;
-
-        QChart *m_chartMotor;
-        QLineSeries *m_serieMotor;
-        QChartView * m_chartViewMotor;
+        // ### GRÁFICOS ###
         int m_tiempo; /*eje x: tiempo*/
 };
 

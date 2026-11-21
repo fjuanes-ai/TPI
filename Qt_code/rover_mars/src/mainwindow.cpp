@@ -4,11 +4,12 @@
 #include <QPixmap>
 #include <QDebug>
 
-MainWindow::MainWindow(QWidget *parent):
-    QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    m_conexion(new conexion(this)),
-    color(Qt::red)
+MainWindow::MainWindow( QWidget *parent ) :
+    QMainWindow( parent ),
+    ui( new Ui::MainWindow ),
+    m_conexion( new conexion(this) ),
+    color( Qt::red ),
+    controlRemoto_Atajos( new ControlRemoto(parent) )
 {
     ui->setupUi(this);
 
@@ -17,16 +18,44 @@ MainWindow::MainWindow(QWidget *parent):
 
     /*TEMA CAMARA Y FUNCIONES DEL .UI*/
     m_camara = new camara(this);
-    connect(m_camara, &camara::nuevoFrame, this, &MainWindow::alRecibirImagen);
-    connect(ui->pushButtonConectar, &QPushButton::clicked, this, &MainWindow::alHacerClickConectar);
-    connect(m_conexion, &conexion::lineaRecibida, this, &MainWindow::alRecibirDatos);
-    connect(m_conexion, &conexion::conectado, this, &MainWindow::alConectar);
-    connect(m_conexion, &conexion::desconectado, this, &MainWindow::alDesconectar);
-    connect(m_conexion, &conexion::errorSocket, this, &MainWindow::alFallarLaConexion);
+    connect(m_camara, &camara::nuevoFrame,
+            this, &MainWindow::alRecibirImagen);
+    connect(ui->pushButtonConectar, &QPushButton::clicked,
+            this, &MainWindow::alHacerClickConectar);
+    //connect(m_conexion, &conexion::lineaRecibida, this, &MainWindow::alRecibirDatos);
+    // Traducción datos a gráficos
+    connect( m_conexion, SIGNAL( datoRecibido() ),
+            this, SLOT( alRecibirDatos() ) );
+    connect( m_conexion, SIGNAL( conectado() ),
+            this, SLOT( alConectar() ) );
+    connect( m_conexion, SIGNAL( desconectado() ),
+            this, SLOT( alDesconectar() ) );
+    connect( m_conexion, SIGNAL( errorSocket() ),
+            this, SLOT( alFallarLaConexion() ) );
 
 
     /*PARTE DE CONTROLES*/
-    connect(ui->lineEdit_comandos, SIGNAL(textChanged(QString)), this, SLOT(comandoPorTeclado()));
+    connect( ui->lineEdit_comandos, SIGNAL(textChanged(QString)),
+             this, SLOT(comandoPorTeclado()) );
+
+    connect( controlRemoto_Atajos, SIGNAL(SIGNAL_Comando_Teclado( conexion::comandos_t )),
+             m_conexion, SLOT(enviarComando( conexion::comandos_t )) );
+
+    // connect( controlRemoto_Atajos, SIGNAL(SIGNAL_ComandoAvanzar( conexion::comandos_t )),
+    //          m_conexion, SLOT(SLOT_Serial_Comando_Avanzar( conexion::comandos_t )) );
+
+    // connect( controlRemoto_Atajos, SIGNAL(SIGNAL_ComandoRetroceder( conexion::comandos_t )),
+    //          m_conexion, SLOT(SLOT_Serial_Comando_Retroceso( conexion::comandos_t )) );
+
+    // connect( controlRemoto_Atajos, SIGNAL(SIGNAL_ComandoDerecha( conexion::comandos_t )),
+    //          m_conexion, SLOT(SLOT_Serial_Comando_Derecha( conexion::comandos_t )) );
+
+    // connect( controlRemoto_Atajos, SIGNAL(SIGNAL_ComandoIzquierda( conexion::comandos_t )),
+    //          m_conexion, SLOT(SLOT_Serial_Comando_Izquierda( conexion::comandos_t )) );
+
+    // connect( controlRemoto_Atajos, SIGNAL(SIGNAL_ComandoFrenado( conexion::comandos_t )),
+    //          m_conexion, SLOT(SLOT_Serial_Comando_Frenado( conexion::comandos_t )) );
+
 
     m_tiempo = 0;
 
@@ -114,57 +143,56 @@ void MainWindow::alHacerClickConectar()
     }
 }
 
-void MainWindow::alRecibirDatos(const QByteArray &linea)
-{
-    const int maxPuntos = 50;
+void MainWindow::alRecibirDatos( const QByteArray &linea ) {
+//     const int maxPuntos = 50;
 
-    if (m_sensores.parsear(linea))
-    {
-        /*LOS VALORES OBTENIDOS POR INTERFAZ*/
-        //ui->labelAccel->setText(QString("Acelerometro: %1").arg(m_sensores.accel()));
-        ui->label_ultrasonido_txt->setText(QString("Ultrasonico:  %1").arg(m_sensores.ultra()));
-        ui->label_motor_txt->setText(QString("Motor: %1").arg(m_sensores.motor()));
+//     if (m_sensores.parsear(linea))
+//     {
+//         /*LOS VALORES OBTENIDOS POR INTERFAZ*/
+//         //ui->labelAccel->setText(QString("Acelerometro: %1").arg(m_sensores.accel()));
+//         ui->label_ultrasonido_txt->setText(QString("Ultrasonico:  %1").arg(m_sensores.ultra()));
+//         ui->label_motor_txt->setText(QString("Motor: %1").arg(m_sensores.motor()));
 
-        /*PARA CADA GRAFICO*/
-        m_serieAccel->append(m_tiempo, m_sensores.accel());
-        m_serieUltra->append(m_tiempo, m_sensores.ultra());
+//         /*PARA CADA GRAFICO*/
+//         m_serieAccel->append(m_tiempo, m_sensores.accel());
+//         m_serieUltra->append(m_tiempo, m_sensores.ultra());
 
-        m_tiempo++;
+//         m_tiempo++;
 
-        if (m_serieAccel->count() > maxPuntos)
-        {
-            m_serieAccel->removePoints(0, m_serieAccel->count() - maxPuntos);
-            m_serieUltra->removePoints(0, m_serieUltra->count() - maxPuntos);
-        }
+//         if (m_serieAccel->count() > maxPuntos)
+//         {
+//             m_serieAccel->removePoints(0, m_serieAccel->count() - maxPuntos);
+//             m_serieUltra->removePoints(0, m_serieUltra->count() - maxPuntos);
+//         }
 
 
-        auto ejesXAccel = m_chartAccel->axes(Qt::Horizontal);
-        auto ejesYAccel = m_chartAccel->axes(Qt::Vertical);
+//         auto ejesXAccel = m_chartAccel->axes(Qt::Horizontal);
+//         auto ejesYAccel = m_chartAccel->axes(Qt::Vertical);
 
-        if (!ejesXAccel.isEmpty())
-            ejesXAccel.first()->setRange(m_tiempo - maxPuntos, m_tiempo);
+//         if (!ejesXAccel.isEmpty())
+//             ejesXAccel.first()->setRange(m_tiempo - maxPuntos, m_tiempo);
 
-        if (!ejesYAccel.isEmpty())
-            ejesYAccel.first()->setRange(0, 1023);   // Rango típico de un ADC de 10 bits.
+//         if (!ejesYAccel.isEmpty())
+//             ejesYAccel.first()->setRange(0, 1023);   // Rango típico de un ADC de 10 bits.
 
-        auto ejesXUltra = m_chartUltra->axes(Qt::Horizontal);
-        auto ejesYUltra = m_chartUltra->axes(Qt::Vertical);
+//         auto ejesXUltra = m_chartUltra->axes(Qt::Horizontal);
+//         auto ejesYUltra = m_chartUltra->axes(Qt::Vertical);
 
-        if (!ejesXUltra.isEmpty())
-            ejesXUltra.first()->setRange(m_tiempo - maxPuntos, m_tiempo);
+//         if (!ejesXUltra.isEmpty())
+//             ejesXUltra.first()->setRange(m_tiempo - maxPuntos, m_tiempo);
 
-        if (!ejesYUltra.isEmpty())
-            ejesYUltra.first()->setRange(US_MIN_DISTANCE, US_MAX_DISTANCE);   // Rango efectivo del HC-SR04 en mm.
+//         if (!ejesYUltra.isEmpty())
+//             ejesYUltra.first()->setRange(US_MIN_DISTANCE, US_MAX_DISTANCE);   // Rango efectivo del HC-SR04 en mm.
 
-        auto ejesXMot = m_chartMotor->axes(Qt::Horizontal);
-        auto ejesYMot = m_chartMotor->axes(Qt::Vertical);
+//         auto ejesXMot = m_chartMotor->axes(Qt::Horizontal);
+//         auto ejesYMot = m_chartMotor->axes(Qt::Vertical);
 
-        if (!ejesXMot.isEmpty())
-            ejesXMot.first()->setRange(m_tiempo - maxPuntos, m_tiempo);
+//         if (!ejesXMot.isEmpty())
+//             ejesXMot.first()->setRange(m_tiempo - maxPuntos, m_tiempo);
 
-        if (!ejesYMot.isEmpty())
-            ejesYMot.first()->setRange(0, 1023);   // Rango típico de un ADC de 10 bits.
-    }
+//         if (!ejesYMot.isEmpty())
+//             ejesYMot.first()->setRange(0, 1023);   // Rango típico de un ADC de 10 bits.
+//     }
 }
 
 void MainWindow::alConectar()
@@ -190,7 +218,7 @@ void MainWindow::alRecibirImagen(const QImage &imagen)
         ui->label_camara->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
-/*CONSTRUCTOR CONTROLES*/
+
 /* # Mapa de Controles #
  * Son iguales con las flechas.
  * 'W': Adelante.
@@ -199,31 +227,35 @@ void MainWindow::alRecibirImagen(const QImage &imagen)
  * 'D': Derecha.
  * ' ': Frenado (espacio).
  */
-void MainWindow::comandoPorTeclado() {
-    QString temp_string = ui->lineEdit_comandos->text();
-    uint8_t cursorIndex = ui->lineEdit_comandos->cursorPosition();
-    QChar temp_qchar = temp_string.at(cursorIndex - 1);
-    char temp_char = temp_qchar.unicode();
-    switch ( temp_char ) {
-        case 'w':
-            m_conexion->enviarComando('w');
-            break;
+// void MainWindow::comandoPorTeclado() {
+//     QString temp_string = ui->lineEdit_comandos->text();
+//     uint8_t cursorIndex = ui->lineEdit_comandos->cursorPosition();
+//     QChar temp_qchar = temp_string.at(cursorIndex - 1);
+//     char temp_char = temp_qchar.unicode();
+//     switch ( temp_char ) {
+//         case 'w':
+//             m_conexion->enviarComando('w');
+//             break;
 
-        case 'a':
-            m_conexion->enviarComando('a');
-            break;
+//         case 'a':
+//             m_conexion->enviarComando('a');
+//             break;
 
-        case 's':
-            m_conexion->enviarComando('s');
-            break;
+//         case 's':
+//             m_conexion->enviarComando('s');
+//             break;
 
-        case 'd':
-            m_conexion->enviarComando('d');
-            break;
+//         case 'd':
+//             m_conexion->enviarComando('d');
+//             break;
 
-        case ' ':
-            m_conexion->enviarComando(' '); // Frenado.
-            break;
-    }
-    ui->lineEdit_comandos->clear();
-}
+//         case ' ':
+//             m_conexion->enviarComando(' '); // Frenado.
+//             break;
+//     }
+//     ui->lineEdit_comandos->clear();
+// }
+
+
+
+

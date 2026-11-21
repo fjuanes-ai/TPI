@@ -3,6 +3,7 @@
 
 
 #include "qt_includes.h"
+#include "conexion.h"
 #include <QKeySequence>
 #include <QShortcut>
 
@@ -15,6 +16,7 @@ private:
     QShortcut *teclaRetroceder;
     QShortcut *teclaDerecha;
     QShortcut *teclaIzquierda;
+    QShortcut *teclaFrenar;
 
 
     // ## MÉTODOS ##
@@ -23,16 +25,19 @@ private slots:
     void SLOT_Retroceso();
     void SLOT_Derecha();
     void SLOT_Izquierda();
+    void SLOT_Frenado();
 
 signals:
-    void SIGNAL_ComandoAvanzar();
-    void SIGNAL_ComandoRetroceder();
-    void SIGNAL_ComandoDerecha();
-    void SIGNAL_ComandoIzquierda();
+    void SIGNAL_Comando_Teclado( conexion::comandos_t );
+    // void SIGNAL_ComandoAvanzar( conexion::comandos_t );
+    // void SIGNAL_ComandoRetroceder( conexion::comandos_t );
+    // void SIGNAL_ComandoDerecha( conexion::comandos_t );
+    // void SIGNAL_ComandoIzquierda( conexion::comandos_t );
+    // void SIGNAL_ComandoFrenado( conexion::comandos_t );
 
 
 public:
-    ControlRemoto();    // Constructor
+    ControlRemoto( QObject *parent );    // Constructor
 };
 
 #endif // CONTROLREMOTO_H

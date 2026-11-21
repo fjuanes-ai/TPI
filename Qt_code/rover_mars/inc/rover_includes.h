@@ -6,6 +6,7 @@
 #include "conexion.h"
 #include "sensores.h"
 #include "camara.h"
+#include "controlremoto.h"
 // IWYU pragma: end_exports
 
 

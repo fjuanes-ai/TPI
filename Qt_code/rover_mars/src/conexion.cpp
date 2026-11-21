@@ -1,5 +1,9 @@
 #include "conexion.h"
 
+#define TRAMA_TAMANIO 3
+
+
+
 conexion::conexion(QObject *parent): QObject(parent), m_socket(new QTcpSocket(this))
 {
     connect(m_socket, &QTcpSocket::readyRead, this, &conexion::onReadyRead);
@@ -8,13 +12,13 @@ conexion::conexion(QObject *parent): QObject(parent), m_socket(new QTcpSocket(th
     connect(m_socket, &QTcpSocket::errorOccurred, this, &conexion::onErrorOccurred);
 }
 
-void conexion::conectar(const QString &host, quint16 puerto)
+void conexion::conectar(const QString &host, uint32_t puerto)
 {
     if (m_socket->state() == QAbstractSocket::ConnectedState)
         return;
 
     m_buffer.clear();
-    m_socket->connectToHost(host, puerto);
+    m_socket->connectToHost( host, puerto );
 }
 
 void conexion::desconectar()
@@ -58,10 +62,41 @@ void conexion::onErrorOccurred(QAbstractSocket::SocketError socketError)
     emit errorSocket(m_socket->errorString());
 }
 
-void conexion::enviarComando(char comando)
-{
-    if (m_socket->state() == QAbstractSocket::ConnectedState)
-    {
-        m_socket->write(&comando, 1);
+
+/* # Mapa de Controles #
+ * Son iguales con las flechas.
+ * 'W': Adelante.
+ * 'A': Izquierda.
+ * 'S': Atrás.
+ * 'D': Derecha.
+ * ' ': Frenado (espacio).
+ */
+void conexion::enviarComando( comandos_t comando ) {
+    char trama[TRAMA_TAMANIO];
+
+
+    if ( m_socket->state() == QAbstractSocket::ConnectedState ) {
+
+        ArmarTrama( trama, TRAMA_TAMANIO, trama_t::INICIO_TRAMA, trama_t::FIN_TRAMA );
+
+        trama[1] = (char) comando;
+
+        m_socket->write( trama, TRAMA_TAMANIO );
     }
+}
+
+
+void conexion::ArmarTrama( char *arrayBytes, uint32_t nBytes, trama_t inicioDeTrama, trama_t finDeTrama ) {
+
+    if ( (!arrayBytes) || (nBytes == 0) ) {
+        return;
+    }
+
+    arrayBytes[0] = inicioDeTrama;
+    arrayBytes[nBytes - 1] = finDeTrama;
+}
+
+
+void datoRecibido(  ) {
+
 }

@@ -510,9 +510,9 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
-         <layout class="QGridLayout" name="gridLayout_2">
+         <layout class="QGridLayout" name="gridLayout_2" columnstretch="10,2">
           <item row="0" column="0">
-           <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,3,10">
+           <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,3,0,0">
             <item>
              <widget class="QLabel" name="label_camara_txt">
               <property name="font">
@@ -540,6 +540,16 @@
                </size>
               </property>
              </spacer>
+            </item>
+            <item>
+             <widget class="QWidget" name="widget" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>100</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="label_camara">
@@ -669,6 +679,9 @@
                <number>0</number>
               </property>
               <item>
+               <widget class="QGraphicsView" name="graphicsView"/>
+              </item>
+              <item>
                <widget class="QLabel" name="label_logo_01">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
@@ -784,13 +797,13 @@
             <item>
              <layout class="QVBoxLayout" name="verticalLayout">
               <item>
-               <widget class="QWidget" name="widgetGraficoMotor" native="true"/>
+               <widget class="QCustomPlot" name="widgetGraficoMotor" native="true"/>
               </item>
               <item>
-               <widget class="QWidget" name="widgetGraficoUltra" native="true"/>
+               <widget class="QCustomPlot" name="widgetGraficoUltra" native="true"/>
               </item>
               <item>
-               <widget class="QWidget" name="widgetGraficoAccel" native="true"/>
+               <widget class="QCustomPlot" name="widgetGraficoAccel" native="true"/>
               </item>
              </layout>
             </item>
@@ -844,6 +857,14 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
