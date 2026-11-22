@@ -8,6 +8,10 @@ sensores::sensores(): m_accel(0), m_ultra(0), m_motor(0)
 
 }
 
+/* Formato JSON de entrada:
+ * {"accel":<valor_a>,"ultra":<valor_u>,"motor":<valor_m>}\n
+ */
+
 bool sensores::parsear(const QByteArray &linea)
 {
     QString texto = QString::fromUtf8(linea).trimmed();

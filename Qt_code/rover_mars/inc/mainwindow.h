@@ -6,6 +6,9 @@
 #include "rover_includes.h"
 
 
+#define TAM_EJE             180
+#define UPDATE_TIME_MSEC    100
+
 QT_BEGIN_NAMESPACE namespace Ui
 {
     class MainWindow;
@@ -29,27 +32,34 @@ class MainWindow : public QMainWindow
         void alDesconectar();
         void alFallarLaConexion(const QString &mensaje);
         void alRecibirImagen(const QImage &imagen);
-
-        /*Parte de controles*/
-        //void comandoPorTeclado();
-        // void SLOT_Serial_Comando_Avanzar();
-        // void SLOT_Serial_Comando_Retroceder();
-        // void SLOT_Serial_Comando_Derecha();
-        // void SLOT_Serial_Comando_Izquierda();
-        // void SLOT_Serial_Comando_Frenar();
+        void plotData();
 
     private:
-        Ui::MainWindow *ui;
-        conexion *m_conexion;
-        sensores  m_sensores;
-        camara *m_camara;
-        QPalette palette;
-        QColor color;
+        void SetupCamera();
+        void SetupConection();
+        void SetupRemoteControl();
+        void SetupGraphics();
 
-        ControlRemoto *controlRemoto_Atajos;
+
+        Ui::MainWindow  *ui;
+
+        QTimer          timer_plot;
+        QElapsedTimer   timer;
+
+
+        // ### Periféricos ###
+        conexion        *m_conexion;
+        sensores        m_sensores;
+        camara          *m_camara;
+
+        ControlRemoto   *controlRemoto_Atajos;
 
         // ### GRÁFICOS ###
-        int m_tiempo; /*eje x: tiempo*/
+        QCPGraph        *graficoAcelerometro;
+        QCPGraph        *graficoMotor;
+        QCPGraph        *graficoUltrasonido;
+        // # Vector de datos #
+        QSharedPointer<QCPAxisTickerTime> timeTicker;
 };
 
 #endif // MAINWINDOW_H

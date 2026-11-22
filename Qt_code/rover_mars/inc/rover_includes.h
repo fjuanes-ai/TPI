@@ -7,6 +7,7 @@
 #include "sensores.h"
 #include "camara.h"
 #include "controlremoto.h"
+#include "qcustomplot.h"
 // IWYU pragma: end_exports
 
 
