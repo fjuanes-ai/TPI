@@ -1,79 +1,184 @@
-/*
- * GPIO.cpp
- *
- *  Created on: Apr 15, 2026
- *      Author: iyopolo
- */
-
 #include "Modulos/02-GPIO/GPIO.h"
 
+/***********************************************************************************************************************************
+ *** DEFINES PRIVADOS AL MODULO
+ **********************************************************************************************************************************/
 
-// La clase, al tener ctes, SIEMPRE hay que inicializarlas. Los 2 constructores chocan en ese sentido y por eso da error.
-//GPIO::GPIO() {
-//	// TODO Auto-generated constructor stub
-//
-//}
+/***********************************************************************************************************************************
+ *** MACROS PRIVADAS AL MODULO
+ **********************************************************************************************************************************/
 
-// # LISTA INICIALIZADORA #
-// Esa manera de poner los valroes entre paréntesis al lado de variables es para inicializar dichas variables constantes.
-GPIO::GPIO( uint8_t port, uint8_t pin, uint8_t direccion, uint8_t actividad ) :
-__port(port), __pin(pin), __direccion(direccion), __actividad(actividad)  {
-//	this->port = port;			// Si hay nombres redundantes, se puede usar "this->" para indicar las variables privadas.
+/***********************************************************************************************************************************
+ *** TIPOS DE DATOS PRIVADOS AL MODULO
+ **********************************************************************************************************************************/
 
-	// TODO: implementar "modo".
+/***********************************************************************************************************************************
+ *** TABLAS PRIVADAS AL MODULO
+ **********************************************************************************************************************************/
+const uint8_t IOCON_INDEX_PIO0[] = { 17,11,6,5,4,3,16,15,4,13,8,7,2,1,18,10,9,0,30,29,28,27,26,25,24,23,22,21,20,0,0,35};
+const uint8_t IOCON_INDEX_PIO1[] = { 36,37,3,41,42,43,46,49,31,32,55,54,33,34,39,40,44,45,47,48,52,53,0,0,0,0,0,0,0,50,51};
 
-	//SYSCON->SYSAHBCLKCTRL0 |= (SYSCON_SYSAHBCLKCTRL0_GPIO0_MASK << SYSCON_SYSAHBCLKCTRL0_GPIO0_SHIFT);			// No importa que siempre encendamos el CLOCK, con 1 vez alcanza y otras no afectan.
-	SYSCON->SYSAHBCLKCTRL0 |= (1 << 20) | (1 << 6);			// No importa que siempre encendamos el CLOCK, con 1 vez alcanza y otras no afectan.
+/***********************************************************************************************************************************
+ *** VARIABLES GLOBALES PUBLICAS
+ **********************************************************************************************************************************/
 
-	// bit 6:	Habilita los puertos de GPIO_0 (puerto 0).
-	// bit 20:	Habilita los puertos de GPIO_1 (puerto 1).
+/***********************************************************************************************************************************
+ *** VARIABLES GLOBALES PRIVADAS AL MODULO
+ **********************************************************************************************************************************/
 
-	switch ( __direccion ) {
-		case SALIDA:
-			GPIO_REG->DIR[__port] |= (1 << __pin);		// Por prolijidad, usamos las variables internas.
-		break;
+/***********************************************************************************************************************************
+ *** IMPLEMENTACION DE LOS METODODS DE LA CLASE
+ **********************************************************************************************************************************/
+Gpio::Gpio ( uint8_t port , uint8_t bit , uint8_t mode , uint8_t direction , uint8_t activity) :
+m_port ( port) , m_bit ( bit ) , m_modo ( mode ) , m_direccion ( direction ) , m_actividad ( activity )
+{
+	m_error = OK;
 
-		case ENTRADA:
-			GPIO_REG->DIR[__port] &= ~(1 << __pin);		// Lo negamos + AND para poner un 0 (entrada).
-		break;
+	if ( m_port > PORT1 )
+		m_error = ERROR;
+	if ( m_port == PORT0 && m_bit > B_PORT0 )
+		m_error = ERROR;
+	if ( m_port == PORT1 && m_bit > B_PORT1 )
+		m_error = ERROR;
+
+	if ( m_error == OK)
+	{
+
+		SYSCON->SYSAHBCLKCTRL0 |= (1 << 7);								// 7 = SWM
+		SYSCON->SYSAHBCLKCTRL0 |= (1 << 6) | (1 << 20) | (1 << 18);		// 6 = GPIO0	20 = GPIO1	18 = IOCON
+
+		if ( m_direccion == Gpio::OUTPUT )
+		{
+			SetPinModeOut ( );
+			SetDirOutputs ( );
+		}
+		else
+		{
+			SetDirInputs ( );
+			SetPinModeIn();
+		}
 	}
+
 }
 
-
-void GPIO::SetPin(void) const {	// No recibe nada porque al ser parte del objeto, ya tenemos las características.
-
-	GPIO_REG->B[__port][__pin] = ( __actividad == ALTO ) ? ON : OFF;
-}
-
-
-void GPIO::ClrPin(void) const {	// No recibe nada porque al ser parte del objeto, ya tenemos las características.
-
-	GPIO_REG->B[__port][__pin] = ( __actividad == ALTO ) ? OFF : ON;
-}
-
-
-bool GPIO::GetPin(void) const {	// No recibe nada porque al ser parte del objeto, ya tenemos las características.
-
-	return ( ( __actividad == ALTO )  ?  GPIO_REG->B[__port][__pin]  :  !(GPIO_REG->B[__port][__pin]) );
-}
-
-
-void GPIO::SetDir ( uint8_t direccion ) {
-
-	__direccion = direccion;
-
-	switch ( __direccion ) {
-		case SALIDA:
-			GPIO_REG->DIR[__port] |= (1 << __pin);
-		break;
-
-		case ENTRADA:
-			GPIO_REG->DIR[__port] &= ~(1 << __pin);
-		break;
+uint8_t Gpio::SetPin ( void )
+{
+	if ( m_error == OK )
+	{
+		if ( m_actividad == HIGH )
+			GPIO->B[ m_port ][m_bit]  = ON;
+		else
+			GPIO->B[ m_port ][m_bit]  = OFF;
 	}
+
+	return m_error;
 }
 
+uint8_t Gpio::ClrPin ( void )
+{
+	if ( m_error == OK )
+	{
+		if ( m_actividad == HIGH )
+			GPIO->CLR[ m_port ] = 1 << m_bit ;
+		else
+			GPIO->SET[ m_port ] = 1 << m_bit ;
+	}
+	return m_error;
+}
 
-GPIO::~GPIO() {
-	// TODO Auto-generated destructor stub
+uint8_t Gpio::SetTogglePin ( void )
+{
+	if ( m_error == OK )
+		GPIO->NOT[ m_port ] = 1 << m_bit ;
+
+	return m_error;
+}
+
+uint8_t Gpio::SetDirOutputs ( void )
+{
+	if ( m_error == OK )
+	{
+		m_direccion = OUTPUT ;
+		GPIO->DIRSET[ m_port ] = 1 << m_bit ;
+	}
+
+	return m_error ;
+}
+
+uint8_t Gpio::SetDirInputs ( void )
+{
+	if ( m_error == OK )
+	{
+		m_direccion = INPUT ;
+		GPIO->DIRCLR[ m_port ] = 1 << m_bit ;
+	}
+
+	return m_error ;
+}
+
+uint8_t Gpio::SetToggleDir ( void )
+{
+	if ( m_error == OK )
+		GPIO->DIRNOT[m_port] = ( 1 << m_bit );
+
+	return m_error;
+}
+
+uint8_t Gpio::GetPin ( void ) const
+{
+	uint8_t in;
+	in = GPIO->B[m_port][m_bit] ;
+	in = (m_actividad == HIGH ) ? in : !in;
+
+	if ( m_error == OK )
+		return in;
+	return m_error;
+}
+
+uint8_t Gpio::SetPinModeOut( void )
+{
+	return 1;
+}
+
+uint8_t Gpio::SetPinModeIn ( void )
+{
+	uint8_t Indice_PortPin ;
+
+	if ( m_error == OK )
+	{
+		Indice_PortPin = IOCON_INDEX_PIO0[m_bit];
+		if ( m_port )
+			Indice_PortPin = IOCON_INDEX_PIO1[m_bit];
+
+		IOCON->PIO[ Indice_PortPin ] = ~0x18;
+		IOCON->PIO[ Indice_PortPin ] = m_modo << 3;
+	}
+	return m_error;
+}
+
+Gpio & Gpio::operator=( bool estado )
+{
+	if ( estado == ON )
+		SetPin();
+	else
+		ClrPin();
+	return *this;
+}
+
+bool Gpio::operator== ( bool estado )
+{
+	if ( GetPin() == estado )
+		return true ;
+	return false;
+}
+
+bool Gpio::operator== ( Gpio & gpio )
+{
+	if ( GetPin() == gpio.GetPin() )
+		return true ;
+	return false;
+}
+Gpio::operator bool( )
+{
+	return GetPin();
 }
