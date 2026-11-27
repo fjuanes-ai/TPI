@@ -40,10 +40,12 @@ void conexion::conectar(const QString &host, uint32_t puerto)
 void conexion::timedOut() {
     QString temp_err = "Superó timeout conexión: ";
 
-    this->desconectar();
+    if ( !(m_socket->waitForConnected(1)) ) {
+        this->desconectar();
 
-    temp_err.append( QString::number( SOCKET_TIMEOUT_MS, 10 ) );
-    emit errorSocket( temp_err );
+        temp_err.append( QString::number( SOCKET_TIMEOUT_MS, 10 ) );
+        emit errorSocket( temp_err );
+    }
 }
 
 
