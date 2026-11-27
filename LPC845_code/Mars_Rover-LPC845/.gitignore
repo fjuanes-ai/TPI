@@ -1,5 +1,5 @@
-./*/.metadata/*
-./*/Debug/*
-./*/Release/*
-./*/.mcuxpressoide_packages_support/*
-./*/.settings/*
+./**/.metadata/**
+./**/Debug/**
+./**/Release/**
+./**/.mcuxpressoide_packages_support/**
+./**/.settings/**
