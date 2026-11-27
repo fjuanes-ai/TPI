@@ -3,8 +3,7 @@
  * ### TPO: Mars Rover - Grupo 6 ###
  * ## Informática II - R2002 - CL2026 ##
  *
- * @brief           Prueba de interrupciones externas. + Práctica de
- * 					timers en secuencia.
+ * @brief           TPO. Integración de módulos.
  *
  * @author          Francisco Juanes
  * 					Mateo Román
