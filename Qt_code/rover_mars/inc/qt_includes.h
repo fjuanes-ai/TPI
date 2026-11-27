@@ -7,10 +7,10 @@
 #include <QObject>
 #include <QtCharts>
 #include <QShortcut>
+#include <QByteArray>
 // #include <QNetworkAccessManager>
 // #include <QNetworkReply>
 // #include <QImage>
-#include <QByteArray>
 // #include <QKeySequence>
 // #include <QShortcut>
 // IWYU pragma: end_exports

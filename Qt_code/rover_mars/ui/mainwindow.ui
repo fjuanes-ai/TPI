@@ -508,7 +508,10 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
+      </property>
+      <property name="tabsClosable">
+       <bool>false</bool>
       </property>
       <widget class="QWidget" name="tab_cam">
        <attribute name="title">
@@ -696,9 +699,15 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_datos">
+      <widget class="QWidget" name="tab_graficos_acelerometro">
+       <property name="baseSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
        <attribute name="title">
-        <string>Datos</string>
+        <string>Gráfico - Acelerómetro</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_4">
         <item row="0" column="0">
@@ -724,7 +733,7 @@
              </font>
             </property>
             <property name="text">
-             <string>GRAFICOS</string>
+             <string>GRÁFICOS - ACELERÓMETRO</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -746,7 +755,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Motor</string>
+                 <string>X</string>
                 </property>
                </widget>
               </item>
@@ -758,7 +767,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Ultrasonido</string>
+                 <string>Y</string>
                 </property>
                </widget>
               </item>
@@ -770,7 +779,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Acelerómetro</string>
+                 <string>Z</string>
                 </property>
                </widget>
               </item>
@@ -779,13 +788,13 @@
             <item>
              <layout class="QVBoxLayout" name="verticalLayout">
               <item>
-               <widget class="QCustomPlot" name="widgetGraficoMotor" native="true"/>
+               <widget class="QCustomPlot" name="widgetGrafico_Acelerometro_X" native="true"/>
               </item>
               <item>
-               <widget class="QCustomPlot" name="widgetGraficoUltra" native="true"/>
+               <widget class="QCustomPlot" name="widgetGrafico_Acelerometro_Y" native="true"/>
               </item>
               <item>
-               <widget class="QCustomPlot" name="widgetGraficoAccel" native="true"/>
+               <widget class="QCustomPlot" name="widgetGrafico_Acelerometro_Z" native="true"/>
               </item>
              </layout>
             </item>
@@ -851,65 +860,43 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_mapa">
+      <widget class="QWidget" name="tab_graficos_ultrasonido">
        <attribute name="title">
-        <string>Mapa</string>
+        <string>Gráfico - Ultrasonido</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_8">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_7" stretch="10,1">
-          <property name="sizeConstraint">
-           <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
-          </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout_7">
           <item>
-           <widget class="QCustomPlot" name="widgetMapa" native="true"/>
+           <widget class="QLabel" name="label_graficos_txt_2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>1</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>GRÁFICO - ULTRASONIDO</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+           </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <item>
-             <widget class="QLabel" name="label_logo_03">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
-                <horstretch>16</horstretch>
-                <verstretch>9</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>16</width>
-                <height>9</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>202</width>
-                <height>74</height>
-               </size>
-              </property>
-              <property name="sizeIncrement">
-               <size>
-                <width>16</width>
-                <height>9</height>
-               </size>
-              </property>
-              <property name="baseSize">
-               <size>
-                <width>16</width>
-                <height>9</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/new/prefix1/media/logo_utn.jpg&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="scaledContents">
-               <bool>true</bool>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QCustomPlot" name="widgetGrafico_Ultrasonido" native="true"/>
           </item>
          </layout>
         </item>
@@ -925,10 +912,13 @@
   <customwidget>
    <class>QCustomPlot</class>
    <extends>QWidget</extends>
-   <header>qcustomplot.h</header>
+   <header location="global">qcustomplot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>pushButtonConectar</tabstop>
+ </tabstops>
  <resources>
   <include location="recursos.qrc"/>
  </resources>

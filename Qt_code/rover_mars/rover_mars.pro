@@ -10,8 +10,10 @@ INCLUDEPATH += inc/
 VPATH   += src/
 
 SOURCES += $$files(src/*.cpp)
+#           $$files(build/Desktop_Qt_6_11_1-Debug/*.cpp)
 
 HEADERS += $$files(inc/*.h)
+#           $$files(build/Desktop_Qt_6_11_1-Debug/*.h)
 
 FORMS   += $$files(ui/*.ui)
 
@@ -21,3 +23,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += $$files(ui/*.qrc)
+
+TARGET = marsRover.bin

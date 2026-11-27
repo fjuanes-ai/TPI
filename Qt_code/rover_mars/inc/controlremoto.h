@@ -2,10 +2,13 @@
 #define CONTROLREMOTO_H
 
 
+// IWYU pragma: begin_exports
 #include "qt_includes.h"
 #include "conexion.h"
 #include <QKeySequence>
 #include <QShortcut>
+// IWYU pragma: end_exports
+
 
 class ControlRemoto : public QObject {
     Q_OBJECT
@@ -20,7 +23,7 @@ private:
 
 
     // ## MÉTODOS ##
-private slots:
+public slots:
     void SLOT_Avance();
     void SLOT_Retroceso();
     void SLOT_Derecha();

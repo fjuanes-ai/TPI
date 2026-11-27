@@ -2,6 +2,7 @@
 
 camara::camara(QObject *parent): QObject(parent), m_manager(new QNetworkAccessManager(this)), m_reply(nullptr)
 {
+//    qDebug() << "# Cámara (clase) #";
 }
 
 void camara::iniciar(const QString &url)
@@ -12,8 +13,11 @@ void camara::iniciar(const QString &url)
     QNetworkRequest request{QUrl(url)};
     m_reply = m_manager->get(request);
 
-    connect(m_reply, &QNetworkReply::readyRead, this, &camara::onReadyRead);
-    connect(m_reply, &QNetworkReply::finished, this, &camara::onFinished);
+//    qDebug() << "Connect readyRead -> onReadyRead works:" <<
+        connect(m_reply, &QNetworkReply::readyRead, this, &camara::onReadyRead);
+
+//    qDebug() << "Connect finished -> onFinished works:" <<
+        connect(m_reply, &QNetworkReply::finished, this, &camara::onFinished);
 }
 
 void camara::detener()

@@ -2,10 +2,13 @@
 #define CAMARA_H
 
 
+// IWYU pragma: begin_exports
 #include "qt_includes.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QImage>
+// IWYU pragma: end_exports
+
 
 class camara : public QObject
 {
@@ -20,7 +23,7 @@ signals:
     void nuevoFrame(const QImage &imagen);
     void errorStream(const QString &mensaje);
 
-private slots:
+public slots:
     void onReadyRead();
     void onFinished();
 

@@ -2,6 +2,8 @@
 
 
 ControlRemoto::ControlRemoto( QObject *parent ) {
+//    qDebug() << "# ControlRemoto (clase) #";
+
     teclaAvanzar = new QShortcut(QKeySequence("W"), parent  );
     teclaRetroceder = new QShortcut(QKeySequence("S"), parent );
     teclaDerecha = new QShortcut(QKeySequence("D"), parent );
@@ -9,16 +11,25 @@ ControlRemoto::ControlRemoto( QObject *parent ) {
     teclaFrenar = new QShortcut(QKeySequence(" "), parent );
 
 
-    QObject::connect( teclaAvanzar, SIGNAL(activated()),
-             this, SLOT(SLOT_Avance()) );
-    QObject::connect( teclaRetroceder, SIGNAL(activated()),
-                     this, SLOT(SLOT_Retroceso()) );
-    QObject::connect( teclaDerecha, SIGNAL(activated()),
-                     this, SLOT(SLOT_Derecha()) );
-    QObject::connect( teclaIzquierda, SIGNAL(activated()),
-                     this, SLOT(SLOT_Izquierda()) );
-    QObject::connect( teclaFrenar, SIGNAL(activated()),
-                     this, SLOT(SLOT_Frenado()) );
+//    qDebug() << "Connect activated -> SLOT_Avance works:" <<
+        QObject::connect( teclaAvanzar, &QShortcut::activated,
+                      this, &ControlRemoto::SLOT_Avance );
+
+//    qDebug() << "Connect activated -> SLOT_Retroceso works:" <<
+        QObject::connect( teclaRetroceder, &QShortcut::activated,
+                         this, &ControlRemoto::SLOT_Retroceso );
+
+//    qDebug() << "Connect activated -> SLOT_Derecha works:" <<
+        QObject::connect( teclaDerecha, &QShortcut::activated,
+                         this, &ControlRemoto::SLOT_Derecha );
+
+//    qDebug() << "Connect activated -> SLOT_Izquierda works:" <<
+        QObject::connect( teclaIzquierda, &QShortcut::activated,
+                         this, &ControlRemoto::SLOT_Izquierda );
+
+//    qDebug() << "Connect activated -> SLOT_Frenado works:" <<
+        QObject::connect( teclaFrenar, &QShortcut::activated,
+                         this, &ControlRemoto::SLOT_Frenado );
 }
 
 

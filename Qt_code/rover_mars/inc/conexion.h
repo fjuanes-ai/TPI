@@ -2,9 +2,12 @@
 #define CONEXION_H
 
 
+// IWYU pragma: begin_exports
 #include "qt_includes.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+// IWYU pragma: end_exports
+
 
 class conexion : public QObject {
     Q_OBJECT
@@ -50,25 +53,19 @@ class conexion : public QObject {
 
     signals:
         void lineaRecibida(const QByteArray &linea);   /*una línea completa (json) lista para parsear*/
-        void datoRecibido(  );
+        //void datoRecibido();
         void conectado();
         void desconectado();
         void errorSocket(const QString &mensaje);
 
 
-    private slots:
+    public slots:
+        void timedOut();
         void onReadyRead();
         void onConnected();
         void onDisconnected();
-        void onErrorOccurred(QAbstractSocket::SocketError socketError);
-
+        void onErrorOccurred( QAbstractSocket::SocketError socketError );
         void enviarComando( comandos_t comando ); /*para CONTROLES*/
-
-        // void SLOT_Serial_Comando_Avanzar( conexion::comandos_t );
-        // void SLOT_Serial_Comando_Retroceder( conexion::comandos_t );
-        // void SLOT_Serial_Comando_Derecha( conexion::comandos_t );
-        // void SLOT_Serial_Comando_Izquierda( conexion::comandos_t );
-        // void SLOT_Serial_Comando_Frenar( conexion::comandos_t );
 
     private:
         QTcpSocket *m_socket;

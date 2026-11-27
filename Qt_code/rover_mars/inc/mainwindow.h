@@ -2,8 +2,10 @@
 #define MAINWINDOW_H
 
 
+// IWYU pragma: begin_exports
 #include "qt_includes.h"
 #include "rover_includes.h"
+// IWYU pragma: end_exports
 
 
 #define TAM_EJE             180
@@ -25,7 +27,7 @@ class MainWindow : public QMainWindow
         explicit MainWindow(QWidget *parent = nullptr);
         ~MainWindow() override;
 
-    private slots:
+    public slots:
         void alHacerClickConectar();
         void alRecibirDatos(const QByteArray &linea);
         void alConectar();
@@ -44,7 +46,7 @@ class MainWindow : public QMainWindow
         Ui::MainWindow  *ui;
 
         QTimer          timer_plot;
-        QElapsedTimer   timer;
+        QElapsedTimer   timer_elapsed_program;
 
 
         // ### Periféricos ###
@@ -55,9 +57,15 @@ class MainWindow : public QMainWindow
         ControlRemoto   *controlRemoto_Atajos;
 
         // ### GRÁFICOS ###
-        QCPGraph        *graficoAcelerometro;
-        QCPGraph        *graficoMotor;
+        QCPGraph        **graficosAcelerometro;
+        typedef enum axis_e {
+            X_AXIS = 0,
+            Y_AXIS,
+            Z_AXIS,
+            N_AXIS = 3
+        } axis_t;
         QCPGraph        *graficoUltrasonido;
+
         // # Vector de datos #
         QSharedPointer<QCPAxisTickerTime> timeTicker;
 };

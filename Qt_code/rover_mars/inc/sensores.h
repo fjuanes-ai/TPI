@@ -11,18 +11,25 @@
 class sensores
 {
     public:
+        typedef enum partes_json_e {
+            PARTES = 4
+        } partes_json_t;
+
+
         sensores();
 
         bool parsear(const QByteArray &linea);   // intenta interpretar una línea json; devuelve true si tuvo éxito
 
-        int accel() const;
-        int ultra() const;
-        int motor() const;
+        int acelerometro_x() const;
+        int acelerometro_y() const;
+        int acelerometro_z() const;
+        int ultrasonido() const;
 
     private:
-        int m_accel;
-        int m_ultra;
-        int m_motor;
+        int m_acelerometro_x;
+        int m_acelerometro_y;
+        int m_acelerometro_z;
+        int m_ultrasonido;
 };
 
 #endif // SENSORES_H
