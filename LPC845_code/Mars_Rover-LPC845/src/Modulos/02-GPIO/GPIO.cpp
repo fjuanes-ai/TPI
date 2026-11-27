@@ -77,4 +77,3 @@ void GPIO::SetDir ( uint8_t direccion ) {
 GPIO::~GPIO() {
 	// TODO Auto-generated destructor stub
 }
-

@@ -1,0 +1,3 @@
+../src/Modulos/swm/swm.cpp:42:6:void SwitchMatrix_EnableDisable(bool)	16	static
+../src/Modulos/swm/swm.cpp:50:6:void PINASSIGN_Config(uint8_t, uint8_t, uint8_t)	24	static
+../src/Modulos/swm/swm.cpp:63:6:void PINENABLE_Config(uint8_t, uint8_t)	16	static
