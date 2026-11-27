@@ -1,58 +1,70 @@
-/*
- * GPIO.h
- *
- *  Created on: Apr 15, 2026
- *      Author: iyopolo
- */
+#ifndef GPIO_H_
+#define GPIO_H_
+
+/***********************************************************************************************************************************
+ *** INCLUDES GLOBALES
+ **********************************************************************************************************************************/
+#include "Drivers/LPC845.h"
+#include "Modulos/01-In_Out/in.h"
+#include "Modulos/01-In_Out/out.h"
+
+/***********************************************************************************************************************************
+ *** DEFINES GLOBALES
+ **********************************************************************************************************************************/
+
+/***********************************************************************************************************************************
+ *** MACROS GLOBALES
+ **********************************************************************************************************************************/
+
+/***********************************************************************************************************************************
+ *** TIPO DE DATOS GLOBALES
+ **********************************************************************************************************************************/
+
+/***********************************************************************************************************************************
+ *** VARIABLES GLOBALES
+ **********************************************************************************************************************************/
+
+/***********************************************************************************************************************************
+ *** IMPLANTACION DE LA CLASE
+ **********************************************************************************************************************************/
+class Gpio : public Outputs ,  public Inputs
+{
+	protected:
+		const 	uint8_t m_port ;
+		const 	uint8_t m_bit ;
+		const 	uint8_t m_modo ;
+				uint8_t m_direccion ;
+		const 	uint8_t m_actividad ;
+				int8_t  m_error ;
+	public:
+		enum port_t			{ PORT0 , PORT1 };
+		enum max_bits_port_t{ B_PORT0 = 31 , B_PORT1 = 31 };
+		enum direction_t	{ INPUT , OUTPUT };
+		enum power_t		{ OFF , ON };
+		enum mode_output_t 	{ PUSHPULL , OPENCOLECTOR }; // el orden esta atado a las hojas de datos
+		enum mode_input_t 	{ INACTIVE , PULLDOWN , PULLUP , REPEATER };
+		enum activity_t		{ LOW ,	HIGH };
+		enum error_t		{ ERROR = 2 , OK };
+
+		Gpio ( uint8_t port , uint8_t bit , uint8_t mode , uint8_t activity , uint8_t direction );
+
+		uint8_t SetPin ( void );
+		uint8_t ClrPin ( void );
+		uint8_t SetTogglePin ( void ) ;
+		uint8_t SetDirInputs ( void )  ;
+		uint8_t SetDirOutputs ( void )  ;
+		uint8_t SetToggleDir ( void ) ;
+		uint8_t GetPin ( void ) const ;
+		uint8_t SetPinModeOut ( void )  ;
+		uint8_t SetPinModeIn ( void ) ;
+		Gpio& operator=( bool estado );
+		bool operator== ( bool estado );
+		bool operator== ( Gpio& );
+
+		explicit operator bool( ) ;
+
+		~Gpio (){};
+};
 
 
-#ifndef MODULOS_02_GPIO_GPIO_H_
-	#define MODULOS_02_GPIO_GPIO_H_
-
-	#include "Drivers/LPC845.h"
-	#include "Modulos/01-In_Out/in.h"
-	#include "Modulos/01-In_Out/out.h"
-
-
-	class GPIO : public IN, OUT {
-		private:
-			const uint8_t	__port;
-			const uint8_t	__pin;
-			uint8_t			__direccion;
-			const uint8_t	__actividad;
-
-		public:
-			enum actividad_e {
-				BAJO = 0,
-				ALTO = 1
-			};
-
-			enum estado_e {
-				OFF = 0,
-				ON = 1
-			};
-
-			enum direccion_e {
-				ENTRADA = 0,
-				SALIDA = 1
-			};
-
-			enum puertos_e {
-				PORT0 = 0,
-				PORT1 = 1
-			};
-
-
-//			GPIO();				// CONSTRUCTOR (prototipo).
-			GPIO( uint8_t port, uint8_t pin, uint8_t direccion, uint8_t actividad = ALTO );		// CONSTRUCTOR (prototipo).																					// SOLO en su prototipo se ponen los parámetros defaults.
-
-			void SetPin () const;	// Son ctes ya que no cambian objetos dentro de la clase.
-			void ClrPin () const;
-			bool GetPin () const;
-			void SetDir ( uint8_t direccion );
-
-			virtual ~GPIO();	// DESTRUCTOR (prototipo).
-
-	};
-
-#endif /* MODULOS_02_GPIO_GPIO_H_ */
+#endif /* GPIO_H_ */
