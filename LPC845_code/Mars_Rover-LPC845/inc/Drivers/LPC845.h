@@ -981,7 +981,7 @@ typedef struct {
   __O  uint32_t DIRNOT[2];
 } GPIO_Type;
 
-#define	 GPIO_REG  		( (GPIO_Type *) 0xA0000000UL )
+#define	 GPIO  		( (GPIO_Type *) 0xA0000000UL )
 
 //CSTimer
 struct SCT_Type {
@@ -1032,6 +1032,41 @@ struct SCT_Type {
 
 // Definición de la macro casteada a la dirección base
 #define LPC_SCT ((SCT_Type *) 0x50004000U)
+
+
+
+/*****************
+ ******I2C*******
+******************/
+
+struct I2C_Type{
+	__IO uint32_t CFG;
+	__IO uint32_t STAT;
+	__IO uint32_t INTENSET;
+	__O uint32_t INTENCLR;
+	__IO uint32_t TIMEOUT;
+	__IO uint32_t CLKDIV;
+	__I uint32_t INTSTAT;
+	uint32_t RESERVED0;
+	__IO uint32_t MSTCTL;
+	__IO uint32_t MSTTIME;
+	__IO uint32_t MSTDAT;
+	 uint32_t RESERVED1[5];
+	__IO uint32_t SLVCTL;
+	__IO uint32_t SLVDAT;
+	__IO uint32_t SLVADR[4];
+	__IO uint32_t SLVQUAL0;
+	uint32_t RESERVED2[9];
+	__I uint32_t MONRXDAT;
+};
+#define LPC_I2C0 ((I2C_Type *)0x40050000U)
+#define LPC_I2C1 ((I2C_Type *)0x40054000U)
+#define LPC_I2C2 ((I2C_Type *)0x40058000U)
+#define LPC_I2C3 ((I2C_Type *)0x4005C000U)
+
+#ifndef LPC_I2C
+#define LPC_I2C LPC_I2C0
+#endif
 
 /**
   \brief  Structure type to access the System Timer (SysTick).
