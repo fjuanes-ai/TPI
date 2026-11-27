@@ -1,5 +1,5 @@
 ./**/.metadata/**
 ./**/Debug/**
 ./**/Release/**
-./**/.mcuxpressoide_packages_support/**
+./**/LPC845_code/.mcuxpressoide_packages_support/**
 ./**/.settings/**
